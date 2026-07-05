@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.xai_http stub â€” sadece env var ile Ã§alÄ±ÅŸÄ±r."""
+"""ReYMeN tools.xai_http stub â€” sadece env var ile çalÄ±ÅŸÄ±r."""
 
 import json
 import os

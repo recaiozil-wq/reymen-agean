@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 db_backup.py â€” ReYMeN Veritabani Yedekleme Sistemi
 

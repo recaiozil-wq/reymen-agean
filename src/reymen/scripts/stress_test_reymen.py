@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ReYMeN Stress Test â€” 3000 sorgu hedefli batch test + rapor"""
 
 import sys, os, json, time, random
@@ -69,7 +69,7 @@ SORULAR = [
     # D) Karma
     "tesekkur ederim",
     "sagol",
-    "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z",
+    "görüÅŸürüz",
     "eyvallah",
     "bana yardim et",
     "bilgisayar nedir",

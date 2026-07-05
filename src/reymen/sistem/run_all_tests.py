@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """run_all_tests.py â€” Tum Reymen testlerini topluca calistirir."""
 
 import sys, os, time, traceback

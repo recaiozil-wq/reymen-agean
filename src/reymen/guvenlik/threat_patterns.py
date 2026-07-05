@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """threat_patterns.py â€” Prompt Injection Tespiti.
 
 Kullanici girdisinde ve LLM ciktisinda prompt injection,

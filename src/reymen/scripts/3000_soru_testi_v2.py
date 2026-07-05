@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 3000 Soru ReYMeN Testi - Optimize Edilmis Surum
 reymen_agent._deepseek_sohbet() kullanir, her soru ayri API cagrisi.

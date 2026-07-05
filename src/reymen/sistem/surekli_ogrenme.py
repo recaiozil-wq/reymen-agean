@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-surekli_ogrenme.py â€” Session''lar arasÄ± sÃ¼rekli Ã¶ÄŸrenme (Continuous Learning).
+surekli_ogrenme.py â€” Session''lar arasÄ± sürekli öÄŸrenme (Continuous Learning).
 """
 
 from __future__ import annotations

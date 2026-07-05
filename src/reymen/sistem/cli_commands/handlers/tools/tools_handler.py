@@ -1,4 +1,4 @@
-﻿"""_handle_tools_command handler."""
+"""_handle_tools_command handler."""
 
 
 def _handle_tools_command(cli, cmd: str):

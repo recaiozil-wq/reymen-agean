@@ -1,4 +1,4 @@
-﻿"""ReYMeN shared debug session â€” BaÄŸÄ±msÄ±z ReYMeN sÃ¼rÃ¼mÃ¼."""
+"""ReYMeN shared debug session â€” BaÄŸÄ±msÄ±z ReYMeN sürümü."""
 
 import datetime
 import json

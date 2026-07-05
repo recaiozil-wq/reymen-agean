@@ -1,12 +1,12 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 cron_skill_sync.py â€” Skills â†’ OnceHafiza DB senkronizasyonu.
-Her 6 saatte bir Ã§alÄ±ÅŸÄ±r.
+Her 6 saatte bir çalÄ±ÅŸÄ±r.
 
-- skills/ altÄ±ndaki tÃ¼m .md dosyalarÄ±nÄ± tara
+- skills/ altÄ±ndaki tüm .md dosyalarÄ±nÄ± tara
 - skills_index.db (FTS5) + beceriler_meta tablosuyla karÅŸÄ±laÅŸtÄ±r
-- Eksikleri ekle, deÄŸiÅŸenleri gÃ¼ncelle
-- Rapor: kaÃ§ yeni, kaÃ§ gÃ¼ncellendi
+- Eksikleri ekle, deÄŸiÅŸenleri güncelle
+- Rapor: kaç yeni, kaç güncellendi
 """
 
 import hashlib
@@ -103,7 +103,7 @@ def log_kaydet(yeni: int, guncellenen: int, hata: int, detay: str):
 | Metrik | DeÄŸer |
 |--------|-------|
 | ğŸ†• Yeni | {yeni} |
-| ğŸ”„ GÃ¼ncellenen | {guncellenen} |
+| ğŸ”„ Güncellenen | {guncellenen} |
 | âŒ Hata | {hata} |
 
 {detay}
@@ -128,7 +128,7 @@ def main() -> dict:
     logger.info("Toplam .md dosyasÄ±: %d", len(dosyalar))
 
     if not dosyalar:
-        logger.warning("HiÃ§ .md dosyasÄ± bulunamadÄ±!")
+        logger.warning("Hiç .md dosyasÄ± bulunamadÄ±!")
         return {"yeni": 0, "guncellenen": 0, "hata": 0, "toplam": 0}
 
     con = db_baglan()
@@ -155,7 +155,7 @@ def main() -> dict:
                 (ad, dosya["aciklama"], dosya["icerik"], dosya["kaynak"]),
             )
 
-            # Meta gÃ¼ncelle
+            # Meta güncelle
             con.execute(
                 "INSERT OR REPLACE INTO beceriler_meta (ad, dosya_hash, guncelleme) VALUES (?, ?, datetime('now'))",
                 (ad, dosya["dosya_hash"]),
@@ -176,18 +176,18 @@ def main() -> dict:
     sure = time.time() - basla
 
     ozet = (
-        f"- **Ä°ÅŸlem sÃ¼resi:** {sure:.1f}s\n"
+        f"- **Ä°ÅŸlem süresi:** {sure:.1f}s\n"
         f"- **Toplam dosya:** {len(dosyalar)}\n"
-        f"- **Meta kayÄ±t (Ã¶ncesi):** {len(meta)}\n"
-        f"- **FTS5 kayÄ±t (Ã¶ncesi):** {len(fts5_ads)}\n"
+        f"- **Meta kayÄ±t (öncesi):** {len(meta)}\n"
+        f"- **FTS5 kayÄ±t (öncesi):** {len(fts5_ads)}\n"
         f"- **Yeni eklenen:** {yeni_say}\n"
-        f"- **GÃ¼ncellenen:** {guncel_say}\n"
+        f"- **Güncellenen:** {guncel_say}\n"
         f"- **Hata:** {hata_say}\n"
     )
     log_kaydet(yeni_say, guncel_say, hata_say, ozet)
 
     logger.info(
-        "=== TamamlandÄ±: +%d yeni, ~%d gÃ¼ncel, %d hata (%.1fs) ===",
+        "=== TamamlandÄ±: +%d yeni, ~%d güncel, %d hata (%.1fs) ===",
         yeni_say,
         guncel_say,
         hata_say,
@@ -206,6 +206,6 @@ def main() -> dict:
 if __name__ == "__main__":
     sonuc = main()
     print(
-        f"\nğŸ“Š RAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} gÃ¼ncellendi "
+        f"\nğŸ“Š RAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} güncellendi "
         f"({sonuc['hata']} hata) â€” {sonuc['sure']}s"
     )

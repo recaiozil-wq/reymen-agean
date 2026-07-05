@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.schema_sanitizer shim â€” ReYMeN schema sanitizer'Ä±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.schema_sanitizer shim â€” ReYMeN schema sanitizer'Ä±nÄ± yönlendirir."""
 
 from __future__ import annotations
 
@@ -9,5 +9,5 @@ logger = logging.getLogger(__name__)
 
 
 def sanitize_tool_schemas(schemas: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """ReYMeN sanitize_tool_schemas â€” ReYMeN'de olduÄŸu gibi geÃ§ir."""
+    """ReYMeN sanitize_tool_schemas â€” ReYMeN'de olduÄŸu gibi geçir."""
     return schemas

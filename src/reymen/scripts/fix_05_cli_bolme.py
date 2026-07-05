@@ -1,7 +1,7 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
-FIX 05 â€” cli.py BÃ¶lme PlanÄ±
-Yapar : cli.py'deki bloklarÄ± analiz eder, Claude Code task dosyasÄ± Ã¼retir
+FIX 05 â€” cli.py Bölme PlanÄ±
+Yapar : cli.py'deki bloklarÄ± analiz eder, Claude Code task dosyasÄ± üretir
 Rapor : claude_code_task_cli_bolme.md + fix_05_rapor.json
 """
 
@@ -40,7 +40,7 @@ def hdr(t):
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 05 â€” cli.py BÃ¶lme PlanÄ±\nKÃ¶k: {kok}")
+    hdr(f"FIX 05 â€” cli.py Bölme PlanÄ±\nKök: {kok}")
     t0 = time.time()
     rapor = {"tarih": datetime.now().isoformat(), "kok": str(kok)}
 
@@ -96,10 +96,10 @@ def main():
         )
 
     # Claude Code task dosyasÄ±
-    task = f"""# Claude Code Task: cli.py BÃ¶lme (15,762 â†’ 7 ModÃ¼l)
+    task = f"""# Claude Code Task: cli.py Bölme (15,762 â†’ 7 Modül)
 
 ## Hedef
-`reymen/sistem/cli.py` dosyasÄ±nÄ± ({n} satÄ±r) 7 ayrÄ± modÃ¼le bÃ¶l.
+`reymen/sistem/cli.py` dosyasÄ±nÄ± ({n} satÄ±r) 7 ayrÄ± modüle böl.
 Her blok ayrÄ± .py dosyasÄ±, `cli_main.py` sadece dispatch.
 
 ## Bloklar
@@ -115,7 +115,7 @@ Fonksiyonlar: {', '.join(b['fonksiyonlar'][:10])}
     task += f"""
 ## KÄ±sÄ±tlar
 - `cli_main.py` (dispatch) mevcut API'yi koru: `run()`, `main()`, `AIAgent()`
-- Her modÃ¼l kendi `import`'larÄ±nÄ± iÃ§ersin
+- Her modül kendi `import`'larÄ±nÄ± içersin
 - `from reymen.sistem.cli_X import ...` formatÄ±
 - Her adÄ±mda `ast.parse` ile doÄŸrula (syntax hatasÄ± olmasÄ±n)
 - SÄ±ra: helpers â†’ display â†’ commands â†’ stream â†’ voice â†’ maintenance â†’ auth â†’ cli_main

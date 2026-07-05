@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-reymen_agent.py â€” ReYMeN ana agent modÃ¼lÃ¼.
+reymen_agent.py â€” ReYMeN ana agent modülü.
 DeepSoek API, agent orchestrator, beceri baÄŸlamÄ± ve format temizleme.
 """
 
@@ -32,7 +32,7 @@ MAX_MESAJ_UZUNLUK = 500
 
 
 def _get_logger(name: str = "reymen_agent") -> logging.Logger:
-    """Singleton logger oluÅŸturur/dÃ¶ndÃ¼rÃ¼r."""
+    """Singleton logger oluÅŸturur/döndürür."""
     global _logger
     if _logger is None:
         _logger = logging.getLogger(name)
@@ -53,7 +53,7 @@ def _get_logger(name: str = "reymen_agent") -> logging.Logger:
 
 
 def _agent_instance(config: Optional[dict] = None) -> Any:
-    """Agent singleton â€” AIAgentOrchestrator instance'Ä± dÃ¶ndÃ¼rÃ¼r."""
+    """Agent singleton â€” AIAgentOrchestrator instance'Ä± döndürür."""
     global _agent
     if _agent is not None:
         return _agent
@@ -73,7 +73,7 @@ def _agent_instance(config: Optional[dict] = None) -> Any:
 
 
 def _beceri_baglami_al(hedef: str) -> str:
-    """closed_learning_loop._beceri_ara Ã¼zerinden beceri baÄŸlamÄ± alÄ±r."""
+    """closed_learning_loop._beceri_ara üzerinden beceri baÄŸlamÄ± alÄ±r."""
     try:
         from closed_learning_loop import _beceri_ara
 
@@ -82,7 +82,7 @@ def _beceri_baglami_al(hedef: str) -> str:
 
         sonuc = _beceri_ara(sorgu)
 
-        # Beceri bulunamadi / toplam kontrolÃ¼
+        # Beceri bulunamadi / toplam kontrolü
         if not sonuc or "beceri bulunamadi" in sonuc.lower():
             return ""
         if "toplam" in sonuc.lower():
@@ -103,16 +103,16 @@ def _beceri_baglami_al(hedef: str) -> str:
 
 
 def _deepseek_sohbet(messages: Any, config: Optional[dict] = None) -> str:
-    """DeepSeek API'ye sohbet isteÄŸi gÃ¶nderir."""
+    """DeepSeek API'ye sohbet isteÄŸi gönderir."""
     logger = _get_logger()
 
-    # API anahtarÄ± kontrolÃ¼
+    # API anahtarÄ± kontrolü
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
         logger.warning("DeepSeek API anahtarÄ± bulunamadÄ±")
         return "API anahtarÄ± bulunamadÄ±"
 
-    # MesajÄ± string'den listeye Ã§evir
+    # MesajÄ± string'den listeye çevir
     if isinstance(messages, str):
         user_message = messages
     elif isinstance(messages, list):
@@ -152,7 +152,7 @@ def _deepseek_sohbet(messages: Any, config: Optional[dict] = None) -> str:
     }
 
     try:
-        logger.info("DeepSeek API Ã§aÄŸrÄ±sÄ± yapÄ±lÄ±yor...")
+        logger.info("DeepSeek API çaÄŸrÄ±sÄ± yapÄ±lÄ±yor...")
         resp = requests.post(
             DEEPSEEK_API_URL, headers=headers, json=payload, timeout=60
         )
@@ -172,7 +172,7 @@ def _deepseek_sohbet(messages: Any, config: Optional[dict] = None) -> str:
 
 
 def _agent_loop(hedef: str, config: Optional[dict] = None) -> str:
-    """Agent loop â€” orchestrator Ã¼zerinden konuÅŸma Ã§alÄ±ÅŸtÄ±rÄ±r."""
+    """Agent loop â€” orchestrator üzerinden konuÅŸma çalÄ±ÅŸtÄ±rÄ±r."""
     logger = _get_logger()
     logger.info(f"Agent loop baÅŸlatÄ±lÄ±yor: {hedef[:50]}...")
 
@@ -182,7 +182,7 @@ def _agent_loop(hedef: str, config: Optional[dict] = None) -> str:
             logger.warning("Agent yok, fallback kullanÄ±lÄ±yor")
             return _deepseek_fallback(hedef)
 
-        # Agent ile konuÅŸmayÄ± Ã§alÄ±ÅŸtÄ±r
+        # Agent ile konuÅŸmayÄ± çalÄ±ÅŸtÄ±r
         agent.run_conversation(hedef)
 
         # YanÄ±tÄ± conversation_history'den al
@@ -218,13 +218,13 @@ def _agent_loop(hedef: str, config: Optional[dict] = None) -> str:
 
 
 def _yanit_ayikla(raw: str) -> str:
-    """Ham Ã§Ä±ktÄ±dan yanÄ±t metnini ayÄ±klar."""
+    """Ham çÄ±ktÄ±dan yanÄ±t metnini ayÄ±klar."""
     if not raw:
         return ""
 
     satirlar = raw.split("\n")
 
-    # MarkÃ¶r Ã¶ncelik sÄ±rasÄ± (en yÃ¼ksek â†’ dÃ¼ÅŸÃ¼k)
+    # Markör öncelik sÄ±rasÄ± (en yüksek â†’ düÅŸük)
     markorler = [
         ("[TAMAMLANDI]", 3),
         ("[SONUC]", 2),
@@ -238,7 +238,7 @@ def _yanit_ayikla(raw: str) -> str:
                 if len(icerik) >= 3:
                     return icerik
 
-    # MarkÃ¶r bulunamadÄ± â€” son 5 satÄ±rdan en uzun iÃ§erikli satÄ±r
+    # Markör bulunamadÄ± â€” son 5 satÄ±rdan en uzun içerikli satÄ±r
     son_satirlar = satirlar[-5:]
 
     # Filtrele: kÄ±sa/kalÄ±p satÄ±rlarÄ± atla
@@ -251,7 +251,7 @@ def _yanit_ayikla(raw: str) -> str:
             continue
         if satir_stripped == "===":
             continue
-        if "[Budget]" in satir_stripped or "[BÃ¼tÃ§e]" in satir_stripped:
+        if "[Budget]" in satir_stripped or "[Bütçe]" in satir_stripped:
             continue
         if "--- TUR" in satir_stripped:
             continue
@@ -261,7 +261,7 @@ def _yanit_ayikla(raw: str) -> str:
         # Hepsi filtrelendiyse son satÄ±rÄ± al
         return son_satirlar[-1].strip() if son_satirlar else ""
 
-    # En uzun iÃ§erikli satÄ±rÄ± seÃ§
+    # En uzun içerikli satÄ±rÄ± seç
     return max(filtrelenmis, key=len)
 
 
@@ -273,7 +273,7 @@ def _yanit_ayikla(raw: str) -> str:
 def _deepseek_fallback(
     error: str, messages: Any = None, config: Optional[dict] = None
 ) -> str:
-    """Fallback â€” agent baÅŸarÄ±sÄ±z olursa direkt DeepSeek API Ã§aÄŸrÄ±sÄ±."""
+    """Fallback â€” agent baÅŸarÄ±sÄ±z olursa direkt DeepSeek API çaÄŸrÄ±sÄ±."""
     logger = _get_logger()
     logger.warning(f"Fallback kullanÄ±lÄ±yor: {error}")
 
@@ -283,7 +283,7 @@ def _deepseek_fallback(
 
     # KullanÄ±lacak mesaj
     if messages is None:
-        mesaj = f"Hata oluÅŸtu: {error}. LÃ¼tfen kullanÄ±cÄ±ya yardÄ±mcÄ± ol."
+        mesaj = f"Hata oluÅŸtu: {error}. Lütfen kullanÄ±cÄ±ya yardÄ±mcÄ± ol."
     elif isinstance(messages, str):
         mesaj = messages
     else:
@@ -326,13 +326,13 @@ def _deepseek_fallback(
 
 
 def _format_temizle(text: str) -> str:
-    """Metin formatÄ±nÄ± temizler â€” backtick ve kod bloklarÄ±nÄ± dÃ¼zeltir."""
+    """Metin formatÄ±nÄ± temizler â€” backtick ve kod bloklarÄ±nÄ± düzeltir."""
     if not text:
         return text
 
-    # Kod bloÄŸu iÃ§inde olup olmadÄ±ÄŸÄ±mÄ±zÄ± takip et
+    # Kod bloÄŸu içinde olup olmadÄ±ÄŸÄ±mÄ±zÄ± takip et
     def _kod_ici_indexler(satirlar):
-        """Kod bloÄŸu iÃ§indeki satÄ±rlarÄ±n index setini dÃ¶ndÃ¼rÃ¼r."""
+        """Kod bloÄŸu içindeki satÄ±rlarÄ±n index setini döndürür."""
         kod_ici = set()
         acik = False
         for i, satir in enumerate(satirlar):
@@ -348,7 +348,7 @@ def _format_temizle(text: str) -> str:
     yeni_satirlar = []
     for i, satir in enumerate(satirlar):
         if i in kod_ici:
-            # Kod bloÄŸu iÃ§indeki satÄ±rlarÄ± deÄŸiÅŸtirme
+            # Kod bloÄŸu içindeki satÄ±rlarÄ± deÄŸiÅŸtirme
             yeni_satirlar.append(satir)
             continue
 
@@ -356,7 +356,7 @@ def _format_temizle(text: str) -> str:
 
         # 4+ backtick â†’ 3 backtick
         if yeni_satir.startswith("````"):
-            # KaÃ§ backtick var?
+            # Kaç backtick var?
             count = 0
             for ch in yeni_satir:
                 if ch == "`":
@@ -367,22 +367,22 @@ def _format_temizle(text: str) -> str:
                 gerisi = yeni_satir[count:]
                 yeni_satir = "```" + gerisi
 
-        # Ã‡ift backtick + dil â†’ Ã¼Ã§lÃ¼ backtick + dil (aÃ§Ä±lÄ±ÅŸ)
+        # Ã‡ift backtick + dil â†’ üçlü backtick + dil (açÄ±lÄ±ÅŸ)
         if yeni_satir.startswith("``") and not yeni_satir.startswith("```"):
             gerisi = yeni_satir[2:]
             if gerisi and not gerisi.startswith("`"):
                 yeni_satir = "```" + gerisi
 
-        # SatÄ±r baÅŸÄ± tek backtick â†’ Ã¼Ã§lÃ¼ backtick
+        # SatÄ±r baÅŸÄ± tek backtick â†’ üçlü backtick
         if yeni_satir.startswith("`") and not yeni_satir.startswith("``"):
-            # Kod bloÄŸu aÃ§ma mÄ± yoksa inline kod mu?
+            # Kod bloÄŸu açma mÄ± yoksa inline kod mu?
             gerisi = yeni_satir[1:]
             if gerisi.strip():
                 yeni_satir = "```" + gerisi
 
         yeni_satirlar.append(yeni_satir)
 
-    # Kod bloÄŸu kapanÄ±ÅŸÄ±nÄ± dÃ¼zelt: tek backtick â†’ Ã¼Ã§lÃ¼
+    # Kod bloÄŸu kapanÄ±ÅŸÄ±nÄ± düzelt: tek backtick â†’ üçlü
     metin = "\n".join(yeni_satirlar)
     if metin.rstrip().endswith("`") and not metin.rstrip().endswith("```"):
         # Son satÄ±r tek backtick ile bitiyor
@@ -396,7 +396,7 @@ def _format_temizle(text: str) -> str:
                 acik_blok_sayisi += 1
 
         if acik_blok_sayisi % 2 != 0:
-            # AÃ§Ä±k blok var, kapat
+            # AçÄ±k blok var, kapat
             for j in range(len(satirlar_yeni) - 1, -1, -1):
                 s = satirlar_yeni[j]
                 if s.rstrip().endswith("`") and not s.rstrip().endswith("```"):
@@ -475,10 +475,10 @@ def _format_temizle(text: str) -> str:
 def isleyen_gorev(
     task: str, use_agent: bool = False, chat_id: Optional[str] = None
 ) -> str:
-    """Ana iÅŸlev â€” gÃ¶revi iÅŸler ve yanÄ±t dÃ¶ndÃ¼rÃ¼r."""
+    """Ana iÅŸlev â€” görevi iÅŸler ve yanÄ±t döndürür."""
     logger = _get_logger()
     logger.info(
-        f"GÃ¶rev iÅŸleniyor: {task[:50]}... (use_agent={use_agent}, chat_id={chat_id})"
+        f"Görev iÅŸleniyor: {task[:50]}... (use_agent={use_agent}, chat_id={chat_id})"
     )
 
     if use_agent:
@@ -493,14 +493,14 @@ def isleyen_gorev(
 
 
 def kopru_deepseek_istek(messages: Any, config: Optional[dict] = None) -> str:
-    """KÃ¶prÃ¼ entegrasyonu â€” isleyen_gorev'e yÃ¶nlendirir."""
+    """Köprü entegrasyonu â€” isleyen_gorev'e yönlendirir."""
     logger = _get_logger()
-    logger.info("KÃ¶prÃ¼ isteÄŸi alÄ±ndÄ±, isleyen_gorev'e yÃ¶nlendiriliyor...")
+    logger.info("Köprü isteÄŸi alÄ±ndÄ±, isleyen_gorev'e yönlendiriliyor...")
 
     if isinstance(messages, str):
         return isleyen_gorev(messages, chat_id="kopru")
     elif isinstance(messages, list):
-        # Liste ise son user mesajÄ±nÄ± Ã§Ä±kar
+        # Liste ise son user mesajÄ±nÄ± çÄ±kar
         user_texts = [
             m["content"]
             for m in messages

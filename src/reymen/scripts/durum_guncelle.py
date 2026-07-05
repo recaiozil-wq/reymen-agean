@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 durum_guncelle.py â€” Her gece 21:00'de calisir.
 Kod kalitesi metriklerini toplar, durum.json'a yazar.

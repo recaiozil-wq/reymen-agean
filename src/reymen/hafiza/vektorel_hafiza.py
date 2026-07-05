@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 vektorel_hafiza.py â€” ChromaDB anlamsal bellek (RAG).
 
@@ -167,16 +167,16 @@ def _budama_yap(collection):
 
 
 def anlamsal_hafiza_ara(collection, sorgu: str, adet: int = 3) -> str:
-    """Anlamsal arama â€” ilgili tecrÃ¼beleri dondurur.
+    """Anlamsal arama â€” ilgili tecrübeleri dondurur.
 
     Returns:
-        Bulunan tecrÃ¼belerin metin listesi veya bulunamadÄ± mesajÄ±.
+        Bulunan tecrübelerin metin listesi veya bulunamadÄ± mesajÄ±.
     """
     try:
         sonuc = collection.query(query_texts=[sorgu[:300]], n_results=adet)
         dokumanlar = sonuc.get("documents", [[]])[0]
         if not dokumanlar:
-            return "[HafÄ±za]: Ä°lgili tecrÃ¼be bulunamadÄ±."
+            return "[HafÄ±za]: Ä°lgili tecrübe bulunamadÄ±."
 
         # Mesafeye gore siralama (dusuk mesafe = yuksek benzerlik)
         mesafeler = sonuc.get("distances", [[]])[0]
@@ -190,19 +190,19 @@ def anlamsal_hafiza_ara(collection, sorgu: str, adet: int = 3) -> str:
 
 
 def hafiza_ozeti_al(collection, adet: int = 5) -> str:
-    """Son N tecrÃ¼benin ozetini dondur (oturum basinda baglam icin)."""
+    """Son N tecrübenin ozetini dondur (oturum basinda baglam icin)."""
     try:
         peek = collection.peek(limit=adet)
         docs = peek.get("documents", [])
         if not docs:
             return ""
-        return "Son tecrÃ¼beler:\n" + "\n".join(f"- {d[:120]}" for d in docs)
+        return "Son tecrübeler:\n" + "\n".join(f"- {d[:120]}" for d in docs)
     except Exception:
         return ""
 
 
 def basarili_tecrube_kaydet(collection, hedef: str, ozet: str):
-    """Basarili gorev tecrÃ¼besini kaydet (kullanim kolayligi)."""
+    """Basarili gorev tecrübesini kaydet (kullanim kolayligi)."""
     kayit_id = f"basarili-{abs(hash(hedef)) % 100000}"
     tecrube_kaydet(
         collection,
@@ -213,7 +213,7 @@ def basarili_tecrube_kaydet(collection, hedef: str, ozet: str):
 
 
 def basarisiz_tecrube_kaydet(collection, hedef: str, hata: str):
-    """Basarisiz gorev tecrÃ¼besini kaydet."""
+    """Basarisiz gorev tecrübesini kaydet."""
     kayit_id = f"hata-{abs(hash(hedef + hata)) % 100000}"
     tecrube_kaydet(
         collection,

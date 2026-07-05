@@ -1,4 +1,4 @@
-﻿"""
+"""
 Cron job storage and management.
 
 Jobs are stored in ~/.reymen/cron/jobs.json

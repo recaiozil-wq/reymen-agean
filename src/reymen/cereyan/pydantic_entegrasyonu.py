@@ -1,10 +1,10 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 pydantic_entegrasyonu.py â€” Pydantic ile type-safe structured output validation.
 
-Tool Ã§aÄŸrÄ±larÄ±nda giriÅŸ/Ã§Ä±kÄ±ÅŸ ÅŸemalarÄ±nÄ± Pydantic model olarak tanÄ±mlar.
-LLM Ã§Ä±ktÄ±sÄ±nÄ± doÄŸrular, hatalÄ± JSON'u otomatik dÃ¼zeltir.
-Pydantic yoksa graceful degrade ile eski davranÄ±ÅŸa dÃ¶ner.
+Tool çaÄŸrÄ±larÄ±nda giriÅŸ/çÄ±kÄ±ÅŸ ÅŸemalarÄ±nÄ± Pydantic model olarak tanÄ±mlar.
+LLM çÄ±ktÄ±sÄ±nÄ± doÄŸrular, hatalÄ± JSON'u otomatik düzeltir.
+Pydantic yoksa graceful degrade ile eski davranÄ±ÅŸa döner.
 
 KullanÄ±m:
     from reymen.cereyan.pydantic_entegrasyonu import (
@@ -12,12 +12,12 @@ KullanÄ±m:
         pydantic_aktif, ToolCallModel
     )
 
-    # Tool Ã§aÄŸrÄ±sÄ± doÄŸrulama
+    # Tool çaÄŸrÄ±sÄ± doÄŸrulama
     dogrulanmis = validate_tool_call("WEB_ARA", {"sorgu": "test"})
     if dogrulanmis["basarili"]:
         args = dogrulanmis["args"]
 
-    # LLM Ã§Ä±ktÄ±sÄ± doÄŸrulama
+    # LLM çÄ±ktÄ±sÄ± doÄŸrulama
     sonuc = validate_llm_output(yanit, WebAraOutput)
 """
 
@@ -57,20 +57,20 @@ except ImportError:
 
 
 class ToolCallModel(BaseModel):
-    """TÃ¼m tool Ã§aÄŸrÄ±larÄ± iÃ§in temel Pydantic model."""
+    """Tüm tool çaÄŸrÄ±larÄ± için temel Pydantic model."""
 
     pass
 
 
-# â”€â”€ Bilinen tool'lar iÃ§in giriÅŸ ÅŸemalarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Bilinen tool'lar için giriÅŸ ÅŸemalarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class WebAraInput(ToolCallModel):
     """WEB_ARA tool girdisi."""
 
-    sorgu: str = Field(..., description="Aranacak kelime veya cÃ¼mle")
+    sorgu: str = Field(..., description="Aranacak kelime veya cümle")
     max_sonuc: Optional[int] = Field(
-        default=5, ge=1, le=50, description="Maksimum sonuÃ§ sayÄ±sÄ±"
+        default=5, ge=1, le=50, description="Maksimum sonuç sayÄ±sÄ±"
     )
 
 
@@ -78,7 +78,7 @@ class DosyaOkuInput(ToolCallModel):
     """DOSYA_OKU tool girdisi."""
 
     dosya_yolu: str = Field(..., min_length=1, description="Okunacak dosyanÄ±n tam yolu")
-    satir_bas: Optional[int] = Field(default=None, ge=1, description="BaÅŸlangÄ±Ã§ satÄ±rÄ±")
+    satir_bas: Optional[int] = Field(default=None, ge=1, description="BaÅŸlangÄ±ç satÄ±rÄ±")
     satir_limit: Optional[int] = Field(
         default=None, ge=1, le=2000, description="Maksimum satÄ±r sayÄ±sÄ±"
     )
@@ -90,7 +90,7 @@ class DosyaYazInput(ToolCallModel):
     dosya_yolu: str = Field(
         ..., min_length=1, description="YazÄ±lacak dosyanÄ±n tam yolu"
     )
-    icerik: str = Field(..., description="Dosyaya yazÄ±lacak iÃ§erik")
+    icerik: str = Field(..., description="Dosyaya yazÄ±lacak içerik")
 
 
 class PythonCalistirInput(ToolCallModel):
@@ -112,7 +112,7 @@ class GorevBittiInput(ToolCallModel):
     """GOREV_BITTI tool girdisi."""
 
     ozet: str = Field(
-        ..., min_length=1, max_length=1000, description="YapÄ±lanlarÄ±n Ã¶zeti (2â€“5 cÃ¼mle)"
+        ..., min_length=1, max_length=1000, description="YapÄ±lanlarÄ±n özeti (2â€“5 cümle)"
     )
 
 
@@ -122,7 +122,7 @@ class ProfilDegistirInput(ToolCallModel):
     profil_adi: str = Field(
         ...,
         pattern=r"^[a-zA-Z0-9_-]+$",
-        description="GeÃ§ilecek profil adÄ±: reyment, dev, test, prod",
+        description="Geçilecek profil adÄ±: reyment, dev, test, prod",
     )
 
 
@@ -133,19 +133,19 @@ class SkillAktivasyonInput(ToolCallModel):
 
 
 class WebAraOutput(ToolCallModel):
-    """WEB_ARA tool Ã§Ä±ktÄ±sÄ±."""
+    """WEB_ARA tool çÄ±ktÄ±sÄ±."""
 
     baslik: str = Field(..., description="Sayfa baÅŸlÄ±ÄŸÄ±")
     url: str = Field(..., description="Sayfa URL'si")
-    ozet: Optional[str] = Field(default=None, description="Sayfa Ã¶zeti")
+    ozet: Optional[str] = Field(default=None, description="Sayfa özeti")
     skor: Optional[float] = Field(
         default=None, ge=0.0, le=1.0, description="Alaka skoru"
     )
 
 
-# â”€â”€ Tool â†’ Schema eÅŸleme sÃ¶zlÃ¼ÄŸÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Tool â†’ Schema eÅŸleme sözlüÄŸü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # GiriÅŸ ÅŸemasÄ± olan tool'lar burada tanÄ±mlanÄ±r.
-# Her tool: (input_model, output_model) Ã§ifti.
+# Her tool: (input_model, output_model) çifti.
 # output_model=None ise sadece giriÅŸ doÄŸrulamasÄ± yapÄ±lÄ±r.
 
 TOOL_SCHEMALARI: Dict[str, tuple] = {
@@ -161,25 +161,25 @@ TOOL_SCHEMALARI: Dict[str, tuple] = {
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# 2. JSON DÃ¼zeltme
+# 2. JSON Düzeltme
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _json_duzelt(ham: str) -> str:
-    """JSON formatÄ±nÄ± otomatik dÃ¼zelt.
+    """JSON formatÄ±nÄ± otomatik düzelt.
 
-    YaygÄ±n LLM hatalarÄ±nÄ± dÃ¼zeltir:
-    - Tek tÄ±rnak -> Ã§ift tÄ±rnak
+    YaygÄ±n LLM hatalarÄ±nÄ± düzeltir:
+    - Tek tÄ±rnak -> çift tÄ±rnak
     - Trailing comma
     - TÄ±rnaksÄ±z anahtar
     - None/null karmaÅŸasÄ±
-    - Son sÃ¼slÃ¼ parantez eksikliÄŸi
+    - Son süslü parantez eksikliÄŸi
 
     Args:
         ham: Ham JSON metni
 
     Returns:
-        DÃ¼zeltilmiÅŸ JSON metni
+        DüzeltilmiÅŸ JSON metni
     """
     if not ham or not isinstance(ham, str):
         return ham
@@ -187,11 +187,11 @@ def _json_duzelt(ham: str) -> str:
     # BoÅŸluklarÄ± temizle
     metin = ham.strip()
 
-    # JSON deÄŸilse (dÃ¼z metin, tool adÄ± vs.) olduÄŸu gibi dÃ¶ndÃ¼r
+    # JSON deÄŸilse (düz metin, tool adÄ± vs.) olduÄŸu gibi döndür
     if not (metin.startswith("{") or metin.startswith("[")):
         return ham
 
-    # 1. Tek tÄ±rnak -> Ã§ift tÄ±rnak (sadece JSON anahtarlarÄ± ve string deÄŸerler iÃ§in)
+    # 1. Tek tÄ±rnak -> çift tÄ±rnak (sadece JSON anahtarlarÄ± ve string deÄŸerler için)
     metin = re.sub(r"(?<!\\)'", '"', metin)
 
     # 2. Python None -> JSON null
@@ -199,22 +199,22 @@ def _json_duzelt(ham: str) -> str:
     metin = re.sub(r"\bTrue\b", "true", metin)
     metin = re.sub(r"\bFalse\b", "false", metin)
 
-    # 3. Trailing comma temizle (}, ] Ã¶ncesi)
+    # 3. Trailing comma temizle (}, ] öncesi)
     metin = re.sub(r",\s*([}\]])", r"\1", metin)
 
-    # 4. TÄ±rnaksÄ±z anahtar dÃ¼zelt (Ã¶r: {sorgu: "test"} -> {"sorgu": "test"})
+    # 4. TÄ±rnaksÄ±z anahtar düzelt (ör: {sorgu: "test"} -> {"sorgu": "test"})
     metin = re.sub(r"\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:", r'{"\1":', metin)
 
-    # 5. JSON string iÃ§indeki escape sorunlarÄ±
+    # 5. JSON string içindeki escape sorunlarÄ±
     metin = metin.replace("\\'", "'")
 
-    # 6. Fazladan sÃ¼slÃ¼ parantez kapatma
+    # 6. Fazladan süslü parantez kapatma
     acik_suslu = metin.count("{")
     kapali_suslu = metin.count("}")
     if acik_suslu > kapali_suslu:
         metin += "}" * (acik_suslu - kapali_suslu)
 
-    # 7. Fazladan kÃ¶ÅŸeli parantez kapatma
+    # 7. Fazladan köÅŸeli parantez kapatma
     acik_koseli = metin.count("[")
     kapali_koseli = metin.count("]")
     if acik_koseli > kapali_koseli:
@@ -224,10 +224,10 @@ def _json_duzelt(ham: str) -> str:
 
 
 def _schema_al(tool_adi: str):
-    """Bir tool'un giriÅŸ ÅŸemasÄ±nÄ± dÃ¶ndÃ¼rÃ¼r.
+    """Bir tool'un giriÅŸ ÅŸemasÄ±nÄ± döndürür.
 
     Args:
-        tool_adi: Tool adÄ± (bÃ¼yÃ¼k harf)
+        tool_adi: Tool adÄ± (büyük harf)
 
     Returns:
         Pydantic model sÄ±nÄ±fÄ± veya None
@@ -249,10 +249,10 @@ def validate_tool_call(
     tool_adi: str,
     args: Union[Dict[str, Any], str],
 ) -> Dict[str, Any]:
-    """Tool Ã§aÄŸrÄ±sÄ± parametrelerini Pydantic ile doÄŸrula.
+    """Tool çaÄŸrÄ±sÄ± parametrelerini Pydantic ile doÄŸrula.
 
     Args:
-        tool_adi: Tool adÄ± (Ã¶rn: "WEB_ARA", "DOSYA_OKU")
+        tool_adi: Tool adÄ± (örn: "WEB_ARA", "DOSYA_OKU")
         args: Parametre dict'i veya ham string
 
     Returns:
@@ -264,9 +264,9 @@ def validate_tool_call(
         }
 
     Not:
-        - Pydantic yoksa args olduÄŸu gibi dÃ¶ner (graceful degrade)
-        - Åema tanÄ±mlÄ± deÄŸilse args olduÄŸu gibi dÃ¶ner (geÃ§erli)
-        - JSON hatalarÄ±nda otomatik dÃ¼zeltme denenir
+        - Pydantic yoksa args olduÄŸu gibi döner (graceful degrade)
+        - Åema tanÄ±mlÄ± deÄŸilse args olduÄŸu gibi döner (geçerli)
+        - JSON hatalarÄ±nda otomatik düzeltme denenir
     """
     sonuc: Dict[str, Any] = {
         "basarili": False,
@@ -284,7 +284,7 @@ def validate_tool_call(
         sonuc["basarili"] = True
         return sonuc
 
-    # Åema kontrolÃ¼ â€” ÅŸema yoksa args olduÄŸu gibi geÃ§er
+    # Åema kontrolü â€” ÅŸema yoksa args olduÄŸu gibi geçer
     schema_model = _schema_al(tool_adi)
     if schema_model is None:
         if isinstance(args, dict):
@@ -294,19 +294,19 @@ def validate_tool_call(
         sonuc["basarili"] = True
         return sonuc
 
-    # args string ise JSON'a Ã§evirmeyi dene
+    # args string ise JSON'a çevirmeyi dene
     if isinstance(args, str):
         try:
-            # Ã–nce ham JSON'u dÃ¼zelt
+            # Ã–nce ham JSON'u düzelt
             duzeltilmis = _json_duzelt(args)
             parsed_args = json.loads(duzeltilmis)
             if duzeltilmis != args:
-                logger.info("[Pydantic] %s JSON'u otomatik dÃ¼zeltildi.", tool_adi)
+                logger.info("[Pydantic] %s JSON'u otomatik düzeltildi.", tool_adi)
             args = parsed_args
         except json.JSONDecodeError as e:
             # Orijinal args'i olduÄŸu gibi kullan (graceful)
             logger.warning(
-                "[Pydantic] %s iÃ§in JSON parse hatasÄ±: %s. Orijinal string args kullanÄ±lÄ±yor.",
+                "[Pydantic] %s için JSON parse hatasÄ±: %s. Orijinal string args kullanÄ±lÄ±yor.",
                 tool_adi,
                 e,
             )
@@ -315,9 +315,9 @@ def validate_tool_call(
             sonuc["basarili"] = True  # Graceful degrade
             return sonuc
 
-    # Dict tip kontrolÃ¼
+    # Dict tip kontrolü
     if not isinstance(args, dict):
-        # Dict deÄŸilse stringe Ã§evir ve param olarak ver
+        # Dict deÄŸilse stringe çevir ve param olarak ver
         sonuc["args"] = {"param": str(args)}
         sonuc["hata"] = (
             f"Args dict deÄŸil ({type(args).__name__}), string olarak iletiliyor"
@@ -345,7 +345,7 @@ def validate_tool_call(
         )
         sonuc["args"] = args  # Orijinal args'i koru (graceful)
         sonuc["hata"] = hata_detay
-        sonuc["basarili"] = True  # Hata bildir ama Ã§alÄ±ÅŸmaya devam et
+        sonuc["basarili"] = True  # Hata bildir ama çalÄ±ÅŸmaya devam et
     except Exception as e:
         logger.error(
             "[Pydantic] %s beklenmeyen hata: %s",
@@ -360,7 +360,7 @@ def validate_tool_call(
 
 
 def _validation_hata_mesaji(e) -> str:
-    """Pydantic ValidationError'dan okunabilir hata mesajÄ± Ã¼retir.
+    """Pydantic ValidationError'dan okunabilir hata mesajÄ± üretir.
 
     Args:
         e: Pydantic ValidationError
@@ -372,7 +372,7 @@ def _validation_hata_mesaji(e) -> str:
     for hata in e.errors():
         alan = " -> ".join(str(loc) for loc in hata.get("loc", []))
         tip = hata.get("type", "unknown")
-        msg = hata.get("msg", "GeÃ§ersiz deÄŸer")
+        msg = hata.get("msg", "Geçersiz deÄŸer")
         if alan:
             hatalar.append(f"'{alan}': {msg} (tip: {tip})")
         else:
@@ -389,23 +389,23 @@ def validate_llm_output(
     output: Union[str, Dict[str, Any]],
     schema_model,
 ) -> Dict[str, Any]:
-    """LLM Ã§Ä±ktÄ±sÄ±nÄ± Pydantic model ile doÄŸrula.
+    """LLM çÄ±ktÄ±sÄ±nÄ± Pydantic model ile doÄŸrula.
 
     Args:
-        output: LLM'den gelen ham Ã§Ä±ktÄ± (string veya dict)
-        schema_model: DoÄŸrulama iÃ§in Pydantic model sÄ±nÄ±fÄ±
+        output: LLM'den gelen ham çÄ±ktÄ± (string veya dict)
+        schema_model: DoÄŸrulama için Pydantic model sÄ±nÄ±fÄ±
 
     Returns:
         {
             "basarili": True/False,
             "data": doÄŸrulanmÄ±ÅŸ dict (basarili=True ise),
             "hata": hata mesajÄ± (basarili=False ise),
-            "duzeltildi": JSON otomatik dÃ¼zeltme yapÄ±ldÄ± mÄ±,
+            "duzeltildi": JSON otomatik düzeltme yapÄ±ldÄ± mÄ±,
         }
 
     Not:
-        - Pydantic yoksa output olduÄŸu gibi dÃ¶ner
-        - JSON hatalarÄ±nda otomatik dÃ¼zeltme denenir
+        - Pydantic yoksa output olduÄŸu gibi döner
+        - JSON hatalarÄ±nda otomatik düzeltme denenir
     """
     sonuc: Dict[str, Any] = {
         "basarili": False,
@@ -423,7 +423,7 @@ def validate_llm_output(
         sonuc["basarili"] = True
         return sonuc
 
-    # JSON Ã§Ã¶zÃ¼mleme
+    # JSON çözümleme
     if isinstance(output, str):
         try:
             duzeltilmis = _json_duzelt(output)
@@ -431,7 +431,7 @@ def validate_llm_output(
                 sonuc["duzeltildi"] = True
             parsed = json.loads(duzeltilmis)
         except json.JSONDecodeError as e:
-            sonuc["hata"] = f"JSON Ã§Ã¶zÃ¼mleme hatasÄ±: {e}"
+            sonuc["hata"] = f"JSON çözümleme hatasÄ±: {e}"
             sonuc["data"] = {"raw": output}
             return sonuc
     elif isinstance(output, dict):
@@ -448,7 +448,7 @@ def validate_llm_output(
         sonuc["basarili"] = True
     except ValidationError as e:
         sonuc["hata"] = _validation_hata_mesaji(e)
-        sonuc["data"] = parsed  # Orijinal parsed veriyi dÃ¶ndÃ¼r
+        sonuc["data"] = parsed  # Orijinal parsed veriyi döndür
     except Exception as e:
         sonuc["hata"] = f"Beklenmeyen hata: {e}"
         sonuc["data"] = parsed
@@ -457,17 +457,17 @@ def validate_llm_output(
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# 5. Tools Schema Ãœretici (motor.py iÃ§in yardÄ±mcÄ±)
+# 5. Tools Schema Ãœretici (motor.py için yardÄ±mcÄ±)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def schema_to_tool_def(ad: str, input_model, aciklama: str = "") -> Optional[dict]:
-    """Pydantic model'den OpenAI-uyumlu tool definition Ã¼retir.
+    """Pydantic model'den OpenAI-uyumlu tool definition üretir.
 
     Args:
         ad: Tool adÄ±
         input_model: Pydantic input modeli
-        aciklama: Tool aÃ§Ä±klamasÄ± (boÅŸsa model docstring'inden alÄ±nÄ±r)
+        aciklama: Tool açÄ±klamasÄ± (boÅŸsa model docstring'inden alÄ±nÄ±r)
 
     Returns:
         {"type": "function", "function": {"name": ..., "description": ..., "parameters": ...}}
@@ -479,7 +479,7 @@ def schema_to_tool_def(ad: str, input_model, aciklama: str = "") -> Optional[dic
     props = dict(schema.get("properties", {}))
     required = list(schema.get("required", []))
 
-    # AÃ§Ä±klama
+    # AçÄ±klama
     if not aciklama:
         aciklama = input_model.__doc__ or ad.replace("_", " ").title()
 
@@ -502,11 +502,11 @@ def schema_to_tool_def(ad: str, input_model, aciklama: str = "") -> Optional[dic
 
 
 def tools_schema_pydantic(tool_adi: str, aciklama: str = "") -> Optional[dict]:
-    """Pydantic model'den tek bir tool definition Ã¼retir.
+    """Pydantic model'den tek bir tool definition üretir.
 
     Args:
         tool_adi: Tool adÄ±
-        aciklama: AÃ§Ä±klama (opsiyonel)
+        aciklama: AçÄ±klama (opsiyonel)
 
     Returns:
         Tool definition dict veya None (ÅŸema yoksa/pydantic yoksa)
@@ -520,7 +520,7 @@ def tools_schema_pydantic(tool_adi: str, aciklama: str = "") -> Optional[dict]:
 
 
 def tum_tools_schema() -> Dict[str, Optional[dict]]:
-    """TÃ¼m bilinen tool ÅŸemalarÄ±nÄ± Ã¼retir.
+    """Tüm bilinen tool ÅŸemalarÄ±nÄ± üretir.
 
     Returns:
         {tool_adi: tool_definition_dict veya None}
@@ -539,11 +539,11 @@ def tum_tools_schema() -> Dict[str, Optional[dict]]:
 
 
 def ham_param_to_dict(tool_adi: str, ham_param: str) -> Dict[str, Any]:
-    """Eski sistemin quoted-string ham_param'Ä±nÄ± Pydantic schema ile dict'e Ã§evir.
+    """Eski sistemin quoted-string ham_param'Ä±nÄ± Pydantic schema ile dict'e çevir.
 
     Args:
         tool_adi: Tool adÄ±
-        ham_param: Quoted-string parametre (Ã¶rn: '"test.py" "icerik"')
+        ham_param: Quoted-string parametre (örn: '"test.py" "icerik"')
 
     Returns:
         Parametre dict'i
@@ -577,12 +577,12 @@ def ham_param_to_dict(tool_adi: str, ham_param: str) -> Dict[str, Any]:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# 7. AraÃ§ Ã‡alÄ±ÅŸtÄ±rma Ã–ncesi/SonrasÄ± Hook
+# 7. Araç Ã‡alÄ±ÅŸtÄ±rma Ã–ncesi/SonrasÄ± Hook
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def tool_cagri_oncesi(tool_adi: str, args: Any) -> Dict[str, Any]:
-    """Tool Ã§aÄŸrÄ±lmadan Ã¶nce args doÄŸrulamasÄ± yap.
+    """Tool çaÄŸrÄ±lmadan önce args doÄŸrulamasÄ± yap.
 
     Args:
         tool_adi: Tool adÄ±

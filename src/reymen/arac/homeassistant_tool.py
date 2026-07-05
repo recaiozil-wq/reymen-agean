@@ -1,7 +1,7 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """homeassistant_tool.py â€” Home Assistant AkÄ±llÄ± Ev AracÄ±.
 
-Home Assistant REST API Ã¼zerinden entitiy sorgulama, servis Ã§aÄŸÄ±rma
+Home Assistant REST API üzerinden entitiy sorgulama, servis çaÄŸÄ±rma
 ve otomasyon tetikleme. gateway/homeassistant.py'den baÄŸÄ±msÄ±z, doÄŸrudan motor aracÄ±.
 ENV: HA_URL, HA_TOKEN
 """
@@ -54,10 +54,10 @@ def durum_oku(entity_id: str) -> str:
     """Bir entity'nin durumunu oku.
 
     Args:
-        entity_id: HA entity ID'si (Ã¶r. light.salon, sensor.sicaklik)
+        entity_id: HA entity ID'si (ör. light.salon, sensor.sicaklik)
 
     Returns:
-        Durum ve Ã¶zellikler metin olarak
+        Durum ve özellikler metin olarak
     """
     yanit = _ha_get(f"/api/states/{entity_id}")
     if isinstance(yanit, dict) and "error" in yanit:
@@ -70,10 +70,10 @@ def durum_oku(entity_id: str) -> str:
 
 
 def tum_durumlar(domain: str = "") -> str:
-    """TÃ¼m entity durumlarÄ±nÄ± listele.
+    """Tüm entity durumlarÄ±nÄ± listele.
 
     Args:
-        domain: Filtre (Ã¶r. light, switch, sensor) â€” boÅŸsa hepsi
+        domain: Filtre (ör. light, switch, sensor) â€” boÅŸsa hepsi
 
     Returns:
         Entity listesi metin olarak
@@ -90,9 +90,9 @@ def tum_durumlar(domain: str = "") -> str:
 
     if not entitiler:
         return (
-            f"Domain '{domain}' iÃ§in entity bulunamadÄ±."
+            f"Domain '{domain}' için entity bulunamadÄ±."
             if domain
-            else "HiÃ§ entity yok."
+            else "Hiç entity yok."
         )
 
     satirlar = [f"Home Assistant Entity'leri ({len(entitiler)}):"]
@@ -104,15 +104,15 @@ def tum_durumlar(domain: str = "") -> str:
 
 
 def servis_cagir(domain: str, servis: str, entity_id: str = "", **kwargs) -> str:
-    """Home Assistant servisi Ã§aÄŸÄ±r.
+    """Home Assistant servisi çaÄŸÄ±r.
 
     Args:
-        domain:    Servis domain'i (Ã¶r. light, switch, script)
-        servis:    Servis adÄ± (Ã¶r. turn_on, turn_off, toggle)
-        entity_id: Hedef entity (boÅŸsa tÃ¼m domain)
+        domain:    Servis domain'i (ör. light, switch, script)
+        servis:    Servis adÄ± (ör. turn_on, turn_off, toggle)
+        entity_id: Hedef entity (boÅŸsa tüm domain)
 
     Returns:
-        SonuÃ§ metni
+        Sonuç metni
     """
     veri: dict = {}
     if entity_id:
@@ -122,11 +122,11 @@ def servis_cagir(domain: str, servis: str, entity_id: str = "", **kwargs) -> str
     yanit = _ha_post(f"/api/services/{domain}/{servis}", veri)
     if isinstance(yanit, dict) and "error" in yanit:
         return f"[HA Servis]: {yanit['error']}"
-    return f"OK: {domain}.{servis} Ã§aÄŸrÄ±ldÄ±."
+    return f"OK: {domain}.{servis} çaÄŸrÄ±ldÄ±."
 
 
 def isik_ac(entity_id: str, parlaklik: Optional[int] = None) -> str:
-    """IÅŸÄ±k aÃ§."""
+    """IÅŸÄ±k aç."""
     kw = {"brightness": parlaklik} if parlaklik is not None else {}
     return servis_cagir("light", "turn_on", entity_id, **kw)
 
@@ -137,7 +137,7 @@ def isik_kapat(entity_id: str) -> str:
 
 
 def switch_toglle(entity_id: str) -> str:
-    """Switch'i aÃ§/kapat."""
+    """Switch'i aç/kapat."""
     return servis_cagir("switch", "toggle", entity_id)
 
 
@@ -147,7 +147,7 @@ def otomasyon_calistir(otomasyon_id: str) -> str:
 
 
 def motor_kaydet(motor):
-    """HA araÃ§larÄ±nÄ± motora kaydet."""
+    """HA araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
@@ -159,19 +159,19 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "HA_TUM_DURUMLAR",
         lambda domain="": tum_durumlar(domain),
-        "TÃ¼m HA entity'lerini listele",
+        "Tüm HA entity'lerini listele",
     )
     motor._plugin_arac_kaydet(
         "HA_SERVIS",
         lambda domain, servis, entity_id="": servis_cagir(domain, servis, entity_id),
-        "Home Assistant servisi Ã§aÄŸÄ±r",
+        "Home Assistant servisi çaÄŸÄ±r",
     )
     motor._plugin_arac_kaydet(
         "HA_ISIK_AC",
         lambda entity_id, parlaklik="": isik_ac(
             entity_id, int(parlaklik) if parlaklik else None
         ),
-        "IÅŸÄ±k aÃ§",
+        "IÅŸÄ±k aç",
     )
     motor._plugin_arac_kaydet(
         "HA_ISIK_KAPAT",
@@ -181,7 +181,7 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "HA_SWITCH",
         lambda entity_id: switch_toglle(entity_id),
-        "Switch'i aÃ§/kapat",
+        "Switch'i aç/kapat",
     )
     motor._plugin_arac_kaydet(
         "HA_OTOMASYON",

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 memory_agent.py â€” ReYMeN Konusma Hafiza Sistemi.
 

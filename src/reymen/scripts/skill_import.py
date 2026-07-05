@@ -1,8 +1,8 @@
-﻿"""ReYMeN skill'lerini ReYMeN formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼r.
+"""ReYMeN skill'lerini ReYMeN formatÄ±na dönüÅŸtür.
 KullanÄ±m: python reymen/scripts/skill_import.py [--kategori AI_ML,DevOps]
 
 ReYMeN: ~/AppData/Local/reymen/skills/<kategori>/<skill>/SKILL.md
-ReYMeN: reymen/cereyan/skills/Skiller/<kategori>/<skill>_SKILL.md (dÃ¼z dosya)
+ReYMeN: reymen/cereyan/skills/Skiller/<kategori>/<skill>_SKILL.md (düz dosya)
 """
 
 import os, re, shutil
@@ -40,7 +40,7 @@ KATEGORI_MAP = {
 
 
 def skill_aktar(hedef_klasor: str = "", limit: int = 0):
-    """ReYMeN skill'lerini ReYMeN formatÄ±na Ã§evir."""
+    """ReYMeN skill'lerini ReYMeN formatÄ±na çevir."""
     hedef = REYMEN_SKILLS
     if hedef_klasor:
         hedef = hedef / hedef_klasor
@@ -62,7 +62,7 @@ def skill_aktar(hedef_klasor: str = "", limit: int = 0):
                 continue
 
             # ReYMeN formatÄ±: <kategori>/<skill>/SKILL.md
-            # ReYMeN formatÄ±: <kategori>/<skill>_SKILL.md (dÃ¼z dosya)
+            # ReYMeN formatÄ±: <kategori>/<skill>_SKILL.md (düz dosya)
             icerik = skill_md.read_text("utf-8", errors="replace")
 
             # Frontmatter'Ä± temizle (ReYMeN formatÄ±na uygun)
@@ -85,7 +85,7 @@ def skill_aktar(hedef_klasor: str = "", limit: int = 0):
 
 
 def skill_say():
-    """ReYMeN ve ReYMeN'deki skill sayÄ±larÄ±nÄ± gÃ¶ster."""
+    """ReYMeN ve ReYMeN'deki skill sayÄ±larÄ±nÄ± göster."""
     ReYMeN = sum(
         1
         for k in REYMEN_SKILLS.iterdir()
@@ -110,5 +110,5 @@ if __name__ == "__main__":
     sonra = skill_say()
 
     print(f"Aktarilan: {adet} skill")
-    print(f"ReYMeN toplam: {sonra['reymen']} (Ã¶nce: {once['reymen']})")
+    print(f"ReYMeN toplam: {sonra['reymen']} (önce: {once['reymen']})")
     print(f"Hala eksik: {sonra['eksik']}")

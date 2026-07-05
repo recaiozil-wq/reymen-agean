@@ -1,4 +1,4 @@
-﻿"""ReYMeN 300 soru test - hizli, output gorunur"""
+"""ReYMeN 300 soru test - hizli, output gorunur"""
 
 import os, sys, json, time, random, string
 

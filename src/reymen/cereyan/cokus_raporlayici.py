@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 cokus_raporlayici.py â€” Otonom Sistem Cokus Raporlayicisi.
 

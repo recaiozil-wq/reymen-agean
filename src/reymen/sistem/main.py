@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """main.py â€” ReYMeN Otonom Ajan. Ana ReAct dongusu.
 
 Entegre moduller:
@@ -31,9 +31,9 @@ DOT_ENV = Path(__file__).parent / ".env"
 if DOT_ENV.exists():
     load_dotenv(DOT_ENV, override=True)
 
-# â”€â”€ ERKEN LOG SUSTURMA: tÃ¼m import'lardan Ã–NCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Hem standart logging hem loguru, modÃ¼l importu sÄ±rasÄ±nda plugin loglarÄ± Ã¼retir.
-# Bu blok, import Ã¶ncesi her ikisini de susturur.
+# â”€â”€ ERKEN LOG SUSTURMA: tüm import'lardan Ã–NCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Hem standart logging hem loguru, modül importu sÄ±rasÄ±nda plugin loglarÄ± üretir.
+# Bu blok, import öncesi her ikisini de susturur.
 import logging as _startup_log
 
 _startup_log.disable(_startup_log.CRITICAL)
@@ -41,7 +41,7 @@ _LOGURU_KALDIRILDI = False
 try:
     from loguru import logger as _loguru_inst
 
-    _loguru_inst.remove()  # tÃ¼m loguru handler'larÄ±nÄ± kaldÄ±r
+    _loguru_inst.remove()  # tüm loguru handler'larÄ±nÄ± kaldÄ±r
     _LOGURU_KALDIRILDI = True
 except Exception as _e:
     logger.warning("[Main] except Exception (L41): %s", Exception)
@@ -532,7 +532,7 @@ class AIAgentOrchestrator:
             logger.warning("[Main] except Exception (L418): %s", Exception)
             pass
 
-        # â”€â”€ AraÃ§ plugin'leri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ Araç plugin'leri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self._plugin_yukleyici = None
         try:
             from reymen.sistem.plugin_loader import PluginYukleyici
@@ -615,7 +615,7 @@ class AIAgentOrchestrator:
     # â”€â”€ Ana ReAct dongusu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def run_conversation(self, hedef):
-        print("[TEST] burasÄ± Ã§alÄ±ÅŸÄ±yor")
+        print("[TEST] burasÄ± çalÄ±ÅŸÄ±yor")
         import time as _time
 
         _t_baslat = _time.time()
@@ -623,7 +623,7 @@ class AIAgentOrchestrator:
         hedef = self._giris_temizle(hedef)
 
         # â”€â”€ Ã–NCE HAFIZAYA BAK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        # OnceHafiza: daha Ã¶nce Ã§Ã¶zÃ¼lmÃ¼ÅŸ mÃ¼?
+        # OnceHafiza: daha önce çözülmüÅŸ mü?
         _oh = _get_once_hafiza()
         _hafiza_kayit = _oh.hafizada_ara(hedef)
         if _hafiza_kayit:
@@ -644,7 +644,7 @@ class AIAgentOrchestrator:
             _karmasiklik_raw = (
                 analiz.get("karmasiklik", 1) if isinstance(analiz, dict) else 1
             )
-            # KarmaÅŸÄ±klÄ±ÄŸa gÃ¶re Ã¶lÃ§eklendir: k1=15, k2=25, k3=40, k4=60, k5=90
+            # KarmaÅŸÄ±klÄ±ÄŸa göre ölçeklendir: k1=15, k2=25, k3=40, k4=60, k5=90
             _tur_tablosu = {1: 15, 2: 25, 3: 40, 4: 60, 5: 90}
             _base = getattr(self.budget, "max_total", None) or self.max_tur
             max_tur = max(_base, _tur_tablosu.get(_karmasiklik_raw, _base))
@@ -679,14 +679,14 @@ class AIAgentOrchestrator:
             print("[Hafiza] Ilgili gecmis tecrube bulundu.")
             self.bounded_memory.kaydet(f"[Gecmis]: {gecmis}", "MEMORY.md")
 
-        # HafÄ±za Plugin: onceden_getir â€” API Ã§aÄŸrÄ±sÄ± Ã¶ncesi baÄŸlam zenginleÅŸtirme
+        # HafÄ±za Plugin: onceden_getir â€” API çaÄŸrÄ±sÄ± öncesi baÄŸlam zenginleÅŸtirme
         _hafiza_plugin_baglam = ""
         if self.aktif_hafiza_plugin:
             try:
                 _hafiza_plugin_baglam = self.aktif_hafiza_plugin.onceden_getir(hedef)
                 if _hafiza_plugin_baglam:
                     print(
-                        f"[HafÄ±zaPlugin/{self.aktif_hafiza_plugin.ad}] Ã–nceki baÄŸlam yÃ¼klendi."
+                        f"[HafÄ±zaPlugin/{self.aktif_hafiza_plugin.ad}] Ã–nceki baÄŸlam yüklendi."
                     )
             except Exception as _e:
                 logger.warning("[Main] except Exception (L565): %s", Exception)
@@ -748,7 +748,7 @@ class AIAgentOrchestrator:
                 logger.warning("[Main] except Exception (L617): %s", Exception)
                 pass
 
-        # â”€â”€ SABÄ°T PROMPT BLOÄU: dÃ¶ngÃ¼ dÄ±ÅŸÄ±nda bir kez hesapla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ SABÄ°T PROMPT BLOÄU: döngü dÄ±ÅŸÄ±nda bir kez hesapla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         _sabit_beceri_baglami = ""
         try:
             _sb = self.learning.beceri_baglamini_al(hedef, adet=3)
@@ -848,7 +848,7 @@ class AIAgentOrchestrator:
             if tur == 1:
                 self._son_sistem_prompt = sistem_prompt
 
-            # â”€â”€ SABÄ°T BLOKLAR: dÃ¶ngÃ¼ dÄ±ÅŸÄ±nda hesaplandÄ±, buraya ekle â”€â”€â”€â”€â”€â”€â”€
+            # â”€â”€ SABÄ°T BLOKLAR: döngü dÄ±ÅŸÄ±nda hesaplandÄ±, buraya ekle â”€â”€â”€â”€â”€â”€â”€
             sistem_prompt += _sabit_beceri_baglami
             sistem_prompt += _sabit_skill_ozet
             sistem_prompt += _sabit_tercih_blok
@@ -884,11 +884,11 @@ class AIAgentOrchestrator:
 
             # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
             # NATIVE FC HÄ°BRÄ°T MOTOR
-            # Ã–ncelik: native function calling â†’ paralel araÃ§ Ã§alÄ±ÅŸtÄ±rma â†’ continue
+            # Ã–ncelik: native function calling â†’ paralel araç çalÄ±ÅŸtÄ±rma â†’ continue
             # Fallback: text-parse â†’ eylemi_ayristir â†’ mevcut dispatch
             # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-            # 1. Semantic cache (hem FC hem metin modu iÃ§in)
+            # 1. Semantic cache (hem FC hem metin modu için)
             cevap = None
             if _sem_cache and tur > 1:
                 cevap = _sem_cache.ara(_efektif_sistem, mesajlar)
@@ -913,7 +913,7 @@ class AIAgentOrchestrator:
                         self._fc_mod = True
 
                         if _fc_tc:
-                            # â”€â”€ GOREV_BITTI native tool kontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                            # â”€â”€ GOREV_BITTI native tool kontrolü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                             _gb_tc = next(
                                 (
                                     tc
@@ -934,7 +934,7 @@ class AIAgentOrchestrator:
                                 except Exception:
                                     _gb_args = {}
                                 _gb_ozet = _gb_args.get(
-                                    "ozet", _fc_metin or "GÃ¶rev tamamlandÄ±."
+                                    "ozet", _fc_metin or "Görev tamamlandÄ±."
                                 )
                                 _gb_esc = _gb_ozet.replace("\\", "\\\\").replace(
                                     '"', '\\"'
@@ -942,7 +942,7 @@ class AIAgentOrchestrator:
                                 cevap = f'GOREV_BITTI("{_gb_esc}")'
                                 # cevap set edildi â†’ aÅŸaÄŸÄ±daki GOREV_BITTI bloÄŸu handle eder
                             else:
-                                # â”€â”€ Paralel araÃ§ Ã§alÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                                # â”€â”€ Paralel araç çalÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                                 mesajlar.append(
                                     {
                                         "role": "assistant",
@@ -990,7 +990,7 @@ class AIAgentOrchestrator:
                                         _sonuclar.append(_sonuc)
                                         print(f"[FC] {_fn} â†’ {_sonuc[:120]}")
 
-                                # Budget: tek Ã§aÄŸrÄ± baÅŸÄ±na bir tur (paralel araÃ§lar = 1 tur)
+                                # Budget: tek çaÄŸrÄ± baÅŸÄ±na bir tur (paralel araçlar = 1 tur)
                                 if self.budget:
                                     _hata_var = any("[Hata]" in s for s in _sonuclar)
                                     self.budget.tur_bitir(
@@ -1007,7 +1007,7 @@ class AIAgentOrchestrator:
                                         ]
                                         self.trajectory.adim_ekle(
                                             tur,
-                                            f"FC:{len(_non_gb)}araÃ§",
+                                            f"FC:{len(_non_gb)}araç",
                                             str(_isimler),
                                             son_gozlem,
                                         )
@@ -1033,7 +1033,7 @@ class AIAgentOrchestrator:
                                 _fc_araclari_calistirildi = True
 
                         else:
-                            # tool_calls yok â†’ LLM gÃ¶revi bitirdi (ReYMeN davranÄ±ÅŸÄ±)
+                            # tool_calls yok â†’ LLM görevi bitirdi (ReYMeN davranÄ±ÅŸÄ±)
                             if _fc_metin:
                                 _fc_esc = _fc_metin.replace("\\", "\\\\").replace(
                                     '"', '\\"'
@@ -1044,11 +1044,11 @@ class AIAgentOrchestrator:
 
                     except Exception as _fc_err:
                         print(
-                            f"[FC] Hata ({type(_fc_err).__name__}): {_fc_err} â†’ metin moduna geÃ§ildi."
+                            f"[FC] Hata ({type(_fc_err).__name__}): {_fc_err} â†’ metin moduna geçildi."
                         )
                         self._fc_mod = False
 
-            # FC araÃ§larÄ± paralel Ã§alÄ±ÅŸtÄ±rÄ±ldÄ± â†’ yeni tura geÃ§ (assistant+tool eklendi)
+            # FC araçlarÄ± paralel çalÄ±ÅŸtÄ±rÄ±ldÄ± â†’ yeni tura geç (assistant+tool eklendi)
             if _fc_araclari_calistirildi:
                 continue
 
@@ -1063,7 +1063,7 @@ class AIAgentOrchestrator:
                 if _sem_cache and cevap and "[Beyin Hatasi]" not in cevap:
                     _sem_cache.kaydet(sistem_prompt, mesajlar, cevap)
 
-            # 4. Hallucination filtresi (hem FC hem metin yanÄ±tlarÄ± iÃ§in)
+            # 4. Hallucination filtresi (hem FC hem metin yanÄ±tlarÄ± için)
             if self.halucination_filtresi and cevap:
                 _temiz_cevap, uyarilar = self.halucination_filtresi.filtrele(
                     cevap, hedef=hedef
@@ -1087,7 +1087,7 @@ class AIAgentOrchestrator:
                                 "role": "user",
                                 "content": (
                                     f"Ã–nceki yanÄ±tÄ±nda ÅŸu sorunlar tespit edildi:\n{_uyari_metni}\n\n"
-                                    "LÃ¼tfen yalnÄ±zca doÄŸrulayabildiÄŸin bilgileri kullan ve "
+                                    "Lütfen yalnÄ±zca doÄŸrulayabildiÄŸin bilgileri kullan ve "
                                     "aynÄ± eylemi tekrar dene."
                                 ),
                             }
@@ -1096,7 +1096,7 @@ class AIAgentOrchestrator:
                         adim_gecmisi.append(f"GUARDRAIL: {uyarilar[0][:80]}")
                         continue
 
-            # 5. DÃ¼ÅŸÃ¼nce/Eylem logu ve mesajlara ekle
+            # 5. DüÅŸünce/Eylem logu ve mesajlara ekle
             _karmasiklik_now = (
                 analiz.get("karmasiklik", 1) if isinstance(analiz, dict) else 1
             )
@@ -1573,7 +1573,7 @@ if __name__ == "__main__":
 
     try:
         with _contextlib.redirect_stdout(_buf), _contextlib.redirect_stderr(_buf):
-            # 1. Config yÃ¼kle
+            # 1. Config yükle
             try:
                 from setup import config_yukle
 
@@ -1582,7 +1582,7 @@ if __name__ == "__main__":
                 kayitli = None
             aktif_config = kayitli or CONFIG
 
-            # 2. BaÅŸlangÄ±Ã§ kontrolÃ¼ (API / Ollama / llava)
+            # 2. BaÅŸlangÄ±ç kontrolü (API / Ollama / llava)
             try:
                 from reymen.sistem.baslangic_kontrol import (
                     baslangic_kontrolu,
@@ -1638,11 +1638,11 @@ if __name__ == "__main__":
             f"Komutlar: /model  /guncelle  /yansima  /hafiza  /cikis{_hafiza_bilgi}\n"
         )
 
-    # 5b. Startup bitti â€” logging'i ac ama gÃ¼rÃ¼ltÃ¼lÃ¼ logger'lari WARNING'de tut
+    # 5b. Startup bitti â€” logging'i ac ama gürültülü logger'lari WARNING'de tut
     _startup_log.disable(_startup_log.NOTSET)
     # Root logger'i WARNING'e al â†’ INFO seviyesi artÄ±k terminale yazÄ±lmaz
     _startup_log.getLogger().setLevel(_startup_log.WARNING)
-    # Spesifik gÃ¼rÃ¼ltÃ¼lÃ¼ logger'lar
+    # Spesifik gürültülü logger'lar
     for _noisy_logger in (
         "CUA",
         "cua_motor_araci",
@@ -1695,7 +1695,7 @@ if __name__ == "__main__":
         logger.warning("[Main] except Exception (L1395): %s", Exception)
         pass
 
-    # 7. Ä°nteraktif dÃ¶ngÃ¼
+    # 7. Ä°nteraktif döngü
 
     try:
         from reymen.sistem.guncelle import (
@@ -1710,7 +1710,7 @@ if __name__ == "__main__":
     _bildirim_gosterildi = False
 
     while True:
-        # Arka plan gÃ¼ncelleme kontrolÃ¼ bittiyse bir kez bildirim gÃ¶ster
+        # Arka plan güncelleme kontrolü bittiyse bir kez bildirim göster
         if _guncelle_yuklu and not _bildirim_gosterildi:
             bildirim = guncelleme_bildirimi()
             if bildirim:
@@ -1726,7 +1726,7 @@ if __name__ == "__main__":
         try:
             hedef = input("ReYMeN > ").strip()
         except (EOFError, KeyboardInterrupt):
-            print("\n[ReYMeN] GÃ¶rÃ¼ÅŸÃ¼rÃ¼z.")
+            print("\n[ReYMeN] GörüÅŸürüz.")
             break
 
         if not hedef:
@@ -1737,7 +1737,7 @@ if __name__ == "__main__":
             agent.adaptif_ogrenme.kullanici_mesaji_isle(hedef)
 
         if hedef.lower() in ("/cikis", "/q", "exit", "quit"):
-            print("[ReYMeN] GÃ¶rÃ¼ÅŸÃ¼rÃ¼z.")
+            print("[ReYMeN] GörüÅŸürüz.")
             break
 
         if hedef.lower().startswith("/model"):
@@ -1795,7 +1795,7 @@ if __name__ == "__main__":
                 araclar = [s.get("ad", "") for s in hp.arac_sema_al()]
                 print(f"\n[HafÄ±za Plugin] {hp.ad}")
                 print(blok)
-                print(f"AraÃ§lar: {', '.join(araclar)}")
+                print(f"Araçlar: {', '.join(araclar)}")
                 saglayicilar = getattr(agent, "_plugin_yukleyici", None)
                 if saglayicilar:
                     liste = saglayicilar.hafiza_saglayici_listele()
@@ -1810,7 +1810,7 @@ if __name__ == "__main__":
                         if hasattr(hp, "arac_cagri_isle")
                         else ""
                     )
-                    print(sonuc or "SonuÃ§ bulunamadÄ±.")
+                    print(sonuc or "Sonuç bulunamadÄ±.")
                 else:
                     print("KullanÄ±m: /hafiza ara <sorgu>")
 
@@ -1858,16 +1858,16 @@ if __name__ == "__main__":
                         kayitli = yl.hafiza_saglayici_listele()
                         print(f"DeÄŸiÅŸtirilemedi. KayÄ±tlÄ±: {kayitli}")
                 else:
-                    print("[HafÄ±za] Plugin yÃ¶neticisi bulunamadÄ±.")
+                    print("[HafÄ±za] Plugin yöneticisi bulunamadÄ±.")
 
             else:
                 print(
                     "KullanÄ±m:\n"
-                    "  /hafiza durum           â€” aktif plugin ve araÃ§lar\n"
+                    "  /hafiza durum           â€” aktif plugin ve araçlar\n"
                     "  /hafiza ara <sorgu>      â€” hafÄ±zada ara\n"
                     "  /hafiza kaydet <metin>   â€” hafÄ±zaya yaz\n"
                     "  /hafiza listele          â€” son giriÅŸleri listele\n"
-                    "  /hafiza degistir <ad>    â€” farklÄ± provider'a geÃ§"
+                    "  /hafiza degistir <ad>    â€” farklÄ± provider'a geç"
                 )
             continue
 

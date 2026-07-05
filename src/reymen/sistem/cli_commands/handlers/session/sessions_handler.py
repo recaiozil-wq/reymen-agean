@@ -1,4 +1,4 @@
-﻿"""Handle /sessions command â€” browse or resume previous sessions."""
+"""Handle /sessions command â€” browse or resume previous sessions."""
 
 
 def handle_sessions_command(cli, cmd_original: str) -> None:

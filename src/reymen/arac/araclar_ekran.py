@@ -1,18 +1,18 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-araclar_ekran.py â€” Ekran-OCR-TÄ±kla aracÄ± (hassas + gÃ¶rsel onay sÃ¼rÃ¼mÃ¼).
+araclar_ekran.py â€” Ekran-OCR-TÄ±kla aracÄ± (hassas + görsel onay sürümü).
 
 AkÄ±ÅŸ: ekran al -> yazÄ±yÄ± OCR ile bul -> HASSAS nokta hesapla ->
-isteÄŸe baÄŸlÄ± gÃ¶rsel niÅŸan Ã§iz (onay iÃ§in) -> fareyi yolla -> tÄ±kla.
+isteÄŸe baÄŸlÄ± görsel niÅŸan çiz (onay için) -> fareyi yolla -> tÄ±kla.
 
 HASSASÄ°YET (v1.0):
-- AÄŸÄ±rlÄ±k merkezi: kutunun 4 kÃ¶ÅŸesinden gerÃ§ek merkez (poligon centroid).
-- Ofset: yazÄ±nÄ±n yanÄ±ndaki kutucuÄŸa/ikona tÄ±klamak iÃ§in dx,dy kaymasÄ±.
-- GÃ¶rsel niÅŸan: tÄ±klanacak noktaya Ã§apraz Ã§izgi + daire Ã§izip dosyaya kaydeder
-  (sen gÃ¶rÃ¼p onaylarsÄ±n -> "nokta konum belirlenip onay" akÄ±ÅŸÄ±).
-- Ã‡oklu adayÄ± gÃ¶rselde numaralandÄ±rma.
+- AÄŸÄ±rlÄ±k merkezi: kutunun 4 köÅŸesinden gerçek merkez (poligon centroid).
+- Ofset: yazÄ±nÄ±n yanÄ±ndaki kutucuÄŸa/ikona tÄ±klamak için dx,dy kaymasÄ±.
+- Görsel niÅŸan: tÄ±klanacak noktaya çapraz çizgi + daire çizip dosyaya kaydeder
+  (sen görüp onaylarsÄ±n -> "nokta konum belirlenip onay" akÄ±ÅŸÄ±).
+- Ã‡oklu adayÄ± görselde numaralandÄ±rma.
 
-GÃœVENLÄ°K (v0.9'dan): gÃ¼ven eÅŸiÄŸi, Ã§oklu eÅŸleÅŸme, FAILSAFE, tÄ±klama sayacÄ±.
+GÃœVENLÄ°K (v0.9'dan): güven eÅŸiÄŸi, çoklu eÅŸleÅŸme, FAILSAFE, tÄ±klama sayacÄ±.
 """
 
 import os
@@ -57,7 +57,7 @@ class EkranOCRTikla:
         return self._reader
 
     def _centroid(self, kutu):
-        """Poligon aÄŸÄ±rlÄ±k merkezi (basit ortalama 4 kÃ¶ÅŸe yerine alan-aÄŸÄ±rlÄ±klÄ±)."""
+        """Poligon aÄŸÄ±rlÄ±k merkezi (basit ortalama 4 köÅŸe yerine alan-aÄŸÄ±rlÄ±klÄ±)."""
         n = len(kutu)
         cx = sum(p[0] for p in kutu) / n
         cy = sum(p[1] for p in kutu) / n
@@ -85,7 +85,7 @@ class EkranOCRTikla:
         return eslesmeler
 
     def nisan_ciz(self, x, y, dosya_adi="nisan.png", adaylar=None):
-        """TÄ±klanacak noktaya gÃ¶rsel niÅŸan Ã§izer, dosyaya kaydeder (onay iÃ§in).
+        """TÄ±klanacak noktaya görsel niÅŸan çizer, dosyaya kaydeder (onay için).
         adaylar verilirse hepsini numaralandÄ±rÄ±r."""
         if not (PYAUTOGUI_OK and PIL_OK):
             return None
@@ -102,7 +102,7 @@ class EkranOCRTikla:
         return yol
 
     def _tek_nisan(self, draw, x, y, etiket="", renk="red", r=18):
-        # Ã§apraz Ã§izgi
+        # çapraz çizgi
         draw.line([(x - r, y), (x + r, y)], fill=renk, width=2)
         draw.line([(x, y - r), (x, y + r)], fill=renk, width=2)
         # daire
@@ -113,9 +113,9 @@ class EkranOCRTikla:
     def yaziyi_bul_ve_tikla(
         self, aranan_yazi, tikla=True, hangi=0, dx=0, dy=0, nisan=False
     ):
-        """YazÄ±yÄ± bulur, HASSAS nokta hesaplar, isteÄŸe baÄŸlÄ± niÅŸan Ã§izer, tÄ±klar.
-        dx,dy: tÄ±klama noktasÄ±na ofset (yan kutucuÄŸa tÄ±klamak iÃ§in).
-        nisan=True: tÄ±klamadan Ã¶nce gÃ¶rsel niÅŸan dosyasÄ± Ã¼retir (onay iÃ§in)."""
+        """YazÄ±yÄ± bulur, HASSAS nokta hesaplar, isteÄŸe baÄŸlÄ± niÅŸan çizer, tÄ±klar.
+        dx,dy: tÄ±klama noktasÄ±na ofset (yan kutucuÄŸa tÄ±klamak için).
+        nisan=True: tÄ±klamadan önce görsel niÅŸan dosyasÄ± üretir (onay için)."""
         if not PYAUTOGUI_OK:
             return "[Ekran]: pyautogui kurulu deÄŸil."
         if not EASYOCR_OK:
@@ -125,7 +125,7 @@ class EkranOCRTikla:
 
         eslesmeler = self._eslesmeleri_bul(aranan_yazi)
         if not eslesmeler:
-            return f"[Ekran]: '{aranan_yazi}' yeterli gÃ¼venle bulunamadÄ± (eÅŸik {self.guven_esigi})."
+            return f"[Ekran]: '{aranan_yazi}' yeterli güvenle bulunamadÄ± (eÅŸik {self.guven_esigi})."
 
         if len(eslesmeler) > 1 and hangi == -1:
             yol = (
@@ -139,12 +139,12 @@ class EkranOCRTikla:
                 else None
             )
             satir = "\n".join(
-                f"  [{i}] '{e['metin']}' ({e['x']},{e['y']}) gÃ¼ven={e['guven']}"
+                f"  [{i}] '{e['metin']}' ({e['x']},{e['y']}) güven={e['guven']}"
                 for i, e in enumerate(eslesmeler)
             )
-            ek = f"\n  GÃ¶rsel: {yol}" if yol else ""
+            ek = f"\n  Görsel: {yol}" if yol else ""
             return (
-                f"[Ekran]: '{aranan_yazi}' iÃ§in {len(eslesmeler)} eÅŸleÅŸme:\n{satir}{ek}"
+                f"[Ekran]: '{aranan_yazi}' için {len(eslesmeler)} eÅŸleÅŸme:\n{satir}{ek}"
             )
 
         if hangi < 0 or hangi >= len(eslesmeler):
@@ -153,7 +153,7 @@ class EkranOCRTikla:
         hedef_x = secili["x"] + dx
         hedef_y = secili["y"] + dy
 
-        # GÃ¶rsel onay iÃ§in niÅŸan Ã§iz
+        # Görsel onay için niÅŸan çiz
         nisan_yolu = None
         if nisan:
             nisan_yolu = self.nisan_ciz(hedef_x, hedef_y, "hedef.png")
@@ -171,7 +171,7 @@ class EkranOCRTikla:
         ek = f" NiÅŸan: {nisan_yolu}" if nisan_yolu else ""
         return (
             f"[Ekran]: '{secili['metin']}' tÄ±klandÄ± ({hedef_x},{hedef_y}, "
-            f"gÃ¼ven={secili['guven']}). TÄ±klama #{self._tiklama_sayaci}.{ek}"
+            f"güven={secili['guven']}). TÄ±klama #{self._tiklama_sayaci}.{ek}"
         )
 
     def ekran_metnini_oku(self):
@@ -193,7 +193,7 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "EKRAN_OKU",
         lambda: _ekran.ekran_metnini_oku(),
-        "Ekrandaki tÃ¼m metni OCR ile oku",
+        "Ekrandaki tüm metni OCR ile oku",
     )
     motor._plugin_arac_kaydet(
         "EKRAN_TIKLA",

@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 migrate_skills.py â€” Tek seferlik veri taÅŸÄ±ma betiÄŸi.
 
-Mevcut skills/ dizinindeki frontmatter iÃ§ermeyen .md dosyalarÄ±na
+Mevcut skills/ dizinindeki frontmatter içermeyen .md dosyalarÄ±na
 standart YAML frontmatter ekler. Ã–nce skills_backup/ yedeÄŸi alÄ±r.
 
 Kullanim:
@@ -198,7 +198,7 @@ def main():
     print()
 
     if frontmattersiz == 0:
-        print("[Migration] Guncellenecek dosya yok. TÃ¼m dosyalar frontmatter iÃ§eriyor.")
+        print("[Migration] Guncellenecek dosya yok. Tüm dosyalar frontmatter içeriyor.")
         print("[Migration] Migration tamamlandi: 0 dosya guncellendi.")
         return
 

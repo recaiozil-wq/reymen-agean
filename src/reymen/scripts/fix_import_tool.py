@@ -1,12 +1,12 @@
-﻿#!/usr/bin/env python3
-"""Eksik import'larÄ± toplu dÃ¼zelt â€” Claude Code'un unuttuklarÄ±nÄ± ekle."""
+#!/usr/bin/env python3
+"""Eksik import'larÄ± toplu düzelt â€” Claude Code'un unuttuklarÄ±nÄ± ekle."""
 
 import ast, sys
 from pathlib import Path
 
 kok = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")
 
-# Her modÃ¼l iÃ§in bilinen eksik import mapping'i
+# Her modül için bilinen eksik import mapping'i
 FIX_MAP = {
     "re": "import re",
     "os": "import os",
@@ -40,7 +40,7 @@ for py_file in sorted((kok / "reymen" / "sistem").glob("cli_*.py")):
         print(f"âŒ {py_file.name}: SyntaxError â€” {e}")
         continue
 
-    # KullanÄ±lan tÃ¼m name'leri bul
+    # KullanÄ±lan tüm name'leri bul
     used = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):

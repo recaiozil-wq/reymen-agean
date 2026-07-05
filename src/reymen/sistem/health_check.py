@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """health_check.py - ReYMeN Calisma Zamani Saglik Kontrolu.
 
 Kullanim:
@@ -230,17 +230,17 @@ class HealthChecker:
         """
         Katman 1 â€” Denetim sonucunu bulgu panosuna OTOMATÄ°K kaydeder.
 
-        Her tam_kontrol() Ã§alÄ±ÅŸtÄ±ÄŸÄ±nda bu fonksiyon Ã§aÄŸrÄ±lÄ±r:
+        Her tam_kontrol() çalÄ±ÅŸtÄ±ÄŸÄ±nda bu fonksiyon çaÄŸrÄ±lÄ±r:
           1. HealthChecker bulgularÄ±nÄ± (self.sorunlar) board'a yazar
-          2. EÄŸer hiÃ§ sorun yoksa "Temiz rapor" kaydÄ± dÃ¼ÅŸer
-          3. BaÄŸÄ±msÄ±z Ã§aÄŸrÄ±: audit_tamamla(bulan_profil="reymen", konu="...", ...)
+          2. EÄŸer hiç sorun yoksa "Temiz rapor" kaydÄ± düÅŸer
+          3. BaÄŸÄ±msÄ±z çaÄŸrÄ±: audit_tamamla(bulan_profil="reymen", konu="...", ...)
 
         Parametreler:
             bulan_profil: "reymen"/"kiral38"/"pasa_38"/"default"
             konu: Bulgu baÅŸlÄ±ÄŸÄ±
             dosya_yolu: Ä°lgili dosya (opsiyonel)
             onem_derecesi: "kritik"/"orta"/"dusuk"
-            aciklama: AÃ§Ä±klama metni
+            aciklama: AçÄ±klama metni
         Returns:
             {"basarili": bool, "id": int|None, "hata": str|None}
         """
@@ -303,7 +303,7 @@ class HealthChecker:
                     logger.warning("[audit_tamamla] Kayit hatasi: %s", e)
 
             if yazilan == 0 and not self.sorunlar:
-                # HiÃ§ sorun yok â€” "temiz" kaydÄ±
+                # Hiç sorun yok â€” "temiz" kaydÄ±
                 cur.execute(
                     """
                     INSERT OR IGNORE INTO findings
@@ -364,11 +364,11 @@ class HealthChecker:
 
     def check_findings_board_health(self):
         """
-        Katman 2 â€” Bulgu Panosu (findings_board.db) SaÄŸlÄ±k KontrolÃ¼.
+        Katman 2 â€” Bulgu Panosu (findings_board.db) SaÄŸlÄ±k Kontrolü.
 
-        1. Son 7 gÃ¼nde en az 1 audit/tarama Ã§alÄ±ÅŸtÄ± mÄ±? (log'lardan kontrol)
-        2. Audit Ã§alÄ±ÅŸtÄ±ysa, aynÄ± dÃ¶nemde board'a yeni bulgu eklendi mi?
-        3. Audit var ama board gÃ¼ncel deÄŸilse â†’ Telegram uyarÄ±sÄ±
+        1. Son 7 günde en az 1 audit/tarama çalÄ±ÅŸtÄ± mÄ±? (log'lardan kontrol)
+        2. Audit çalÄ±ÅŸtÄ±ysa, aynÄ± dönemde board'a yeni bulgu eklendi mi?
+        3. Audit var ama board güncel deÄŸilse â†’ Telegram uyarÄ±sÄ±
         4. 3 profilin SOUL.md'sinde findings_board kuralÄ± hala var mÄ±? (haftalÄ±k)
         """
         import datetime, json, re
@@ -384,7 +384,7 @@ class HealthChecker:
         yedi_gun_once = now - datetime.timedelta(days=7)
         yedi_gun_once_ts = yedi_gun_once.timestamp()
 
-        # 1) Log'lardan son 7 gÃ¼nde audit/tarama ara
+        # 1) Log'lardan son 7 günde audit/tarama ara
         log_dir = self.base_dir / "logs"
         audit_bulundu = False
         if log_dir.exists():
@@ -424,7 +424,7 @@ class HealthChecker:
 
         sonuc["son_7_gun_audit"] = audit_bulundu
 
-        # 2) Board'da son 7 gÃ¼nde yeni bulgu var mÄ±?
+        # 2) Board'da son 7 günde yeni bulgu var mÄ±?
         board_guncellendi = False
         board_path = self.base_dir / "shared_state" / "findings_board.db"
         if board_path.exists():
@@ -445,7 +445,7 @@ class HealthChecker:
 
         sonuc["son_7_gun_board_guncellemesi"] = board_guncellendi
 
-        # 3) Audit var ama board gÃ¼ncel deÄŸilse uyarÄ±
+        # 3) Audit var ama board güncel deÄŸilse uyarÄ±
         if audit_bulundu and not board_guncellendi:
             uyari = (
                 "Denetim yapildi ama bulgu panosuna yazilmadi, "

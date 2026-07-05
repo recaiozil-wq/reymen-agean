@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module â€” Media/Clipboard operations (paste, copy, image, voice)."""
+"""ReYMeNCLI mixin module â€” Media/Clipboard operations (paste, copy, image, voice)."""
 
 import logging
 import os

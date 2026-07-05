@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """reymen/mcp/mcp_catalog.py â€” MCP Sunucu KataloÄŸu.
 
 Ã–nceden tanÄ±mlÄ± MCP sunucularÄ±nÄ± listeler ve tek komutla kurulum saÄŸlar.
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 KATALOG = {
     "github": {
         "adi": "GitHub MCP",
-        "aciklama": "GitHub API: issue, PR, repo, dosya yÃ¶netimi",
+        "aciklama": "GitHub API: issue, PR, repo, dosya yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-github"],
         "transport": "stdio",
@@ -26,7 +26,7 @@ KATALOG = {
     },
     "filesystem": {
         "adi": "Dosya Sistemi MCP",
-        "aciklama": "GÃ¼venli dosya okuma/yazma/dizin iÅŸlemleri",
+        "aciklama": "Güvenli dosya okuma/yazma/dizin iÅŸlemleri",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-filesystem", "/"],
         "transport": "stdio",
@@ -42,7 +42,7 @@ KATALOG = {
     },
     "sqlite": {
         "adi": "SQLite MCP",
-        "aciklama": "SQLite veritabanÄ± sorgulama ve yÃ¶netim",
+        "aciklama": "SQLite veritabanÄ± sorgulama ve yönetim",
         "komut": "uvx",
         "args": ["mcp-server-sqlite", "--db", "reymen.db"],
         "transport": "stdio",
@@ -58,7 +58,7 @@ KATALOG = {
     },
     "puppeteer": {
         "adi": "Puppeteer (Browser) MCP",
-        "aciklama": "Headless Chrome ile web scraping ve ekran gÃ¶rÃ¼ntÃ¼sÃ¼",
+        "aciklama": "Headless Chrome ile web scraping ve ekran görüntüsü",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
         "transport": "stdio",
@@ -66,7 +66,7 @@ KATALOG = {
     },
     "playwright": {
         "adi": "Playwright MCP",
-        "aciklama": "TarayÄ±cÄ± otomasyonu: sayfa yÃ¼kleme, tÄ±klama, form doldurma, ekran gÃ¶rÃ¼ntÃ¼sÃ¼",
+        "aciklama": "TarayÄ±cÄ± otomasyonu: sayfa yükleme, tÄ±klama, form doldurma, ekran görüntüsü",
         "komut": "npx",
         "args": ["-y", "@playwright/mcp"],
         "transport": "stdio",
@@ -82,7 +82,7 @@ KATALOG = {
     },
     "sequential-thinking": {
         "adi": "Sequential Thinking MCP",
-        "aciklama": "AdÄ±m adÄ±m dÃ¼ÅŸÃ¼nme ve problem Ã§Ã¶zme",
+        "aciklama": "AdÄ±m adÄ±m düÅŸünme ve problem çözme",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
         "transport": "stdio",
@@ -90,16 +90,16 @@ KATALOG = {
     },
     "reymen-local": {
         "adi": "ReYMeN Local MCP",
-        "aciklama": "ReYMeN'in kendi araÃ§larÄ±nÄ± MCP Ã¼zerinden sunar",
+        "aciklama": "ReYMeN'in kendi araçlarÄ±nÄ± MCP üzerinden sunar",
         "command": ["python", "-m", "reymen.mcp.server"],
         "transport": "stdio",
-        "dokuman": "YerleÅŸik â€” reymen.mcp.server modÃ¼lÃ¼",
+        "dokuman": "YerleÅŸik â€” reymen.mcp.server modülü",
     },
 }
 
 
 def listele() -> list[dict]:
-    """Katalogdaki tÃ¼m sunucularÄ± listele."""
+    """Katalogdaki tüm sunucularÄ± listele."""
     return [
         {
             "ad": ad,
@@ -120,10 +120,10 @@ def bilgi(sunucu_adi: str) -> Optional[dict]:
 
 
 def kur(sunucu_adi: str) -> dict:
-    """MCP sunucusunu Ã§alÄ±ÅŸma zamanÄ±na ekle (kurulum+yapÄ±landÄ±rma).
+    """MCP sunucusunu çalÄ±ÅŸma zamanÄ±na ekle (kurulum+yapÄ±landÄ±rma).
 
-    Not: Bu fonksiyon sadece yapÄ±landÄ±rma bilgisini dÃ¶ndÃ¼rÃ¼r.
-    GerÃ§ek MCP sunucu baÅŸlatma config.yaml Ã¼zerinden veya
+    Not: Bu fonksiyon sadece yapÄ±landÄ±rma bilgisini döndürür.
+    Gerçek MCP sunucu baÅŸlatma config.yaml üzerinden veya
     mcp_manager().ekle() ile yapÄ±lÄ±r.
     """
     if sunucu_adi not in KATALOG:
@@ -159,7 +159,7 @@ def kur(sunucu_adi: str) -> dict:
             return {
                 "durum": "kaydedildi",
                 "sunucu": sunucu_adi,
-                "not": "Sunucu kaydedildi ama baÄŸlantÄ± kurulamadÄ± (Ã§alÄ±ÅŸmÄ±yor olabilir)",
+                "not": "Sunucu kaydedildi ama baÄŸlantÄ± kurulamadÄ± (çalÄ±ÅŸmÄ±yor olabilir)",
                 "config": cfg,
             }
     except Exception as e:

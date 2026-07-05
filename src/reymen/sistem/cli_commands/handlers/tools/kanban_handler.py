@@ -1,4 +1,4 @@
-﻿"""_handle_kanban_command handler."""
+"""_handle_kanban_command handler."""
 
 
 def _handle_kanban_command(cli, cmd: str):

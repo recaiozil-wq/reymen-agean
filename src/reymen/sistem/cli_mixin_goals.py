@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module â€” Goal management (goal, subgoal)."""
+"""ReYMeNCLI mixin module â€” Goal management (goal, subgoal)."""
 
 import logging
 import os

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """reymen/sistem/skill_activator.py â€” Auto-activation framework for ReYMeN skills.
 
 Minimal registry that maps skill names to file paths, with an activate()

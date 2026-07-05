@@ -1,13 +1,13 @@
-﻿"""
+"""
 â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
 â•‘  ReYMeN â€” CUA_EKRAN_KULLAN  â€¢  cua_motor_araci.py               â•‘
 â•‘  Tam otonom: Ekran â†’ Vision â†’ Koordinat â†’ Eylem â†’ DoÄŸrula       â•‘
 â•‘  motor.py'ye doÄŸrudan import edilir.                             â•‘
 â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
-â•‘  v2.0 â€” DÃ¼zeltmeler:                                             â•‘
+â•‘  v2.0 â€” Düzeltmeler:                                             â•‘
 â•‘   1. Config YAML desteÄŸi (LM_STUDIO_URL artÄ±k sabit deÄŸil)       â•‘
-â•‘   2. tikla() iÃ§inde FailSafeException yakalama                   â•‘
-â•‘   3. DoÄŸrulama: EVET/HAYIR + sonraki koordinat Ã¶nerisi           â•‘
+â•‘   2. tikla() içinde FailSafeException yakalama                   â•‘
+â•‘   3. DoÄŸrulama: EVET/HAYIR + sonraki koordinat önerisi           â•‘
 â•‘   4. Adaptif MAX_DENEME (baÅŸarÄ±sÄ±zlÄ±kla artar)                   â•‘
 â•‘   5. requests.Session havuzu (~%20 hÄ±z kazancÄ±)                  â•‘
 â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -43,7 +43,7 @@ from typing import Generator, Optional
 
 import requests
 
-# pyautogui ve PIL lazy import â€” kullanÄ±m anÄ±nda try/except ile yÃ¼klenir
+# pyautogui ve PIL lazy import â€” kullanÄ±m anÄ±nda try/except ile yüklenir
 # Kurulum: pip install pyautogui pillow mss
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -53,8 +53,8 @@ import requests
 
 def _config_yukle() -> dict:
     """
-    cua_config.yaml varsa oradan, yoksa varsayÄ±lanlarÄ± dÃ¶ndÃ¼rÃ¼r.
-    PyYAML kurulu deÄŸilse sessizce varsayÄ±lana dÃ¼ÅŸer.
+    cua_config.yaml varsa oradan, yoksa varsayÄ±lanlarÄ± döndürür.
+    PyYAML kurulu deÄŸilse sessizce varsayÄ±lana düÅŸer.
     """
     varsayilan = {
         "lm_studio_url": "http://localhost:1234/v1/chat/completions",
@@ -85,7 +85,7 @@ LM_STUDIO_MODEL: str = _CFG["lm_studio_model"]
 SCREENSHOT_DIR: Path = Path(_CFG["screenshot_dir"])
 LOG_DOSYASI: Path = Path(_CFG["log_dosyasi"])
 TIKLA_BEKLEME: float = float(_CFG["tikla_bekleme"])
-MAX_DENEME_TABAN: int = int(_CFG["max_deneme"])  # adaptif iÃ§in taban
+MAX_DENEME_TABAN: int = int(_CFG["max_deneme"])  # adaptif için taban
 GUVENLI_BOLGE: tuple[int, int] = tuple(_CFG["guvenli_bolge"])  # type: ignore
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -106,7 +106,7 @@ log = logging.getLogger("CUA")
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 5. REQUESTS SESSION HAVUZU
 #    Tek Session nesnesi, baÄŸlantÄ±larÄ± yeniden kullanÄ±r.
-#    weakref ile tutulur â€” modÃ¼l kapanÄ±nca GC onu temizler.
+#    weakref ile tutulur â€” modül kapanÄ±nca GC onu temizler.
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _session_ref: Optional[weakref.ref] = None
@@ -114,7 +114,7 @@ _session_ref: Optional[weakref.ref] = None
 
 def _get_session() -> requests.Session:
     """
-    Tek bir requests.Session dÃ¶ndÃ¼rÃ¼r; yoksa oluÅŸturur.
+    Tek bir requests.Session döndürür; yoksa oluÅŸturur.
     BaÄŸlantÄ± havuzu ~%20 hÄ±z kazancÄ± saÄŸlar.
     """
     global _session_ref
@@ -124,7 +124,7 @@ def _get_session() -> requests.Session:
             return s
     s = requests.Session()
     s.headers.update({"Content-Type": "application/json"})
-    # weakref: Session bÃ¼yÃ¼k bir nesne deÄŸil ama tutarlÄ±lÄ±k iÃ§in
+    # weakref: Session büyük bir nesne deÄŸil ama tutarlÄ±lÄ±k için
     _session_ref = weakref.ref(s)
     return s
 
@@ -144,14 +144,14 @@ class CUASonucu:
     eylem: str
     koordinat: Optional[tuple[int, int]] = None
     vision_yaniti: str = ""
-    sonraki_koordinat: Optional[tuple[int, int]] = None  # v2: doÄŸrulamadan gelen Ã¶neri
+    sonraki_koordinat: Optional[tuple[int, int]] = None  # v2: doÄŸrulamadan gelen öneri
     hata: str = ""
     ekran_boyutu: tuple[int, int] = field(default_factory=lambda: (0, 0))
 
     def str(self) -> str:
         if self.basarili:
             sonraki = (
-                f" | Sonraki Ã¶neri: {self.sonraki_koordinat}"
+                f" | Sonraki öneri: {self.sonraki_koordinat}"
                 if self.sonraki_koordinat
                 else ""
             )
@@ -170,9 +170,9 @@ class CUASonucu:
 
 def ekran_goruntusu_al() -> tuple[Image.Image, tuple[int, int]]:
     """
-    Tam ekran gÃ¶rÃ¼ntÃ¼sÃ¼ alÄ±r.
-    Ã–nce mss dener; yoksa pyautogui'ye dÃ¼ÅŸer.
-    DÃ¶ner: (PIL.Image, (geniÅŸlik, yÃ¼kseklik))
+    Tam ekran görüntüsü alÄ±r.
+    Ã–nce mss dener; yoksa pyautogui'ye düÅŸer.
+    Döner: (PIL.Image, (geniÅŸlik, yükseklik))
     """
     from PIL import Image
 
@@ -195,14 +195,14 @@ def ekran_goruntusu_al() -> tuple[Image.Image, tuple[int, int]]:
         return goruntu, goruntu.size
     except ImportError:
         raise ImportError(
-            "Ekran gÃ¶rÃ¼ntÃ¼sÃ¼ iÃ§in mss veya pyautogui gerekli. pip install mss pyautogui"
+            "Ekran görüntüsü için mss veya pyautogui gerekli. pip install mss pyautogui"
         )
 
 
 def goruntu_base64_yap(goruntu: Image.Image, max_genislik: int = 1280) -> str:
     """
-    PIL gÃ¶rÃ¼ntÃ¼sÃ¼nÃ¼ Base64 JPEG'e dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r.
-    BÃ¼yÃ¼k ekranlarda yeniden boyutlandÄ±rÄ±r.
+    PIL görüntüsünü Base64 JPEG'e dönüÅŸtürür.
+    Büyük ekranlarda yeniden boyutlandÄ±rÄ±r.
     """
     from PIL import Image
 
@@ -210,7 +210,7 @@ def goruntu_base64_yap(goruntu: Image.Image, max_genislik: int = 1280) -> str:
         oran = max_genislik / goruntu.width
         yeni_boyut = (max_genislik, int(goruntu.height * oran))
         goruntu = goruntu.resize(yeni_boyut, Image.LANCZOS)
-        log.info(f"GÃ¶rÃ¼ntÃ¼ yeniden boyutlandÄ±rÄ±ldÄ±: {yeni_boyut}")
+        log.info(f"Görüntü yeniden boyutlandÄ±rÄ±ldÄ±: {yeni_boyut}")
     tampon = BytesIO()
     goruntu.save(tampon, format="JPEG", quality=85)
     b64 = base64.b64encode(tampon.getvalue()).decode("utf-8")
@@ -220,8 +220,8 @@ def goruntu_base64_yap(goruntu: Image.Image, max_genislik: int = 1280) -> str:
     return b64
 
 
-# Critic Note: BytesIO aÃ§Ä±kÃ§a kapatÄ±lÄ±r, gc.collect() Ã§aÄŸrÄ±lÄ±r;
-# bÃ¼yÃ¼k PIL nesnesi scope dÄ±ÅŸÄ±na Ã§Ä±ktÄ±ÄŸÄ±nda GC tarafÄ±ndan toplanÄ±r.
+# Critic Note: BytesIO açÄ±kça kapatÄ±lÄ±r, gc.collect() çaÄŸrÄ±lÄ±r;
+# büyük PIL nesnesi scope dÄ±ÅŸÄ±na çÄ±ktÄ±ÄŸÄ±nda GC tarafÄ±ndan toplanÄ±r.
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -235,8 +235,8 @@ def vision_modele_sor(
     zaman_asimi: int = 30,
 ) -> str:
     """
-    LM Studio llava endpoint'ine gÃ¶rÃ¼ntÃ¼ + prompt gÃ¶nderir.
-    Session havuzunu kullanÄ±r â€” baÄŸlantÄ± yeniden aÃ§Ä±lmaz.
+    LM Studio llava endpoint'ine görüntü + prompt gönderir.
+    Session havuzunu kullanÄ±r â€” baÄŸlantÄ± yeniden açÄ±lmaz.
     """
     payload = {
         "model": LM_STUDIO_MODEL,
@@ -263,11 +263,11 @@ def vision_modele_sor(
         log.info(f"Vision yanÄ±tÄ±: {metin[:120]}")
         return metin
     except requests.exceptions.ConnectionError:
-        hata = "LM Studio baÄŸlantÄ±sÄ± kurulamadÄ±. http://localhost:1234 Ã§alÄ±ÅŸÄ±yor mu?"
+        hata = "LM Studio baÄŸlantÄ±sÄ± kurulamadÄ±. http://localhost:1234 çalÄ±ÅŸÄ±yor mu?"
         log.error(hata)
         return f"HATA: {hata}"
     except requests.exceptions.Timeout:
-        hata = f"Vision model {zaman_asimi}s iÃ§inde yanÄ±t vermedi."
+        hata = f"Vision model {zaman_asimi}s içinde yanÄ±t vermedi."
         log.error(hata)
         return f"HATA: {hata}"
     except Exception as e:
@@ -275,8 +275,8 @@ def vision_modele_sor(
         return f"HATA: {e}"
 
 
-# Critic Note: Session.post() baÄŸlantÄ±yÄ± havuzda tutar; her Ã§aÄŸrÄ±da
-# yeni TCP el sÄ±kÄ±ÅŸmasÄ± aÃ§Ä±lmaz; timeout zorunlu; sÄ±zÄ±ntÄ± yok.
+# Critic Note: Session.post() baÄŸlantÄ±yÄ± havuzda tutar; her çaÄŸrÄ±da
+# yeni TCP el sÄ±kÄ±ÅŸmasÄ± açÄ±lmaz; timeout zorunlu; sÄ±zÄ±ntÄ± yok.
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -293,7 +293,7 @@ def koordinat_parse(
     ekran_boyutu: tuple[int, int] = (1920, 1080),
 ) -> Optional[tuple[int, int]]:
     """
-    Vision yanÄ±tÄ±ndan (x, y) Ã§Ä±karÄ±r.
+    Vision yanÄ±tÄ±ndan (x, y) çÄ±karÄ±r.
     Ekran sÄ±nÄ±rlarÄ± dÄ±ÅŸÄ±nÄ± reddeder.
     """
     eslesmeler = _KOORDINAT_DESENI.findall(metin)
@@ -310,19 +310,19 @@ def koordinat_parse(
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# 2. EYLEM MOTORU â€” FailSafe tikla() iÃ§inde de yakalanÄ±yor
+# 2. EYLEM MOTORU â€” FailSafe tikla() içinde de yakalanÄ±yor
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class FailSafeHatasi(Exception):
-    """PyAutoGUI fare gÃ¼venli kÃ¶ÅŸeye gittiÄŸinde fÄ±rlatÄ±lÄ±r."""
+    """PyAutoGUI fare güvenli köÅŸeye gittiÄŸinde fÄ±rlatÄ±lÄ±r."""
 
 
 def tikla(x: int, y: int, cift_tik: bool = False) -> None:
     """
-    PyAutoGUI ile gÃ¼venli tÄ±klama.
+    PyAutoGUI ile güvenli tÄ±klama.
     FailSafeException hem burada hem CUA_EKRAN_KULLAN'da yakalanÄ±r â€”
-    her Ã§aÄŸrÄ± noktasÄ± korunuyor.
+    her çaÄŸrÄ± noktasÄ± korunuyor.
     """
     import pyautogui
 
@@ -335,13 +335,13 @@ def tikla(x: int, y: int, cift_tik: bool = False) -> None:
             pyautogui.click(x, y)
             log.info(f"TÄ±klandÄ±: ({x}, {y})")
     except pyautogui.FailSafeException as e:
-        log.critical(f"FailSafe tetiklendi tikla() iÃ§inde: {e}")
-        raise FailSafeHatasi("Fare gÃ¼venli kÃ¶ÅŸeye gitti.") from e
+        log.critical(f"FailSafe tetiklendi tikla() içinde: {e}")
+        raise FailSafeHatasi("Fare güvenli köÅŸeye gitti.") from e
 
 
-# Critic Note: FailSafeException tikla() iÃ§inde yakalanÄ±p FailSafeHatasi'na
-# dÃ¶nÃ¼ÅŸtÃ¼rÃ¼lÃ¼r; Ã¼st katman (CUA_EKRAN_KULLAN) kendi try bloÄŸunda bunu yakalar;
-# Ã§ift yakalama zincirleme istisna bilgisini korur.
+# Critic Note: FailSafeException tikla() içinde yakalanÄ±p FailSafeHatasi'na
+# dönüÅŸtürülür; üst katman (CUA_EKRAN_KULLAN) kendi try bloÄŸunda bunu yakalar;
+# çift yakalama zincirleme istisna bilgisini korur.
 
 
 def yaz(metin: str, gecikme: float = 0.05) -> None:
@@ -364,9 +364,9 @@ def eylem_yorumla_ve_calistir(
 ) -> str:
     hedef_kucuk = hedef.lower()
     x, y = koordinat
-    if "Ã§ift tÄ±k" in hedef_kucuk or "double" in hedef_kucuk:
+    if "çift tÄ±k" in hedef_kucuk or "double" in hedef_kucuk:
         tikla(x, y, cift_tik=True)
-        return f"Ã§ift_tÄ±klandÄ±({x},{y})"
+        return f"çift_tÄ±klandÄ±({x},{y})"
     if "yaz" in hedef_kucuk or "gir" in hedef_kucuk or "type" in hedef_kucuk:
         yazilacak = re.search(r"['\"](.+?)['\"]", hedef)
         tikla(x, y)
@@ -386,7 +386,7 @@ def eylem_yorumla_ve_calistir(
 
 class AdaptifDenemeSayaci:
     """
-    BaÅŸarÄ±sÄ±z parse giriÅŸimlerine gÃ¶re MAX_DENEME'yi dinamik olarak artÄ±rÄ±r.
+    BaÅŸarÄ±sÄ±z parse giriÅŸimlerine göre MAX_DENEME'yi dinamik olarak artÄ±rÄ±r.
     Taban: MAX_DENEME_TABAN (config'den).
     Her ardÄ±ÅŸÄ±k baÅŸarÄ±sÄ±zlÄ±kta +1 eklenir, maksimum taban Ã— 2.
     BaÅŸarÄ±da sÄ±fÄ±rlanÄ±r.
@@ -410,16 +410,16 @@ class AdaptifDenemeSayaci:
         self._ardisik_basarisiz = 0
 
 
-# Tek global sayaÃ§ â€” motor yaÅŸam dÃ¶ngÃ¼sÃ¼ boyunca Ã¶ÄŸrenir.
+# Tek global sayaç â€” motor yaÅŸam döngüsü boyunca öÄŸrenir.
 _deneme_sayaci = AdaptifDenemeSayaci()
 
 # Critic Note: AdaptifDenemeSayaci sade bir int tutar; bellek maliyeti sabit;
-# global nesne weakref gerektirmiyor â€” kÃ¼Ã§Ã¼k, uzun Ã¶mÃ¼rlÃ¼, paylaÅŸÄ±lan durum.
+# global nesne weakref gerektirmiyor â€” küçük, uzun ömürlü, paylaÅŸÄ±lan durum.
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 3. GELÄ°ÅTÄ°RÄ°LMÄ°Å DOÄRULAMA
-#    EVET/HAYIR + bir sonraki adÄ±m iÃ§in koordinat Ã¶nerisi
+#    EVET/HAYIR + bir sonraki adÄ±m için koordinat önerisi
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
@@ -431,15 +431,15 @@ def _dogrulama_yap(
     """
     Eylem sonrasÄ± doÄŸrulama:
       - BaÅŸarÄ±lÄ± mÄ±? (EVET/HAYIR)
-      - BaÅŸarÄ±sÄ±zsa: bir sonraki adÄ±m iÃ§in koordinat Ã¶nerisi
-    DÃ¶ner: (basarili: bool, sonraki_koordinat: Optional[tuple])
+      - BaÅŸarÄ±sÄ±zsa: bir sonraki adÄ±m için koordinat önerisi
+    Döner: (basarili: bool, sonraki_koordinat: Optional[tuple])
     """
     dogr_prompt = (
-        f"'{hedef}' eylemi gerÃ§ekleÅŸtirildikten sonraki ekran bu. "
+        f"'{hedef}' eylemi gerçekleÅŸtirildikten sonraki ekran bu. "
         "1) Eylem baÅŸarÄ±lÄ± olduysa sadece 'EVET' yaz. "
         "2) BaÅŸarÄ±sÄ±z olduysa 'HAYIR' yaz, ardÄ±ndan bir satÄ±rda "
-        f"'{hedef}' iÃ§in doÄŸru koordinatÄ± 'x, y' formatÄ±nda Ã¶ner. "
-        "BaÅŸka hiÃ§bir ÅŸey yazma."
+        f"'{hedef}' için doÄŸru koordinatÄ± 'x, y' formatÄ±nda öner. "
+        "BaÅŸka hiçbir ÅŸey yazma."
     )
     yanit = vision_modele_sor(b64, dogr_prompt)
     basarili = "EVET" in yanit.upper()
@@ -448,17 +448,17 @@ def _dogrulama_yap(
     if not basarili:
         sonraki = koordinat_parse(yanit, ekran_boyutu)
         if sonraki:
-            log.info(f"DoÄŸrulamadan sonraki koordinat Ã¶nerisi: {sonraki}")
+            log.info(f"DoÄŸrulamadan sonraki koordinat önerisi: {sonraki}")
 
     return basarili, sonraki
 
 
-# Critic Note: b64 bu fonksiyona referans olarak geÃ§er, kopyalanmaz;
+# Critic Note: b64 bu fonksiyona referans olarak geçer, kopyalanmaz;
 # sonraki koordinat sadece baÅŸarÄ±sÄ±z durumda ayrÄ±ÅŸtÄ±rÄ±lÄ±r â€” gereksiz parse yok.
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Ã–N KOÅUL KONTROLÃœ â€” Ã§aÄŸrÄ±lmadan Ã¶nce ortamÄ± doÄŸrula
+# Ã–N KOÅUL KONTROLÃœ â€” çaÄŸrÄ±lmadan önce ortamÄ± doÄŸrula
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _on_kosul_kontrolu_yapildi: bool = False
@@ -467,9 +467,9 @@ _on_kosul_sonuc: Optional[str] = None
 
 def _on_kosul_kontrol() -> Optional[str]:
     """
-    CUA dÃ¶ngÃ¼sÃ¼ iÃ§in gerekli tÃ¼m bileÅŸenleri kontrol eder.
-    Sadece bir kere Ã§alÄ±ÅŸÄ±r â€” sonraki Ã§aÄŸrÄ±larda Ã¶nbellek dÃ¶ndÃ¼rÃ¼r.
-    DÃ¶ner: None (her ÅŸey tamam) veya uyarÄ± metni
+    CUA döngüsü için gerekli tüm bileÅŸenleri kontrol eder.
+    Sadece bir kere çalÄ±ÅŸÄ±r â€” sonraki çaÄŸrÄ±larda önbellek döndürür.
+    Döner: None (her ÅŸey tamam) veya uyarÄ± metni
     """
     global _on_kosul_kontrolu_yapildi, _on_kosul_sonuc
     if _on_kosul_kontrolu_yapildi:
@@ -493,7 +493,7 @@ def _on_kosul_kontrol() -> Optional[str]:
     except ImportError:
         uyarilar.append("pyautogui kurulu deÄŸil: pip install pyautogui")
 
-    # 3. Ekran gÃ¶rÃ¼ntÃ¼sÃ¼ (mss veya pyautogui)
+    # 3. Ekran görüntüsü (mss veya pyautogui)
     try:
         import mss
 
@@ -505,9 +505,9 @@ def _on_kosul_kontrol() -> Optional[str]:
 
             pyautogui.screenshot()
         except Exception:
-            uyarilar.append("Ekran gÃ¶rÃ¼ntÃ¼sÃ¼ alÄ±namÄ±yor â€” mss veya pyautogui gerekli")
+            uyarilar.append("Ekran görüntüsü alÄ±namÄ±yor â€” mss veya pyautogui gerekli")
     except Exception:
-        uyarilar.append("Ekran gÃ¶rÃ¼ntÃ¼sÃ¼ alÄ±namÄ±yor (monitor algÄ±lanamadÄ±)")
+        uyarilar.append("Ekran görüntüsü alÄ±namÄ±yor (monitor algÄ±lanamadÄ±)")
 
     # 4. LM Studio baÄŸlantÄ±sÄ±
     try:
@@ -522,29 +522,29 @@ def _on_kosul_kontrol() -> Optional[str]:
             if LM_STUDIO_MODEL not in model_listesi:
                 uyarilar.append(
                     f"Vision model '{LM_STUDIO_MODEL}' LM Studio'da bulunamadÄ±. "
-                    f"YÃ¼klÃ¼ modeller: {', '.join(model_listesi[:5])}..."
+                    f"Yüklü modeller: {', '.join(model_listesi[:5])}..."
                 )
         else:
             uyarilar.append(f"LM Studio yanÄ±t vermedi (HTTP {yanit.status_code})")
     except requests.exceptions.ConnectionError:
         uyarilar.append(
-            "LM Studio Ã§alÄ±ÅŸmÄ±yor. Vision iÅŸlemler iÃ§in LM Studio'da "
-            "bir vision model (Ã¶r: llava) yÃ¼kleyip http://localhost:1234'Ã¼ aÃ§Ä±n."
+            "LM Studio çalÄ±ÅŸmÄ±yor. Vision iÅŸlemler için LM Studio'da "
+            "bir vision model (ör: llava) yükleyip http://localhost:1234'ü açÄ±n."
         )
     except requests.exceptions.Timeout:
         uyarilar.append("LM Studio'ya baÄŸlantÄ± zaman aÅŸÄ±mÄ±na uÄŸradÄ± (5 sn)")
     except Exception as e:
-        uyarilar.append(f"LM Studio kontrolÃ¼ baÅŸarÄ±sÄ±z: {e}")
+        uyarilar.append(f"LM Studio kontrolü baÅŸarÄ±sÄ±z: {e}")
 
     _on_kosul_kontrolu_yapildi = True
     if uyarilar:
-        _on_kosul_sonuc = "âš  CUA Ã¶n koÅŸul hatasÄ±:\n" + "\n".join(
+        _on_kosul_sonuc = "âš  CUA ön koÅŸul hatasÄ±:\n" + "\n".join(
             f"  â€¢ {u}" for u in uyarilar
         )
         log.warning(_on_kosul_sonuc)
     else:
         _on_kosul_sonuc = None
-        log.info("CUA Ã¶n koÅŸullarÄ± tamam â€” vision model hazÄ±r.")
+        log.info("CUA ön koÅŸullarÄ± tamam â€” vision model hazÄ±r.")
     return _on_kosul_sonuc
 
 
@@ -557,23 +557,23 @@ _vision_onbellek: weakref.WeakValueDictionary = weakref.WeakValueDictionary()
 
 def CUA_EKRAN_KULLAN(hedef: str = "") -> str:
     """
-    Tam otonom CUA dÃ¶ngÃ¼sÃ¼.
+    Tam otonom CUA döngüsü.
 
     AdÄ±mlar:
-        1. Ã–n koÅŸul kontrolÃ¼ (LM Studio, pyautogui, PIL)
-        2. Ekran gÃ¶rÃ¼ntÃ¼sÃ¼ al
-        3. Vision modele gÃ¶nder â†’ koordinat iste
+        1. Ã–n koÅŸul kontrolü (LM Studio, pyautogui, PIL)
+        2. Ekran görüntüsü al
+        3. Vision modele gönder â†’ koordinat iste
         4. KoordinatÄ± parse et (adaptif deneme sayÄ±sÄ±)
-        5. Eylemi yÃ¼rÃ¼t (tÄ±kla / yaz) â€” FailSafe her katmanda yakalanÄ±r
+        5. Eylemi yürüt (tÄ±kla / yaz) â€” FailSafe her katmanda yakalanÄ±r
         6. Bekleme â†’ yeni ekran â†’ doÄŸrula (EVET/HAYIR + sonraki koordinat)
-        7. SonuÃ§ dÃ¶ndÃ¼r
+        7. Sonuç döndür
 
     Parametreler:
         hedef: "WhatsApp ikonuna tÄ±kla"
-               "arama Ã§ubuÄŸuna 'merhaba' yaz"
+               "arama çubuÄŸuna 'merhaba' yaz"
                "" â†’ sadece analiz, eylem yok
     """
-    # â”€â”€ Ã–n koÅŸul kontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Ã–n koÅŸul kontrolü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     uyari = _on_kosul_kontrol()
     if uyari:
         return f"[CUA_UYARI]\n{uyari}\nEksikleri giderdikten sonra tekrar dene."
@@ -596,9 +596,9 @@ def CUA_EKRAN_KULLAN(hedef: str = "") -> str:
 
     # 2-3. Vision + adaptif parse
     prompt = (
-        f"Bu ekran gÃ¶rÃ¼ntÃ¼sÃ¼nde '{hedef}' iÅŸlemini yapmam gerekiyor. "
+        f"Bu ekran görüntüsünde '{hedef}' iÅŸlemini yapmam gerekiyor. "
         "Hangi koordinata tÄ±klamalÄ±yÄ±m? "
-        "SADECE 'x, y' formatÄ±nda koordinat dÃ¶ndÃ¼r, baÅŸka hiÃ§bir ÅŸey yazma. "
+        "SADECE 'x, y' formatÄ±nda koordinat döndür, baÅŸka hiçbir ÅŸey yazma. "
         f"Ekran boyutu: {ekran_boyutu[0]}x{ekran_boyutu[1]} piksel."
     )
 
@@ -619,10 +619,10 @@ def CUA_EKRAN_KULLAN(hedef: str = "") -> str:
 
         log.warning(f"Parse baÅŸarÄ±sÄ±z (deneme {deneme}/{limit})")
         _deneme_sayaci.basarisiz_kaydet()
-        limit = _deneme_sayaci.mevcut_limit  # dinamik gÃ¼ncelleme
+        limit = _deneme_sayaci.mevcut_limit  # dinamik güncelleme
         prompt = (
-            f"Ã–nceki yanÄ±tÄ±n anlaÅŸÄ±lmadÄ±. '{hedef}' iÃ§in "
-            "SADECE iki sayÄ± yaz, Ã¶rnek: '452, 317' â€” baÅŸka hiÃ§bir ÅŸey."
+            f"Ã–nceki yanÄ±tÄ±n anlaÅŸÄ±lmadÄ±. '{hedef}' için "
+            "SADECE iki sayÄ± yaz, örnek: '452, 317' â€” baÅŸka hiçbir ÅŸey."
         )
 
     del b64
@@ -701,14 +701,14 @@ def _dosya_tara(yol: Path) -> dict:
 def _dosyalari_tara_generator(
     kok: Path = Path("."),
 ) -> Generator[tuple[str, dict], None, None]:
-    """yield tabanlÄ± â€” tÃ¼m dosyalarÄ± aynÄ± anda belleÄŸe almaz."""
+    """yield tabanlÄ± â€” tüm dosyalarÄ± aynÄ± anda belleÄŸe almaz."""
     for dosya_adi in _REYMEN_DOSYALARI:
         yield dosya_adi, _dosya_tara(kok / dosya_adi)
 
 
 def CUA_ARACLARI_TARA(kok: str = ".") -> str:
     """
-    ReYMeN bileÅŸenlerini tarar; CUA entegrasyonu iÃ§in durum raporu Ã¼retir.
+    ReYMeN bileÅŸenlerini tarar; CUA entegrasyonu için durum raporu üretir.
     """
     satirlar = ["â•" * 56, "  ReYMeN CUA â€” BileÅŸen Tarama Raporu", "â•" * 56]
     eksik: list[str] = []
@@ -738,28 +738,28 @@ def CUA_ARACLARI_TARA(kok: str = ".") -> str:
         "â”€" * 56,
     ]
     if eksik:
-        satirlar.append("  âš   Eksik dosyalar CUA dÃ¶ngÃ¼sÃ¼nÃ¼ kÄ±smen kÄ±rabilir.")
+        satirlar.append("  âš   Eksik dosyalar CUA döngüsünü kÄ±smen kÄ±rabilir.")
     else:
-        satirlar.append("  âœ… TÃ¼m bileÅŸenler mevcut â€” CUA baÅŸlatÄ±labilir.")
+        satirlar.append("  âœ… Tüm bileÅŸenler mevcut â€” CUA baÅŸlatÄ±labilir.")
     satirlar.append("â•" * 56)
     rapor = "\n".join(satirlar)
-    log.info("AraÃ§ tarama tamamlandÄ±.")
+    log.info("Araç tarama tamamlandÄ±.")
     return rapor
 
 
-# Critic Note: Generator teker teker dosya okur; N dosya iÃ§in O(1) bellek;
-# bÃ¼yÃ¼k projede bile yÄ±ÄŸÄ±n birikmez.
+# Critic Note: Generator teker teker dosya okur; N dosya için O(1) bellek;
+# büyük projede bile yÄ±ÄŸÄ±n birikmez.
 
 
 # â”€â”€ Motor KaydÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def motor_kaydet(motor: object):
-    """motor.py entegrasyonu: CUA araÃ§larÄ±nÄ± kaydet."""
+    """motor.py entegrasyonu: CUA araçlarÄ±nÄ± kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     motor._plugin_arac_kaydet(
         "CUA_EKRAN_KULLAN",
         lambda hedef="": CUA_EKRAN_KULLAN(hedef),
-        "EkranÄ± gÃ¶rÃ¼r, vision model ile analiz eder, hedefe gÃ¶re tÄ±klar veya yazar. Tam otonom CUA dÃ¶ngÃ¼sÃ¼.",
+        "EkranÄ± görür, vision model ile analiz eder, hedefe göre tÄ±klar veya yazar. Tam otonom CUA döngüsü.",
     )
     motor._plugin_arac_kaydet(
         "CUA_ARACLARI_TARA",
@@ -773,7 +773,7 @@ def motor_kaydet(motor: object):
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 MOTOR_ENTEGRASYON_KODU = """
-# â”€â”€ motor.py Ã¼stÃ¼ne ekle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ motor.py üstüne ekle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 from cua_motor_araci import CUA_EKRAN_KULLAN, CUA_ARACLARI_TARA
 
 ARACLAR["CUA_EKRAN_KULLAN"] = CUA_EKRAN_KULLAN
@@ -785,10 +785,10 @@ CUA_ARACLARI = [
     {
         "isim": "CUA_EKRAN_KULLAN",
         "aciklama": (
-            "EkranÄ± gÃ¶rÃ¼r, vision model ile analiz eder, "
-            "verilen hedefe gÃ¶re tÄ±klar veya yazar. "
+            "EkranÄ± görür, vision model ile analiz eder, "
+            "verilen hedefe göre tÄ±klar veya yazar. "
             "hedef='WhatsApp ikonuna tÄ±kla' veya "
-            "hedef='arama Ã§ubuÄŸuna \\'merhaba\\' yaz'"
+            "hedef='arama çubuÄŸuna \\'merhaba\\' yaz'"
         ),
         "parametreler": {"hedef": "str"},
     },

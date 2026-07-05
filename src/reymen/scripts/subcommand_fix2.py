@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """subcommand_fix2.py â€” Tek satirlik print ile 37 subcommand'i duzelt."""
 
 import re

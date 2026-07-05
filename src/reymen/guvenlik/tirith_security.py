@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """tirith_security.py â€” Kapsamli Guvenlik Motoru.
 
 Tum guvenlik bilesenlerini (file_safety, path_security, url_safety,

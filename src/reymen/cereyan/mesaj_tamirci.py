@@ -1,13 +1,13 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Mesaj sÄ±ralÄ± tamiri ve sanitizasyon.
 
 ReYMeN agent'Ä±n agent_runtime_helpers.py'sindeki aÅŸaÄŸÄ±daki fonksiyonlarÄ±n
-ReYMeN iÃ§in adapte edilmiÅŸ versiyonlarÄ±:
+ReYMeN için adapte edilmiÅŸ versiyonlarÄ±:
   - sanitize_tool_call_arguments  â†’ arac_cagri_argumanlarini_temizle
   - repair_message_sequence       â†’ mesaj_siralamasi_tamir_et
 
-Hem ReYMeN'in text-parse dÃ¶ngÃ¼sÃ¼nde hem de FC (native function calling)
-modunda API'ye gÃ¶ndermeden Ã¶nce mesaj geÃ§miÅŸini gÃ¼venli hale getirir.
+Hem ReYMeN'in text-parse döngüsünde hem de FC (native function calling)
+modunda API'ye göndermeden önce mesaj geçmiÅŸini güvenli hale getirir.
 """
 
 from __future__ import annotations
@@ -18,9 +18,9 @@ from typing import Any, Dict, List, Optional
 
 log = logging.getLogger("conversation_loop")
 
-# Corrupted tool call arguments iÃ§in eklenen iÅŸaret
+# Corrupted tool call arguments için eklenen iÅŸaret
 _BOZUK_ARGUMAN_ISARETI = (
-    "[UyarÄ±: orijinal araÃ§ Ã§aÄŸrÄ±sÄ± argÃ¼manlarÄ± bozuktu â€” boÅŸ {} kullanÄ±ldÄ±]"
+    "[UyarÄ±: orijinal araç çaÄŸrÄ±sÄ± argümanlarÄ± bozuktu â€” boÅŸ {} kullanÄ±ldÄ±]"
 )
 
 
@@ -29,10 +29,10 @@ def arac_cagri_argumanlarini_temizle(
     *,
     oturum_id: str = "",
 ) -> int:
-    """Bozuk assistant tool-call argÃ¼man JSON'Ä±nÄ± yerinde onar.
+    """Bozuk assistant tool-call argüman JSON'Ä±nÄ± yerinde onar.
 
-    LLM bazen geÃ§ersiz JSON Ã¼retebilir (eksik kapanÄ±ÅŸ, surrogate chars, vb.).
-    Bu fonksiyon mesaj geÃ§miÅŸini tarar, bozuk argÃ¼manlarÄ± `{}` ile deÄŸiÅŸtirir
+    LLM bazen geçersiz JSON üretebilir (eksik kapanÄ±ÅŸ, surrogate chars, vb.).
+    Bu fonksiyon mesaj geçmiÅŸini tarar, bozuk argümanlarÄ± `{}` ile deÄŸiÅŸtirir
     ve karÅŸÄ±lÄ±k gelen tool result mesajÄ±na uyarÄ± iÅŸareti ekler.
 
     Returns:
@@ -97,7 +97,7 @@ def arac_cagri_argumanlarini_temizle(
                 fonk_adi = fonk.get("name", "?")
                 on_izleme = argumanlar[:80]
                 log.warning(
-                    "Bozuk tool_call argÃ¼manlarÄ± API isteÄŸinden Ã¶nce tamir edildi "
+                    "Bozuk tool_call argümanlarÄ± API isteÄŸinden önce tamir edildi "
                     "(oturum=%s, mesaj_idx=%s, cagri_id=%s, fonk=%s, onizleme=%r)",
                     oturum_id or "-",
                     idx,
@@ -138,16 +138,16 @@ def arac_cagri_argumanlarini_temizle(
     return tamirler
 
 
-# ReYMeN uyumluluÄŸu iÃ§in alias
+# ReYMeN uyumluluÄŸu için alias
 sanitize_tool_call_arguments = arac_cagri_argumanlarini_temizle
 
 
 def mesaj_siralamasi_tamir_et(mesajlar: List[Dict]) -> int:
-    """CanlÄ± geÃ§miÅŸte kalan bozuk rol sÄ±rasÄ±nÄ± dÃ¼zelt.
+    """CanlÄ± geçmiÅŸte kalan bozuk rol sÄ±rasÄ±nÄ± düzelt.
 
     Provider'lar (OpenAI, Anthropic, vb.) katÄ± user/assistant sÄ±ralamasÄ± bekler:
     - Ä°ki ardÄ±ÅŸÄ±k user mesajÄ± olmamalÄ±
-    - tool result, tool_calls iÃ§eren assistant'Ä± takip etmeli
+    - tool result, tool_calls içeren assistant'Ä± takip etmeli
     - Yetim tool mesajlarÄ± (eÅŸleÅŸen assistant tool_call_id'si olmayan) silinmeli
 
     Uygulanan onarÄ±mlar:
@@ -162,7 +162,7 @@ def mesaj_siralamasi_tamir_et(mesajlar: List[Dict]) -> int:
 
     tamirler = 0
 
-    # GeÃ§iÅŸ 1: Bilinen assistant tool_call_id'lerine uymayan yetim
+    # GeçiÅŸ 1: Bilinen assistant tool_call_id'lerine uymayan yetim
     # tool mesajlarÄ±nÄ± at.
     bilinen_arac_idleri: set = set()
     filtrelenmis: List[Dict] = []
@@ -193,7 +193,7 @@ def mesaj_siralamasi_tamir_et(mesajlar: List[Dict]) -> int:
                 bilinen_arac_idleri = set()
             filtrelenmis.append(msg)
 
-    # GeÃ§iÅŸ 2: ArdÄ±ÅŸÄ±k user mesajlarÄ±nÄ± birleÅŸtir (kullanÄ±cÄ± girdisi kaybolmasÄ±n).
+    # GeçiÅŸ 2: ArdÄ±ÅŸÄ±k user mesajlarÄ±nÄ± birleÅŸtir (kullanÄ±cÄ± girdisi kaybolmasÄ±n).
     birlestirilmis: List[Dict] = []
     for msg in filtrelenmis:
         if (
@@ -206,7 +206,7 @@ def mesaj_siralamasi_tamir_et(mesajlar: List[Dict]) -> int:
             onceki = birlestirilmis[-1]
             onceki_icerik = onceki.get("content", "")
             yeni_icerik = msg.get("content", "")
-            # YalnÄ±zca dÃ¼z metin iÃ§eriÄŸi birleÅŸtir; multimodal (list) iÃ§eriÄŸi bÄ±rak
+            # YalnÄ±zca düz metin içeriÄŸi birleÅŸtir; multimodal (list) içeriÄŸi bÄ±rak
             if isinstance(onceki_icerik, str) and isinstance(yeni_icerik, str):
                 onceki["content"] = (
                     (onceki_icerik + "\n\n" + yeni_icerik)
@@ -219,12 +219,12 @@ def mesaj_siralamasi_tamir_et(mesajlar: List[Dict]) -> int:
         else:
             birlestirilmis.append(msg)
 
-    # SonuÃ§larÄ± yerinde uygula
+    # SonuçlarÄ± yerinde uygula
     mesajlar[:] = birlestirilmis
     return tamirler
 
 
-# ReYMeN uyumluluÄŸu iÃ§in alias
+# ReYMeN uyumluluÄŸu için alias
 repair_message_sequence = mesaj_siralamasi_tamir_et
 
 
@@ -246,10 +246,10 @@ def _arac_sonuc_mesaji_olustur(
 
 
 def surrogate_karakterleri_temizle(metin: str) -> str:
-    """String'deki surrogate karakterleri gÃ¼venli ÅŸekilde kaldÄ±r.
+    """String'deki surrogate karakterleri güvenli ÅŸekilde kaldÄ±r.
 
-    LLM yanÄ±tlarÄ±nda bazen geÃ§ersiz Unicode surrogate karakterler
-    olabilir (Ã¶zellikle bazÄ± local modeller). BunlarÄ± encode/decode
+    LLM yanÄ±tlarÄ±nda bazen geçersiz Unicode surrogate karakterler
+    olabilir (özellikle bazÄ± local modeller). BunlarÄ± encode/decode
     ile temizle.
     """
     if not isinstance(metin, str):

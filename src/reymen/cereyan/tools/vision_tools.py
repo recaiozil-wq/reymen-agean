@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """vision_tools.py â€” ReYMeN Vision Tool (motor.py import'i icin wrapper).
 
 conversation_loop.py'deki VisionAdapter + _vision_analiz() fonksiyonunu motor'a acar.

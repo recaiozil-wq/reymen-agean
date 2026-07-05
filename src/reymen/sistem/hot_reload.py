@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 hot_reload.py â€” Motor icin sicak yukleme (hot-reload) modulu.
 

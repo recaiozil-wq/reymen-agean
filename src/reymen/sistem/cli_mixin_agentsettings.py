@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module â€” Agent settings (personality, reasoning, fast, busy, gquota, profile)."""
+"""ReYMeNCLI mixin module â€” Agent settings (personality, reasoning, fast, busy, gquota, profile)."""
 
 import logging
 import os

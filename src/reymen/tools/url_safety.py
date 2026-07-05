@@ -1,6 +1,6 @@
-﻿"""ReYMeN URL safety checks â€” blocks requests to private/internal network addresses.
+"""ReYMeN URL safety checks â€” blocks requests to private/internal network addresses.
 
-Prevents SSRF attacks. BaÄŸÄ±msÄ±z ReYMeN sÃ¼rÃ¼mÃ¼.
+Prevents SSRF attacks. BaÄŸÄ±msÄ±z ReYMeN sürümü.
 """
 
 import ipaddress

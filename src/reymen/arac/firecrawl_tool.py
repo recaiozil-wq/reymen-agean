@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """firecrawl_tool.py â€” Firecrawl API: web scrape + search.
 
 Firecrawl (api.firecrawl.dev/v1) kullanarak:
-  - firecrawl_scrape(url) â†’ URL'nin markdown iÃ§eriÄŸini dÃ¶ndÃ¼rÃ¼r
-  - firecrawl_search(query) â†’ web aramasÄ± yapar (SearchDispatcher'a yÃ¶nlendirir)
+  - firecrawl_scrape(url) â†’ URL'nin markdown içeriÄŸini döndürür
+  - firecrawl_search(query) â†’ web aramasÄ± yapar (SearchDispatcher'a yönlendirir)
 
 API Key: FIRECRAWL_API_KEY env var'dan okunur.
 
@@ -12,7 +12,7 @@ Motor kayÄ±t:
     motor_kaydet(motor)
 
 Not: Web arama iÅŸlevi artÄ±k reymen.arac.web_search_engine'deki
-SearchDispatcher Ã¼zerinden yapÄ±lÄ±r. Bu dosya geriye uyumluluk iÃ§in
+SearchDispatcher üzerinden yapÄ±lÄ±r. Bu dosya geriye uyumluluk için
 korunmaktadÄ±r.
 """
 
@@ -52,14 +52,14 @@ def _headers(api_key: Optional[str] = None) -> dict:
 
 
 def firecrawl_web_extract(url: str, format: str = "markdown") -> str:
-    """Bir URL'nin iÃ§eriÄŸini Firecrawl ile Ã§Ä±kar.
+    """Bir URL'nin içeriÄŸini Firecrawl ile çÄ±kar.
 
     Args:
-        url: Ä°Ã§eriÄŸi Ã§Ä±karÄ±lacak URL
+        url: Ä°çeriÄŸi çÄ±karÄ±lacak URL
         format: Ã‡Ä±ktÄ± formatÄ± ('markdown' veya 'html')
 
     Returns:
-        str: Sayfa iÃ§eriÄŸi (markdown/html) veya hata mesajÄ±
+        str: Sayfa içeriÄŸi (markdown/html) veya hata mesajÄ±
     """
     if not url or not url.strip():
         return "[FIRECRAWL] Hata: 'url' boÅŸ olamaz."
@@ -111,7 +111,7 @@ def firecrawl_web_extract(url: str, format: str = "markdown") -> str:
         if e.code == 401:
             return "[FIRECRAWL] Kimlik doÄŸrulama hatasÄ±. FIRECRAWL_API_KEY env var'Ä±nÄ± kontrol edin."
         elif e.code == 402:
-            return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yÃ¼kleyin."
+            return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yükleyin."
         elif e.code == 429:
             return "[FIRECRAWL] Rate limit aÅŸÄ±ldÄ±. Daha sonra tekrar deneyin."
         return f"[FIRECRAWL] HTTP {e.code}: {e.reason}"
@@ -123,17 +123,17 @@ def firecrawl_web_extract(url: str, format: str = "markdown") -> str:
 
 
 def firecrawl_web_search(query: str, max_results: int = 5, lang: str = "tr") -> str:
-    """Firecrawl ile web aramasÄ± yap â€” SearchDispatcher'a yÃ¶nlendirir.
+    """Firecrawl ile web aramasÄ± yap â€” SearchDispatcher'a yönlendirir.
 
     Args:
         query: Arama sorgusu
-        max_results: Maksimum sonuÃ§ sayÄ±sÄ± (varsayÄ±lan: 5)
+        max_results: Maksimum sonuç sayÄ±sÄ± (varsayÄ±lan: 5)
         lang: Dil kodu (varsayÄ±lan: 'tr')
 
     Returns:
-        str: FormatlanmÄ±ÅŸ arama sonuÃ§larÄ±
+        str: FormatlanmÄ±ÅŸ arama sonuçlarÄ±
     """
-    # SearchDispatcher Ã¼zerinden firecrawl engine'i kullan
+    # SearchDispatcher üzerinden firecrawl engine'i kullan
     dispatcher = _get_dispatcher()
     return dispatcher.ara(query, engine="firecrawl", max_sonuc=max_results)
 
@@ -156,7 +156,7 @@ def motor_kaydet(motor) -> None:
     """Firecrawl tool'larÄ±nÄ± motora kaydet.
 
     Kaydedilen tool'lar:
-      - FIRECRAWL_SCRAPE: URL iÃ§eriÄŸi Ã§Ä±kar (markdown)
+      - FIRECRAWL_SCRAPE: URL içeriÄŸi çÄ±kar (markdown)
       - FIRECRAWL_SEARCH: Web aramasÄ±
     """
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -165,7 +165,7 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "FIRECRAWL_SCRAPE",
             firecrawl_web_extract,
-            "Firecrawl ile bir URL'nin iÃ§eriÄŸini markdown olarak Ã§Ä±kar. "
+            "Firecrawl ile bir URL'nin içeriÄŸini markdown olarak çÄ±kar. "
             "Parametreler: url, format (varsayÄ±lan: markdown).",
         )
         motor._plugin_arac_kaydet(

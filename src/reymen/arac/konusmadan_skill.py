@@ -1,10 +1,10 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 konusmadan_skill.py â€” KonuÅŸma geÃ§miÅŸinden otomatik skill Ã§Ä±karma.
 
-Bir gÃ¶rev baÅŸarÄ±yla tamamlandÄ±ÄŸÄ±nda:
+Bir gÃşrev baÅŸarÄ±yla tamamlandÄ±ÄŸÄ±nda:
   1. KonuÅŸma mesajlarÄ±nÄ± analiz et
-  2. LLM ile Ã§Ã¶zÃ¼m pattern'ini Ã§Ä±kar
+  2. LLM ile Ã§ÃşzÃ¼m pattern'ini Ã§Ä±kar
   3. SKILL.md formatÄ±nda kaydet
   4. FTS5 index'e ekle
 
@@ -36,7 +36,7 @@ INDEX_DB = ROOT.parent / ".ReYMeN" / "db" / "skills.db"  # consolidated: skills_
 _MAKS_ACIKLAMA = 300
 _MAKS_ADIM = 2000
 _MIN_MESAJ_SAYISI = 3  # En az 3 mesaj varsa skill Ã§Ä±kar
-_BASARI_ESIÄI = 0.4  # BaÅŸarÄ± puanÄ± eÅŸiÄŸi (0.0-1.0)
+_BASARI_ESIÄıI = 0.4  # BaÅŸarÄ± puanÄ± eÅŸiÄŸi (0.0-1.0)
 
 # â”€â”€ LLM SaÄŸlayÄ±cÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
@@ -55,7 +55,7 @@ except ImportError:
 
 
 def _mesajlari_ozetle(messages: List[Dict[str, Any]]) -> str:
-    """KonuÅŸma mesajlarÄ±nÄ± LLM'e gÃ¶nderilebilir metne Ã§evir."""
+    """KonuÅŸma mesajlarÄ±nÄ± LLM'e gÃşnderilebilir metne Ã§evir."""
     parcalar = []
     for m in messages[-20:]:  # Son 20 mesaj
         rol = m.get("role", "bilinmeyen")
@@ -76,7 +76,7 @@ def _mesajlari_ozetle(messages: List[Dict[str, Any]]) -> str:
 
 
 def _skill_adi_ureti(ozet: str, konu: str = "") -> str:
-    """KonuÅŸma Ã¶zetinden skill adÄ± Ã¼ret."""
+    """KonuÅŸma Ãşzetinden skill adÄ± Ã¼ret."""
     ad = (konu or ozet)[:60].lower()
     ad = re.sub(r"[^a-z0-9\s-]", "", ad)
     ad = re.sub(r"\s+", "-", ad.strip())
@@ -147,7 +147,7 @@ def _llm_ile_skill_cikar(mesaj_ozeti: str, konu: str = "") -> Optional[Dict[str,
         beyin = _Beyin()
         prompt = f"""Bir kullanÄ±cÄ± ile AI asistan arasÄ±ndaki konuÅŸmayÄ± analiz et ve bir SKILL.md olarak kaydetmek iÃ§in JSON Ã§Ä±ktÄ±sÄ± ver.
 
-KONUÅMA Ã–ZETÄ°:
+KONUÅıMA Ã–ZETÄ°:
 {mesaj_ozeti[:3000]}
 
 AÅŸaÄŸÄ±daki JSON formatÄ±nda Ã§Ä±ktÄ± ver (sadece JSON, baÅŸka metin yok):
@@ -157,7 +157,7 @@ AÅŸaÄŸÄ±daki JSON formatÄ±nda Ã§Ä±ktÄ± ver (sadece JSON, baÅŸka 
   "aciklama": "Ne iÅŸe yarar, ne zaman kullanÄ±lÄ±r (max 300 karakter)",
   "etiketler": ["etiket1", "etiket2", "etiket3"],
   "kategori": "kategori_adi",
-  "adimlar": "AdÄ±m adÄ±m Ã§Ã¶zÃ¼m talimatlarÄ± (Markdown, max 2000 karakter)",
+  "adimlar": "AdÄ±m adÄ±m Ã§ÃşzÃ¼m talimatlarÄ± (Markdown, max 2000 karakter)",
   "trigger_kelimeler": ["kelime1", "kelime2"],
   "guven_skoru": 0.85
 }}
@@ -165,7 +165,7 @@ AÅŸaÄŸÄ±daki JSON formatÄ±nda Ã§Ä±ktÄ± ver (sadece JSON, baÅŸka 
 Kurallar:
 - adimlar: somut, adÄ±m adÄ±m, tekrarlanabilir olmalÄ±
 - guven_skoru: 0.0-1.0 arasÄ±, konuÅŸmanÄ±n skill olmaya ne kadar uygun olduÄŸu
-- EÄŸer konuÅŸma basit bir selamlaÅŸma veya anlamlÄ± bir Ã§Ã¶zÃ¼m iÃ§ermiyorsa guven_skoru dÃ¼ÅŸÃ¼k ver
+- EÄŸer konuÅŸma basit bir selamlaÅŸma veya anlamlÄ± bir Ã§ÃşzÃ¼m iÃ§ermiyorsa guven_skoru dÃ¼ÅŸÃ¼k ver
 """
 
         yanit = beyin.soru(prompt)
@@ -195,7 +195,7 @@ def konusmadan_skill_cikar(
 
     Args:
         messages: KonuÅŸma mesaj listesi.
-        basari: GÃ¶rev baÅŸarÄ±lÄ± mÄ±?
+        basari: GÃşrev baÅŸarÄ±lÄ± mÄ±?
         zorla: Zorla skill Ã§Ä±kar (puan kontrolÃ¼nÃ¼ atla).
         konu: Ä°steÄŸe baÄŸlÄ± konu baÅŸlÄ±ÄŸÄ±.
 
@@ -213,10 +213,10 @@ def konusmadan_skill_cikar(
 
     # Beceri puanÄ± hesapla
     puan = _beceri_puani_hesapla(messages)
-    if puan < _BASARI_ESIÄI and not zorla:
-        return f"[KonusmadanSkill] Dusuk puan ({puan:.2f} < {_BASARI_ESIÄI}), skill cikarilmadi"
+    if puan < _BASARI_ESIÄıI and not zorla:
+        return f"[KonusmadanSkill] Dusuk puan ({puan:.2f} < {_BASARI_ESIÄıI}), skill cikarilmadi"
 
-    # MesajlarÄ± Ã¶zetle
+    # MesajlarÄ± Ãşzetle
     ozet = _mesajlari_ozetle(messages)
 
     # LLM ile skill Ã§Ä±kar
@@ -266,7 +266,7 @@ created_at: {datetime.now().strftime("%Y-%m-%d %H:%M")}
 | **Kim** | AI kullanÄ±cÄ±sÄ± |
 | **Ne** | {baslik} |
 | **Nerede** | `{kategori}/{ad}.md` |
-| **Ne Zaman** | Ä°lgili gÃ¶rev gerektiÄŸinde |
+| **Ne Zaman** | Ä°lgili gÃşrev gerektiÄŸinde |
 | **Neden** | {aciklama} |
 
 {adimlar}
@@ -315,18 +315,18 @@ created_at: {timestamp}
 | **Kim** | AI kullanÄ±cÄ±sÄ± |
 | **Ne** | {baslik} |
 | **Nerede** | `konusma/{ad}.md` |
-| **Ne Zaman** | Ä°lgili gÃ¶rev gerektiÄŸinde |
-| **Neden** | KonuÅŸmadan Ã§Ä±karÄ±lan Ã§Ã¶zÃ¼m |
+| **Ne Zaman** | Ä°lgili gÃşrev gerektiÄŸinde |
+| **Neden** | KonuÅŸmadan Ã§Ä±karÄ±lan Ã§ÃşzÃ¼m |
 
-## Ã‡Ã¶zÃ¼m AdÄ±mlarÄ±
+## Ã‡ÃşzÃ¼m AdÄ±mlarÄ±
 
 1. **Problem:** {baslik}
-2. **Ã‡Ã¶zÃ¼m:** KonuÅŸma iÃ§inde Ã§Ã¶zÃ¼lmÃ¼ÅŸtÃ¼r. Detaylar iÃ§in skill iÃ§eriÄŸine bakÄ±n.
+2. **Ã‡ÃşzÃ¼m:** KonuÅŸma iÃ§inde Ã§ÃşzÃ¼lmÃ¼ÅŸtÃ¼r. Detaylar iÃ§in skill iÃ§eriÄŸine bakÄ±n.
 
 ## KullanÄ±m
 
 Bu skill otomatik olarak bir konuÅŸmadan Ã§Ä±karÄ±lmÄ±ÅŸtÄ±r.
-Ä°lgili bir gÃ¶rev geldiÄŸinde bu skill devreye girecektir.
+Ä°lgili bir gÃşrev geldiÄŸinde bu skill devreye girecektir.
 """
 
     try:

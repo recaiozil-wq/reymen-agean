@@ -1,4 +1,4 @@
-﻿"""
+"""
 ReYMeN tools.environments.ssh â€” SSH remote environment.
 
 SSH uzerinden uzak sunucuda komut calistirir.

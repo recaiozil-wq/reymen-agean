@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 nightly_improvement.py â€” ReYMeN Nightly Self-Improvement Loop.
 
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 # â”€â”€ Proje YollarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-ROOT = Path(__file__).resolve().parent.parent.parent.parent  # proje kÃ¶kÃ¼
+ROOT = Path(__file__).resolve().parent.parent.parent.parent  # proje kökü
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
@@ -82,8 +82,8 @@ class NightlyRapor:
 def _asama_once_hafiza() -> AsamaSonucu:
     """once_hafiza'daki zayÄ±f noktalarÄ± tespit et.
 
-    - DÃ¼ÅŸÃ¼k gÃ¼ven skorlu (< 0.4) kayÄ±tlar
-    - HiÃ§ baÅŸarÄ±lÄ± olmamÄ±ÅŸ hedefler
+    - DüÅŸük güven skorlu (< 0.4) kayÄ±tlar
+    - Hiç baÅŸarÄ±lÄ± olmamÄ±ÅŸ hedefler
     - SÄ±k hata alÄ±nan hedefler (hata_sayisi >= 3)
     """
     basla = time.time()
@@ -118,7 +118,7 @@ def _asama_once_hafiza() -> AsamaSonucu:
                     "WHERE kategori != '' GROUP BY kategori ORDER BY adet DESC"
                 ).fetchall()
 
-                # DÃ¼ÅŸÃ¼k gÃ¼ven skorlu kayÄ±tlar
+                # DüÅŸük güven skorlu kayÄ±tlar
                 dusuk_guven = cur.execute(
                     "SELECT hedef, guven_skoru, basari_sayisi, hata_sayisi "
                     "FROM ogrenmeler WHERE guven_skoru < 0.4 "
@@ -132,7 +132,7 @@ def _asama_once_hafiza() -> AsamaSonucu:
                     "ORDER BY hata_sayisi DESC LIMIT 10"
                 ).fetchall()
 
-                # HiÃ§ baÅŸarÄ±lÄ± olmamÄ±ÅŸ
+                # Hiç baÅŸarÄ±lÄ± olmamÄ±ÅŸ
                 sifir_basari = cur.execute(
                     "SELECT hedef, hata_sayisi "
                     "FROM ogrenmeler WHERE basari_sayisi = 0 AND hata_sayisi > 0 "
@@ -196,12 +196,12 @@ def _asama_once_hafiza() -> AsamaSonucu:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  AÅŸama 2: Skill Ä°yileÅŸtirme (DÃ¼ÅŸÃ¼k BaÅŸarÄ±lÄ± Skill'ler)
+#  AÅŸama 2: Skill Ä°yileÅŸtirme (DüÅŸük BaÅŸarÄ±lÄ± Skill'ler)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_skill_iyilestirme() -> AsamaSonucu:
-    """DÃ¼ÅŸÃ¼k baÅŸarÄ±lÄ± skill'leri tespit et ve iyileÅŸtir."""
+    """DüÅŸük baÅŸarÄ±lÄ± skill'leri tespit et ve iyileÅŸtir."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="skill_iyilestirme", basarili=True)
 
@@ -270,12 +270,12 @@ def _asama_skill_iyilestirme() -> AsamaSonucu:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  AÅŸama 3: Memory Compaction KontrolÃ¼
+#  AÅŸama 3: Memory Compaction Kontrolü
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_memory_compaction() -> AsamaSonucu:
-    """HafÄ±za compaction kontrolÃ¼ yap."""
+    """HafÄ±za compaction kontrolü yap."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="memory_compaction", basarili=True)
 
@@ -339,7 +339,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
     hata_sayisi = 0
 
     try:
-        # â”€â”€ ruff kontrolÃ¼ â”€â”€
+        # â”€â”€ ruff kontrolü â”€â”€
         try:
             r = subprocess.run(
                 [
@@ -360,7 +360,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
                     if satir.strip() and "error" in satir.lower() or "E" in satir:
                         bulgular["ruff"].append(satir.strip()[:150])
                         hata_sayisi += 1
-                # SayÄ±yÄ± standart Ã§Ä±ktÄ±dan al
+                # SayÄ±yÄ± standart çÄ±ktÄ±dan al
                 import re as _re
 
                 sayi_match = _re.search(r"Found (\d+) error", r.stdout)
@@ -369,7 +369,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
         except FileNotFoundError:
             bulgular["ruff"] = ["ruff kurulu degil"]
 
-        # â”€â”€ bandit gÃ¼venlik taramasÄ± â”€â”€
+        # â”€â”€ bandit güvenlik taramasÄ± â”€â”€
         try:
             r = subprocess.run(
                 [sys.executable, "-m", "bandit", "-r", "-q", str(SRC / "reymen")],
@@ -391,7 +391,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
                 icerik = dosya.read_text(encoding="utf-8", errors="replace")
                 satir_sayisi = len(icerik.split("\n"))
 
-                # Bare except kontrolÃ¼
+                # Bare except kontrolü
                 if "except:" in icerik or "except :" in icerik:
                     bulgular["el_kurallari"].append(
                         f"{dosya.relative_to(SRC)}: bare except"
@@ -530,12 +530,12 @@ def _asama_cron_durumu() -> AsamaSonucu:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  AÅŸama 6: 7 GÃ¼nlÃ¼k Trend Raporu
+#  AÅŸama 6: 7 Günlük Trend Raporu
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_trend_raporu() -> AsamaSonucu:
-    """Son 7 gÃ¼nlÃ¼k performans trendini hesapla."""
+    """Son 7 günlük performans trendini hesapla."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="trend_raporu", basarili=True)
 
@@ -564,7 +564,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                 row = con.execute("SELECT COUNT(*) FROM ogrenmeler").fetchone()
                 trend["once_hafiza"]["toplam_kayit"] = row[0] if row else 0
 
-                # Son 7 gÃ¼nde eklenen
+                # Son 7 günde eklenen
                 row = con.execute(
                     "SELECT COUNT(*) FROM ogrenmeler WHERE olusturulma >= ?",
                     (datetime.fromtimestamp(yedi_gun_once).isoformat(),),
@@ -597,7 +597,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                     trend["skill"]["basarili"] = row[1]
                     trend["skill"]["basarisiz"] = row[2]
 
-                # Ä°yileÅŸtirme Ã¶nerileri
+                # Ä°yileÅŸtirme önerileri
                 oneriler = con.execute(
                     "SELECT COUNT(*) FROM iyilestirme_onerileri WHERE olusturulma >= ?",
                     (yedi_gun_once,),
@@ -626,7 +626,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                 except Exception:
                     continue
 
-        # Performans Ã¶zeti
+        # Performans özeti
         trend_ozeti = []
         sk = trend["skill"]
         if sk["kullanim"] > 0:
@@ -697,7 +697,7 @@ def _rapor_kaydet(rapor: NightlyRapor) -> None:
         encoding="utf-8",
     )
 
-    # durum.json gÃ¼ncellemesi
+    # durum.json güncellemesi
     if DURUM_JSON.exists():
         try:
             durum = json.loads(DURUM_JSON.read_text(encoding="utf-8"))
@@ -736,20 +736,20 @@ def _rapor_kaydet(rapor: NightlyRapor) -> None:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  Ana DÃ¶ngÃ¼
+#  Ana Döngü
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def main() -> str:
-    """6 aÅŸamalÄ± gece kendini geliÅŸtirme dÃ¶ngÃ¼sÃ¼nÃ¼ Ã§alÄ±ÅŸtÄ±r.
+    """6 aÅŸamalÄ± gece kendini geliÅŸtirme döngüsünü çalÄ±ÅŸtÄ±r.
 
     Returns:
-        Ã–zet metin (sessiz modda sadece sorun varsa gÃ¶sterilir).
+        Ã–zet metin (sessiz modda sadece sorun varsa gösterilir).
     """
     baslama = time.time()
     logger.info("[Nightly] === Gece Kendini Gelistirme Dongusu basladi ===")
 
-    # AÅŸamalarÄ± sÄ±rayla Ã§alÄ±ÅŸtÄ±r
+    # AÅŸamalarÄ± sÄ±rayla çalÄ±ÅŸtÄ±r
     asama_fonksiyonlari = [
         ("once_hafiza_analizi", _asama_once_hafiza),
         ("skill_iyilestirme", _asama_skill_iyilestirme),
@@ -814,7 +814,7 @@ def main() -> str:
 
     logger.info("[Nightly] === Dongu tamamlandi: %s ===", ozet)
 
-    # Sessiz Ã§alÄ±ÅŸ: sadece sorun varsa kullanÄ±cÄ±ya gÃ¶ster
+    # Sessiz çalÄ±ÅŸ: sadece sorun varsa kullanÄ±cÄ±ya göster
     if uyari_var:
         return f"[NIGHTLY] {ozet}"
     return ""

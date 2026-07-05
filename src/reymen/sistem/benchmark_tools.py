@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-"""model_tools.py â€” Model Benchmark ve YÃ¶netim AraÃ§larÄ±.
+# -*- coding: utf-8 -*-
+"""model_tools.py â€” Model Benchmark ve Yönetim AraçlarÄ±.
 
 LLM saÄŸlayÄ±cÄ±larÄ±nÄ± karÅŸÄ±laÅŸtÄ±rÄ±r: gecikme, token hÄ±zÄ±, maliyet.
-model_metadata.py ile entegre Ã§alÄ±ÅŸÄ±r.
+model_metadata.py ile entegre çalÄ±ÅŸÄ±r.
 """
 
 import json
@@ -22,7 +22,7 @@ except ImportError:
 BENCHMARK_YOLU = Path(__file__).parent / ".ReYMeN" / "model_benchmarks.json"
 BENCHMARK_YOLU.parent.mkdir(parents=True, exist_ok=True)
 
-BENCHMARK_PROMPT = "TÃ¼rkiye'nin baÅŸkenti neresidir? KÄ±sa cevap ver."
+BENCHMARK_PROMPT = "Türkiye'nin baÅŸkenti neresidir? KÄ±sa cevap ver."
 
 
 class BenchmarkSonucu:
@@ -114,7 +114,7 @@ def benchmark_raporu(sonuclar: list) -> str:
 
 def gecmis_oku(son_n: int = 5) -> str:
     if not BENCHMARK_YOLU.exists():
-        return "HenÃ¼z benchmark yapÄ±lmamÄ±ÅŸ."
+        return "Henüz benchmark yapÄ±lmamÄ±ÅŸ."
     try:
         kayitlar = json.loads(BENCHMARK_YOLU.read_text(encoding="utf-8"))
         satirlar = []
@@ -137,7 +137,7 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "MODEL_BENCHMARK_GECMIS",
         lambda son_n=5: gecmis_oku(int(son_n)),
-        "GeÃ§miÅŸ model benchmark sonuÃ§larÄ±nÄ± gÃ¶ster",
+        "GeçmiÅŸ model benchmark sonuçlarÄ±nÄ± göster",
     )
 
     if hasattr(motor, "beyin"):

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """url_safety.py â€” URL Guvenlik Kontrolu.
 
 Agent'in acacagi URL'leri guvenlik acisindan kontrol eder.

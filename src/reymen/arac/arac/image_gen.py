@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-image_gen.py â€” ReYMeN tool arayÃ¼zÃ¼: GÃ¶rsel Ã¼retim araÃ§larÄ±.
+image_gen.py â€” ReYMeN tool arayüzü: Görsel üretim araçlarÄ±.
 
-Bu modÃ¼l, reymen.arac.image_gen_engine motorunu ReYMeN'in tool
+Bu modül, reymen.arac.image_gen_engine motorunu ReYMeN'in tool
 sistemine baÄŸlar. Motor tarafÄ±ndan otomatik kaydedilir.
 
 KullanÄ±m:

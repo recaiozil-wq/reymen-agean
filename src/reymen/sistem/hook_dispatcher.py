@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 hook_dispatcher.py â€” Olay dagitici.
 
@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
 
-# Cereyan hook API'sini import et â€” aynÄ± arayÃ¼z, class+fonksiyon
+# Cereyan hook API'sini import et â€” aynÄ± arayüz, class+fonksiyon
 from reymen.cereyan.hook_dispatcher import (  # noqa: F401
     hook_kaydet,
     hook_kaldir,

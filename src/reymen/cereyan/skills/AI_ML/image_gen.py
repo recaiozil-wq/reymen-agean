@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-image_gen.py â€” AI_ML skill: GÃ¶rsel Ã¼retim (Image Generation) motoru.
+image_gen.py â€” AI_ML skill: Görsel üretim (Image Generation) motoru.
 
 BaÄŸÄ±mlÄ±lÄ±klar:
   - reymen.arac.image_gen_engine â€” FAL, OpenAI, xAI, Stub engine'leri
@@ -16,7 +16,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-# Engine'i iÃ§e aktar
+# Engine'i içe aktar
 try:
     from reymen.arac.image_gen_engine import (
         FALEngine,
@@ -49,16 +49,16 @@ def image_olustur(
     boy: int = 1024,
     backend: str = "",
 ) -> str:
-    """GÃ¶rsel Ã¼ret â€” skill arayÃ¼zÃ¼.
+    """Görsel üret â€” skill arayüzü.
 
     Args:
-        prompt: GÃ¶rsel tanÄ±mÄ±.
+        prompt: Görsel tanÄ±mÄ±.
         en: GeniÅŸlik (piksel).
-        boy: YÃ¼kseklik (piksel).
+        boy: Yükseklik (piksel).
         backend: "fal", "openai", "xai", "stub" veya boÅŸ (varsayÄ±lan).
 
     Returns:
-        [MEDIA] formatÄ±nda sonuÃ§ veya hata mesajÄ±.
+        [MEDIA] formatÄ±nda sonuç veya hata mesajÄ±.
     """
     return resim_olustur(prompt, str(en), str(boy), backend)
 

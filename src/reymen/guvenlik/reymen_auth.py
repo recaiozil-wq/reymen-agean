@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 ğŸ” ReYMeN Auth System â€” Nous Portal alternative.
 
@@ -107,7 +107,7 @@ class User:
 # Desteklenen provider'lar ve API key format regex'leri
 API_KEY_PROVIDERS: dict[str, dict[str, Any]] = {
     # Ã–nce spesifik prefix'ler kontrol edilmeli (sk-ant-, sk-or-, vs.)
-    # Ã§Ã¼nkÃ¼ generic sk- bunlardan Ã¶nce eÅŸleÅŸir
+    # çünkü generic sk- bunlardan önce eÅŸleÅŸir
     "anthropic": {
         "regex": r"^sk-ant-[A-Za-z0-9_.-]{20,}$",
         "env_var": "ANTHROPIC_API_KEY",
@@ -169,7 +169,7 @@ def validate_api_key_format(api_key: str) -> tuple[bool, Optional[str], str]:
     provider = detect_api_key_provider(api_key)
     if provider:
         desc = API_KEY_PROVIDERS[provider]["description"]
-        return True, provider, f"GeÃ§erli {desc}"
+        return True, provider, f"Geçerli {desc}"
     return False, None, "Bilinmeyen API anahtarÄ± formatÄ±"
 
 
@@ -201,7 +201,7 @@ def validate_api_key_live(api_key: str, provider: str, timeout: int = 10) -> boo
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# JWT Token YÃ¶netimi (standart kÃ¼tÃ¼phane ile HMAC-SHA256)
+# JWT Token Yönetimi (standart kütüphane ile HMAC-SHA256)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
@@ -284,16 +284,16 @@ class JWTManager:
                 self._base64_url_decode(payload_b64).decode("utf-8")
             )
 
-            # Expiry kontrolÃ¼
+            # Expiry kontrolü
             now = int(time.time())
             if payload_data.get("exp", 0) < now:
-                logger.warning("[JWT] Token sÃ¼resi dolmuÅŸ")
+                logger.warning("[JWT] Token süresi dolmuÅŸ")
                 return None
 
             return payload_data
 
         except Exception as e:
-            logger.debug("[JWT] Ã‡Ã¶zÃ¼mleme hatasÄ±: %s", e)
+            logger.debug("[JWT] Ã‡özümleme hatasÄ±: %s", e)
             return None
 
     def refresh_token(self, token: str, expires_in: int = 3600) -> Optional[str]:
@@ -301,7 +301,7 @@ class JWTManager:
         payload = self.decode(token, verify=True)
         if payload is None:
             return None
-        # Yeni token oluÅŸtur (sÃ¼reyi uzat)
+        # Yeni token oluÅŸtur (süreyi uzat)
         new_payload = {
             k: v for k, v in payload.items() if k not in ("iat", "exp", "jti")
         }
@@ -675,7 +675,7 @@ class AuthStorage:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# Ana Auth YÃ¶neticisi
+# Ana Auth Yöneticisi
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
@@ -723,7 +723,7 @@ class AuthManager:
     def detect_api_key(self, api_key: str) -> Optional[str]:
         return detect_api_key_provider(api_key)
 
-    # â”€â”€ Token YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Token Yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def create_token(
         self,
@@ -743,7 +743,7 @@ class AuthManager:
             AccessToken object or None (on error)
         """
         if role not in ("admin", "user", "guest"):
-            logger.error("[Auth] GeÃ§ersiz rol: %s", role)
+            logger.error("[Auth] Geçersiz rol: %s", role)
             return None
 
         # KullanÄ±cÄ±yÄ± bul veya oluÅŸtur
@@ -762,7 +762,7 @@ class AuthManager:
         }
         access_token_str = self.jwt.encode(payload, expires_in=expires_in)
 
-        # Refresh token oluÅŸtur (daha uzun sÃ¼reli)
+        # Refresh token oluÅŸtur (daha uzun süreli)
         refresh_payload = {
             "sub": username,
             "role": role,
@@ -781,7 +781,7 @@ class AuthManager:
             scope=scope,
         )
 
-        # Son giriÅŸ zamanÄ±nÄ± gÃ¼ncelle
+        # Son giriÅŸ zamanÄ±nÄ± güncelle
         self.storage.update_user(user.user_id, last_login=time.time())
 
         return AccessToken(
@@ -815,7 +815,7 @@ class AuthManager:
         # Refresh token'Ä± doÄŸrula
         payload = self.jwt.decode(refresh_token, verify=True)
         if payload is None:
-            logger.warning("[Auth] GeÃ§ersiz refresh token")
+            logger.warning("[Auth] Geçersiz refresh token")
             return None
 
         # VeritabanÄ±nda kontrol et
@@ -845,14 +845,14 @@ class AuthManager:
             return 0
         return self.storage.revoke_user_tokens(user.user_id)
 
-    # â”€â”€ KullanÄ±cÄ± YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ KullanÄ±cÄ± Yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def create_user(
         self, username: str, role: str = "user", email: str = ""
     ) -> Optional[User]:
         """Create a new user."""
         if role not in ("admin", "user", "guest"):
-            logger.error("[Auth] GeÃ§ersiz rol: %s", role)
+            logger.error("[Auth] Geçersiz rol: %s", role)
             return None
         return self.storage.create_user(username, role=role, email=email)
 
@@ -950,7 +950,7 @@ class AuthManager:
 auth_manager = AuthManager()
 
 
-# KullanÄ±m kolaylÄ±ÄŸÄ± iÃ§in doÄŸrudan fonksiyonlar
+# KullanÄ±m kolaylÄ±ÄŸÄ± için doÄŸrudan fonksiyonlar
 def validate_key(key: str) -> Optional[str]:
     """Validate API key, return provider name."""
     return auth_manager.validate_api_key(key)

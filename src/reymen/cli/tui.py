@@ -1,11 +1,11 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """reymen.cli.tui â€” ReYMeN Terminal UI (TUI).
 
-Rich tabanli terminal arayÃ¼zÃ¼.
+Rich tabanli terminal arayüzü.
 - Panel, Table, Layout, Live Display
 - Slash komutlar: /help, /model, /clear, /exit
 - Tab ile otomatik tamamlama
-- Durum Ã§ubuÄŸu (model, provider, sÃ¼re, token sayisi)
+- Durum çubuÄŸu (model, provider, süre, token sayisi)
 - Windows ile tam uyumlu (colorama + prompt_toolkit)
 """
 
@@ -59,7 +59,7 @@ def _r(t):
 
 # â”€â”€ Durum verisi (synchronized) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class StatusData:
-    """TUI durum Ã§ubuÄŸu iÃ§in thread-safe veri tutucu."""
+    """TUI durum çubuÄŸu için thread-safe veri tutucu."""
 
     def __init__(self):
         self._lock = threading.Lock()
@@ -109,7 +109,7 @@ class StatusData:
 class ReYMeNTUI:
     """ReYMeN TUI ana sinifi.
 
-    Rich Layout + Live Display ile terminal arayÃ¼zÃ¼.
+    Rich Layout + Live Display ile terminal arayüzü.
     prompt_toolkit ile klavye girdisi ve otomatik tamamlama.
 
     Kullanim:
@@ -222,7 +222,7 @@ class ReYMeNTUI:
             durum["model"],
             "Provider:",
             durum["provider"],
-            "SÃ¼re:",
+            "Süre:",
             durum["sure"],
         )
 
@@ -254,7 +254,7 @@ class ReYMeNTUI:
         goster = "\n".join(satirlar)
 
         body_panel = Panel(
-            Text.from_markup(goster) if goster else "[dim]HenÃ¼z mesaj yok.[/]",
+            Text.from_markup(goster) if goster else "[dim]Henüz mesaj yok.[/]",
             title="[bold]Sohbet[/]",
             border_style="blue",
         )
@@ -287,7 +287,7 @@ class ReYMeNTUI:
             durum["model"],
             "Provider:",
             durum["provider"],
-            "SÃ¼re:",
+            "Süre:",
             durum["sure"],
         )
 
@@ -416,7 +416,7 @@ class ReYMeNTUI:
             "/cls",
             "/clear",
             "/cik",
-            "/Ã§Ä±k",
+            "/çÄ±k",
             "/exit",
             "/quit",
             "/provider",
@@ -483,7 +483,7 @@ class ReYMeNTUI:
                     _prompt_html(),
                     bottom_toolbar=HTML(
                         f"<b>Model:</b> {self.status.kopyala()['model']} | "
-                        f"<b>SÃ¼re:</b> {self.status.kopyala()['sure']}"
+                        f"<b>Süre:</b> {self.status.kopyala()['sure']}"
                     ),
                 )
 
@@ -598,7 +598,7 @@ class ReYMeNTUI:
         g = girdi.lower().strip()
 
         # /cik, /exit, /quit
-        if g in ("/cik", "/Ã§Ä±k", "/exit", "/quit", "/q"):
+        if g in ("/cik", "/çÄ±k", "/exit", "/quit", "/q"):
             self._calisiyor.clear()
             return True
 
@@ -606,7 +606,7 @@ class ReYMeNTUI:
         if g in ("/yardim", "/help", "/?"):
             yardim_text = (
                 "[bold]ReYMeN TUI Komutlari[/]\n\n"
-                "[cyan]/yardim[/]  veya [cyan]/help[/]   Bu menÃ¼yÃ¼ gÃ¶ster\n"
+                "[cyan]/yardim[/]  veya [cyan]/help[/]   Bu menüyü göster\n"
                 "[cyan]/model[/]                     Model deÄŸiÅŸtir\n"
                 "[cyan]/provider[/]                  Provider deÄŸiÅŸtir\n"
                 "[cyan]/temizle[/]  veya [cyan]/clear[/]   EkranÄ± temizle\n"
@@ -639,8 +639,8 @@ class ReYMeNTUI:
             model_bilgi = (
                 "[bold yellow]Mevcut Model:[/] "
                 f"[green]{self.status.kopyala()['model']}[/]\n\n"
-                "[dim]Model deÄŸiÅŸtirmek iÃ§in .env dosyasindaki\n"
-                "REYMEN_MODEL deÄŸiÅŸkenini gÃ¼ncelleyip\n"
+                "[dim]Model deÄŸiÅŸtirmek için .env dosyasindaki\n"
+                "REYMEN_MODEL deÄŸiÅŸkenini güncelleyip\n"
                 "yeniden baÅŸlatÄ±n.[/]"
             )
             panel = Panel(
@@ -657,8 +657,8 @@ class ReYMeNTUI:
             prov_bilgi = (
                 "[bold yellow]Mevcut Provider:[/] "
                 f"[green]{self.status.kopyala()['provider']}[/]\n\n"
-                "[dim]Provider deÄŸiÅŸtirmek iÃ§in .env dosyasindaki\n"
-                "REYMEN_PROVIDER deÄŸiÅŸkenini gÃ¼ncelleyip\n"
+                "[dim]Provider deÄŸiÅŸtirmek için .env dosyasindaki\n"
+                "REYMEN_PROVIDER deÄŸiÅŸkenini güncelleyip\n"
                 "yeniden baÅŸlatÄ±n.[/]"
             )
             panel = Panel(
@@ -678,7 +678,7 @@ class ReYMeNTUI:
             tablo.add_column(style="white")
             tablo.add_row("Model", durum["model"])
             tablo.add_row("Provider", durum["provider"])
-            tablo.add_row("SÃ¼re", durum["sure"])
+            tablo.add_row("Süre", durum["sure"])
             tablo.add_row("Token GiriÅŸ", str(durum["token_giris"]))
             tablo.add_row("Token Ã‡Ä±kÄ±ÅŸ", str(durum["token_cikis"]))
             tablo.add_row("Durum", durum["durum"])

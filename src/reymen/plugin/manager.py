@@ -1,12 +1,12 @@
-﻿# -*- coding: utf-8 -*-
-"""reymen.plugin.manager â€” PluginManager: plugin yÃ¼kleme/kaldÄ±rma/hook daÄŸÄ±tma.
+# -*- coding: utf-8 -*-
+"""reymen.plugin.manager â€” PluginManager: plugin yükleme/kaldÄ±rma/hook daÄŸÄ±tma.
 
 KullanÄ±m:
     from reymen.plugin.manager import PluginManager
 
     pm = PluginManager()
     pm.config_yukle("config.yaml")          # plugins ayarlarÄ±nÄ± oku
-    pm.tumunu_yukle()                       # plugins/ dizinindeki tÃ¼m .py'leri yÃ¼kle
+    pm.tumunu_yukle()                       # plugins/ dizinindeki tüm .py'leri yükle
     pm.hook_cagir("on_session_start", session_id="...", user_id="...")
     pm.hook_cagir("on_message", message="merhaba", context={})
     pm.tumunu_kaldir()                      # kapatÄ±rken
@@ -30,13 +30,13 @@ logger = logging.getLogger(__name__)
 
 
 class PluginManager:
-    """Plugin yÃ¶neticisi â€” yÃ¼kleme, kaldÄ±rma, hook daÄŸÄ±tma.
+    """Plugin yöneticisi â€” yükleme, kaldÄ±rma, hook daÄŸÄ±tma.
 
     Ã–zellikler:
         _pluginler:   {ad: PluginBase instance}
         _aktif:       Plugin sistemi aktif mi?
         _dizin:       Plugin dizini yolu (Path)
-        _oto_yukle:   BaÅŸlangÄ±Ã§ta otomatik yÃ¼kleme
+        _oto_yukle:   BaÅŸlangÄ±çta otomatik yükleme
     """
 
     def __init__(self) -> None:
@@ -90,13 +90,13 @@ class PluginManager:
             logger.warning("[Plugin] Config yukleme hatasi: %s", e)
             self._aktif = False
 
-    # â”€â”€ YÃ¼kleme / KaldÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Yükleme / KaldÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def plugin_yukle(self, ad: str, path: str) -> Optional[PluginBase]:
-        """Tek bir plugin dosyasÄ±nÄ± yÃ¼kle.
+        """Tek bir plugin dosyasÄ±nÄ± yükle.
 
         Args:
-            ad:   Plugin adÄ± (Ã¶r. "ornek_plugin").
+            ad:   Plugin adÄ± (ör. "ornek_plugin").
             path: .py dosyasÄ±nÄ±n tam yolu.
 
         Returns:
@@ -117,7 +117,7 @@ class PluginManager:
                 return None
 
             mod = importlib.util.module_from_spec(spec)
-            # ModÃ¼lÃ¼ sys.modules'e ekle (tekrar yÃ¼klenmesin)
+            # Modülü sys.modules'e ekle (tekrar yüklenmesin)
             sys.modules[ad] = mod
             spec.loader.exec_module(mod)
 
@@ -174,10 +174,10 @@ class PluginManager:
             logger.info("[Plugin] '%s' kaldirildi", ad)
 
     def tumunu_yukle(self) -> int:
-        """plugins/ dizinindeki tÃ¼m .py dosyalarÄ±nÄ± tara ve yÃ¼kle.
+        """plugins/ dizinindeki tüm .py dosyalarÄ±nÄ± tara ve yükle.
 
         Returns:
-            BaÅŸarÄ±yla yÃ¼klenen plugin sayÄ±sÄ±.
+            BaÅŸarÄ±yla yüklenen plugin sayÄ±sÄ±.
         """
         if not self._aktif:
             logger.info("[Plugin] Plugin sistemi aktif degil, yukleme yapilmadi")
@@ -189,7 +189,7 @@ class PluginManager:
 
         dizin = self._dizin
         if not dizin.is_absolute():
-            # Proje kÃ¶kÃ¼ne gÃ¶re Ã§Ã¶z
+            # Proje köküne göre çöz
             for parent in [Path.cwd(), Path(__file__).resolve().parent.parent.parent]:
                 deneme = parent / dizin
                 if deneme.exists():
@@ -209,7 +209,7 @@ class PluginManager:
                 continue
 
             ad = entry.stem
-            # EÄŸer config'de aktif liste varsa, sadece o listedekileri yÃ¼kle
+            # EÄŸer config'de aktif liste varsa, sadece o listedekileri yükle
             if hasattr(self, "_aktif_liste") and self._aktif_liste:
                 if ad not in self._aktif_liste:
                     logger.debug("[Plugin] '%s' aktif listede yok, atlandi", ad)
@@ -223,17 +223,17 @@ class PluginManager:
         return yuklenen
 
     def tumunu_kaldir(self) -> None:
-        """TÃ¼m plugin'leri kaldÄ±r."""
+        """Tüm plugin'leri kaldÄ±r."""
         for ad in list(self._pluginler.keys()):
             self.plugin_kaldir(ad)
 
     # â”€â”€ Hook DaÄŸÄ±tma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get_hook(self, hook_name: str) -> List[Callable]:
-        """Belirtilen hook adÄ±nÄ± implemente eden tÃ¼m plugin metodlarÄ±nÄ± dÃ¶ndÃ¼r.
+        """Belirtilen hook adÄ±nÄ± implemente eden tüm plugin metodlarÄ±nÄ± döndür.
 
         Args:
-            hook_name: Metod adÄ± (Ã¶rn. "pre_llm_call").
+            hook_name: Metod adÄ± (örn. "pre_llm_call").
 
         Returns:
             Ã‡aÄŸrÄ±labilir metodlarÄ±n listesi.
@@ -252,14 +252,14 @@ class PluginManager:
         return callables
 
     def hook_cagir(self, hook_name: str, **kwargs: Any) -> None:
-        """Belirtilen hook'u tÃ¼m plugin'lerde Ã§aÄŸÄ±r.
+        """Belirtilen hook'u tüm plugin'lerde çaÄŸÄ±r.
 
-        Her plugin try/except ile izole Ã§alÄ±ÅŸtÄ±rÄ±lÄ±r. Bir plugin'deki
+        Her plugin try/except ile izole çalÄ±ÅŸtÄ±rÄ±lÄ±r. Bir plugin'deki
         hata diÄŸerlerini etkilemez.
 
         Args:
             hook_name: Ã‡aÄŸrÄ±lacak metod adÄ±.
-            **kwargs:  Metoda aktarÄ±lacak keyword argÃ¼manlarÄ±.
+            **kwargs:  Metoda aktarÄ±lacak keyword argümanlarÄ±.
         """
         if not self._aktif:
             return
@@ -269,7 +269,7 @@ class PluginManager:
             if metod is None or not callable(metod):
                 continue
 
-            # PluginBase no-op kontrolÃ¼
+            # PluginBase no-op kontrolü
             base_metod = getattr(PluginBase, hook_name, None)
             if base_metod is not None:
                 # AynÄ± fonksiyon referansÄ± mÄ±? (override edilmemiÅŸ)
@@ -289,7 +289,7 @@ class PluginManager:
                 )
 
     def hook_cagir_mesaj(self, hook_name: str, message: str, context: dict) -> str:
-        """on_message tÃ¼rÃ¼ hook'lar: mesaj dÃ¶ndÃ¼rebilir."""
+        """on_message türü hook'lar: mesaj döndürebilir."""
         if not self._aktif:
             return message
 
@@ -318,7 +318,7 @@ class PluginManager:
         return guncel
 
     def hook_cagir_pre_llm(self, messages: list, context: dict) -> Tuple[list, dict]:
-        """pre_llm_call hook'larÄ±nÄ± zincirleme Ã§aÄŸÄ±r."""
+        """pre_llm_call hook'larÄ±nÄ± zincirleme çaÄŸÄ±r."""
         if not self._aktif:
             return messages, context
 
@@ -349,7 +349,7 @@ class PluginManager:
         return guncel_msgs, guncel_ctx
 
     def hook_cagir_post_llm(self, response: dict, context: dict) -> dict:
-        """post_llm_call hook'larÄ±nÄ± zincirleme Ã§aÄŸÄ±r."""
+        """post_llm_call hook'larÄ±nÄ± zincirleme çaÄŸÄ±r."""
         if not self._aktif:
             return response
 
@@ -379,14 +379,14 @@ class PluginManager:
     # â”€â”€ Durum / Sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def plugin_listesi(self) -> List[Dict[str, str]]:
-        """YÃ¼klenmiÅŸ plugin'lerin listesi."""
+        """YüklenmiÅŸ plugin'lerin listesi."""
         return [
             {"name": p.name, "version": p.version, "class": type(p).__name__}
             for p in self._pluginler.values()
         ]
 
     def plugin_al(self, ad: str) -> Optional[PluginBase]:
-        """AdÄ±yla plugin instance'Ä± dÃ¶ndÃ¼r."""
+        """AdÄ±yla plugin instance'Ä± döndür."""
         return self._pluginler.get(ad)
 
     @property
@@ -405,8 +405,8 @@ _global_manager: Optional[PluginManager] = None
 def plugin_manager_al() -> PluginManager:
     """Global PluginManager singleton'una eriÅŸ.
 
-    Ä°lk Ã§aÄŸrÄ±da otomatik oluÅŸturur, config.yaml'yi okur ve
-    auto_load=True ise plugin'leri yÃ¼kler.
+    Ä°lk çaÄŸrÄ±da otomatik oluÅŸturur, config.yaml'yi okur ve
+    auto_load=True ise plugin'leri yükler.
     """
     global _global_manager
     if _global_manager is None:
@@ -421,22 +421,22 @@ def plugin_manager_al() -> PluginManager:
 
 
 def plugin_yukle(ad: str, path: str) -> Optional[PluginBase]:
-    """KÄ±sayol: singleton Ã¼zerinden plugin yÃ¼kle."""
+    """KÄ±sayol: singleton üzerinden plugin yükle."""
     return plugin_manager_al().plugin_yukle(ad, path)
 
 
 def plugin_kaldir(ad: str) -> None:
-    """KÄ±sayol: singleton Ã¼zerinden plugin kaldÄ±r."""
+    """KÄ±sayol: singleton üzerinden plugin kaldÄ±r."""
     return plugin_manager_al().plugin_kaldir(ad)
 
 
 def hook_cagir(hook_name: str, **kwargs: Any) -> None:
-    """KÄ±sayol: singleton Ã¼zerinden hook Ã§aÄŸÄ±r."""
+    """KÄ±sayol: singleton üzerinden hook çaÄŸÄ±r."""
     return plugin_manager_al().hook_cagir(hook_name, **kwargs)
 
 
 def plugin_listesi() -> List[Dict[str, str]]:
-    """KÄ±sayol: yÃ¼klenmiÅŸ plugin listesi."""
+    """KÄ±sayol: yüklenmiÅŸ plugin listesi."""
     return plugin_manager_al().plugin_listesi()
 
 

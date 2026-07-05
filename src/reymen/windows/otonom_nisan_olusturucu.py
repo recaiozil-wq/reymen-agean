@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 otonom_nisan_olusturucu.py â€” DOM uzerinden tam otonom sablon cikarma araci.
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """session_search.py â€” FTS5-based session message search engine.
 
 Saves each message to SQLite FTS5, performs full-text search.

@@ -1,5 +1,5 @@
-﻿# -*- coding: utf-8 -*-
-"""reymen/mcp/mcp_tool.py â€” MCP AraÃ§ KaydÄ± ve Ã‡aÄŸrÄ± FonksiyonlarÄ±.
+# -*- coding: utf-8 -*-
+"""reymen/mcp/mcp_tool.py â€” MCP Araç KaydÄ± ve Ã‡aÄŸrÄ± FonksiyonlarÄ±.
 
 ReYMeN Motor'una MCP_TOOL_LISTELE / MCP_TOOL_CAGIR fonksiyonlarÄ±nÄ± kaydeder.
 reymen.arac.mcp_client_tool altyapÄ±sÄ±nÄ± kullanÄ±r (canlÄ± stdio/HTTP MCP client).
@@ -25,12 +25,12 @@ from reymen.arac.mcp_client_tool import (
 
 logger = logging.getLogger(__name__)
 
-# BaÄŸlantÄ± Ã¶nbelleÄŸi â€” ilk Ã§aÄŸrÄ±da tÃ¼m config'deki sunuculara baÄŸlanÄ±r
+# BaÄŸlantÄ± önbelleÄŸi â€” ilk çaÄŸrÄ±da tüm config'deki sunuculara baÄŸlanÄ±r
 _initialized = False
 
 
 def _ensure_connected():
-    """TÃ¼m config'deki MCP sunucularÄ±na baÄŸlan (bir kere)."""
+    """Tüm config'deki MCP sunucularÄ±na baÄŸlan (bir kere)."""
     global _initialized
     if _initialized:
         return
@@ -44,10 +44,10 @@ def _ensure_connected():
 
 
 def mcp_tool_listele(sunucu_ad: str = "") -> list[dict]:
-    """Belirtilen sunucudaki veya tÃ¼m MCP araÃ§larÄ±nÄ± listele.
+    """Belirtilen sunucudaki veya tüm MCP araçlarÄ±nÄ± listele.
 
     Args:
-        sunucu_ad: BoÅŸ = tÃ¼m sunucular, dolu = sadece o sunucu
+        sunucu_ad: BoÅŸ = tüm sunucular, dolu = sadece o sunucu
 
     Returns:
         [{"sunucu", "name", "description"}, ...]
@@ -71,24 +71,24 @@ def mcp_tool_listele(sunucu_ad: str = "") -> list[dict]:
 
 
 def mcp_tool_cagir(sunucu: str, arac: str, args: Optional[dict] = None) -> str:
-    """MCP sunucusunda bir aracÄ± Ã§aÄŸÄ±r.
+    """MCP sunucusunda bir aracÄ± çaÄŸÄ±r.
 
     Args:
         sunucu: MCP sunucu adÄ±
-        arac: Ã‡aÄŸrÄ±lacak araÃ§
+        arac: Ã‡aÄŸrÄ±lacak araç
         args: Parametreler
 
     Returns:
-        AracÄ±n dÃ¶ndÃ¼rdÃ¼ÄŸÃ¼ metin iÃ§erik
+        AracÄ±n döndürdüÄŸü metin içerik
     """
     _ensure_connected()
     return mcp_client_arac_cagir(sunucu, arac, **(args or {}))
 
 
 def motor_kaydet(motor) -> None:
-    """MCP araÃ§larÄ±nÄ± Motor'a kaydet.
+    """MCP araçlarÄ±nÄ± Motor'a kaydet.
 
-    Motor baÅŸlatÄ±lÄ±rken Ã§aÄŸrÄ±lÄ±r.
+    Motor baÅŸlatÄ±lÄ±rken çaÄŸrÄ±lÄ±r.
     """
     _ensure_connected()
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -98,17 +98,17 @@ def motor_kaydet(motor) -> None:
     yonetici = mcp_client()
     yonetici.motor_kaydet(motor)
 
-    # AyrÄ±ca genel liste/Ã§aÄŸrÄ± fonksiyonlarÄ±nÄ± kaydet
+    # AyrÄ±ca genel liste/çaÄŸrÄ± fonksiyonlarÄ±nÄ± kaydet
     motor._plugin_arac_kaydet(
         "MCP_TOOL_LISTELE",
         mcp_tool_listele,
-        "MCP sunucularÄ±ndaki araÃ§larÄ± listeler. "
+        "MCP sunucularÄ±ndaki araçlarÄ± listeler. "
         "KullanÄ±m: MCP_TOOL_LISTELE(sunucu_ad='')",
     )
     motor._plugin_arac_kaydet(
         "MCP_TOOL_CAGIR",
         mcp_tool_cagir,
-        "MCP sunucusunda araÃ§ Ã§aÄŸÄ±rÄ±r. "
+        "MCP sunucusunda araç çaÄŸÄ±rÄ±r. "
         "KullanÄ±m: MCP_TOOL_CAGIR(sunucu='github', "
         "arac='issues/list', args={'repo': 'user/repo'})",
     )

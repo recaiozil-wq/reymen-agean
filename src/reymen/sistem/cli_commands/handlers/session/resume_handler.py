@@ -1,4 +1,4 @@
-﻿"""Handle /resume command â€” switch to a previous session mid-conversation."""
+"""Handle /resume command â€” switch to a previous session mid-conversation."""
 
 import logging
 

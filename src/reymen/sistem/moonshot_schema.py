@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-"""moonshot_schema.py â€” Moonshot/Kimi API AdaptÃ¶rÃ¼.
+# -*- coding: utf-8 -*-
+"""moonshot_schema.py â€” Moonshot/Kimi API Adaptörü.
 
-Moonshot AI (Kimi) iÃ§in OpenAI uyumlu arayÃ¼z.
-Kimi uzun baÄŸlam (128K+) ve Ã‡ince/TÃ¼rkÃ§e desteÄŸi iÃ§in idealdir.
+Moonshot AI (Kimi) için OpenAI uyumlu arayüz.
+Kimi uzun baÄŸlam (128K+) ve Ã‡ince/Türkçe desteÄŸi için idealdir.
 ENV: MOONSHOT_API_KEY
 """
 
@@ -16,7 +16,7 @@ MOONSHOT_BASE = "https://api.moonshot.cn/v1"
 
 
 class MoonshotProvider:
-    """Moonshot Kimi API saÄŸlayÄ±cÄ±sÄ± (OpenAI uyumlu arayÃ¼z)."""
+    """Moonshot Kimi API saÄŸlayÄ±cÄ±sÄ± (OpenAI uyumlu arayüz)."""
 
     MODELLER = {
         "moonshot-v1-8k": {"context": 8192, "max_out": 4096},
@@ -80,7 +80,7 @@ class MoonshotProvider:
         return choices[0]["message"]["content"] if choices else "[Moonshot]: BoÅŸ yanÄ±t"
 
     def dosya_yukle(self, dosya_yolu: str) -> str:
-        """Moonshot Files API ile dÃ¶kÃ¼man yÃ¼kle (long context iÃ§in)."""
+        """Moonshot Files API ile döküman yükle (long context için)."""
         import mimetypes
 
         mime = mimetypes.guess_type(dosya_yolu)[0] or "text/plain"
@@ -110,7 +110,7 @@ class MoonshotProvider:
             with urllib.request.urlopen(req, timeout=30) as r:
                 return json.loads(r.read().decode("utf-8")).get("id", "")
         except Exception as e:
-            return f"[Moonshot Dosya YÃ¼kleme]: {e}"
+            return f"[Moonshot Dosya Yükleme]: {e}"
 
     def model_listesi(self) -> list[str]:
         return list(self.MODELLER.keys())

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """skill_utils.py â€” Skill Yardimci Fonksiyonlar v4.
 
 v4 yenilikleri (agentskills.io derin analiz):
@@ -482,14 +482,14 @@ def skill_aktivat(ad: str) -> str:
     """Skill'i aktive et â€” tam SKILL.md + scripts/references listesi + uyumluluk uyarisi.
 
     Returns:
-        FormatlÄ± skill icerigi veya hata mesaji.
+        FormatlÄı skill icerigi veya hata mesaji.
     """
     dosya = skill_bul(ad)
     if not dosya:
         # Fuzzy: adi kismi eslestirme
-        olasÄ±lar = skill_ara(ad, limit=3)
-        if olasÄ±lar:
-            oneriler = ", ".join(s["ad"] for s in olasÄ±lar)
+        olasÄılar = skill_ara(ad, limit=3)
+        if olasÄılar:
+            oneriler = ", ".join(s["ad"] for s in olasÄılar)
             return f"[Skill]: '{ad}' bulunamadi. Benzer: {oneriler}"
         return f"[Skill]: '{ad}' bulunamadi. SKILL_ARA ile ara."
 
@@ -531,7 +531,7 @@ def skill_aktivat(ad: str) -> str:
             ref_adlari = ", ".join(r.name for r in refler[:10])
             ref_listesi = f"\n[Skill References]: {ref_adlari}"
 
-    # evals/ bilgisi (agentskills.io eval standardÄ±)
+    # evals/ bilgisi (agentskills.io eval standardÄı)
     eval_bilgisi = ""
     eval_dizin = dosya.parent / "evals"
     if eval_dizin.exists():
@@ -623,7 +623,7 @@ def skill_dogrula(ad: str) -> str:
             hatalar.append(
                 f"'description' {len(desc_val)} karakter (max {_MAKS_ACIKLAMA_UZUNLUGU})."
             )
-        # "Ne zaman kullanilacagi" kontrol â€” imperatif yapÄ± (Use when / ne zaman / kullan)
+        # "Ne zaman kullanilacagi" kontrol â€” imperatif yapÄı (Use when / ne zaman / kullan)
         zaman_ipuclari = [
             "use when",
             "use this when",
@@ -904,7 +904,7 @@ def skill_script_yardim(skill_adi: str, script_adi: str) -> str:
     return skill_script_calistir(skill_adi, script_adi, arglar="--help")
 
 
-# â”€â”€ Skill Eval Sistemi (agentskills.io evals/ standardÄ±) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Skill Eval Sistemi (agentskills.io evals/ standardÄı) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_eval_al(ad: str) -> dict:
@@ -1057,7 +1057,7 @@ if __name__ == "__main__":
     n = skill_index_yenile()
     print(f"  Guncellenen: {n} skill")
     print()
-    print("=== 'python' aramasÄ± (FTS5) ===")
+    print("=== 'python' aramasÄı (FTS5) ===")
     for s in skill_ara("python", limit=5):
         print(f"  [{s.get('kategori','?')}] {s['ad']}: {s['aciklama'][:60]}")
     print()

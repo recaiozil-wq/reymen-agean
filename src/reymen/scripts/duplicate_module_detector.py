@@ -1,5 +1,5 @@
-﻿#!/usr/bin/env python3
-"""duplicate_module_detector.py â€” ReYMeN projesindeki ReYMeN kopyasÄ± modÃ¼lleri tespit eder.
+#!/usr/bin/env python3
+"""duplicate_module_detector.py â€” ReYMeN projesindeki ReYMeN kopyasÄ± modülleri tespit eder.
 
 KullanÄ±m:
     python reymen/scripts/duplicate_module_detector.py
@@ -68,7 +68,7 @@ def scan_mirror_dirs(proje_koku: Path):
                 }
             )
 
-    # ReYMeN core dizinlerini de tara (referans iÃ§in)
+    # ReYMeN core dizinlerini de tara (referans için)
     core_py = 0
     for d in REYMEN_CORE_DIRS:
         yol = proje_koku / d
@@ -112,8 +112,8 @@ def main():
 
     # .ReYMeN/ veya reymen/ varlÄ±ÄŸÄ±nÄ± kontrol et
     if not (proje_koku / "reymen").exists():
-        print(f"HATA: Bu bir ReYMeN proje kÃ¶kÃ¼ deÄŸil: {proje_koku}")
-        print("LÃ¼tfen ReYMeN-Ajan dizininde Ã§alÄ±ÅŸtÄ±rÄ±n.")
+        print(f"HATA: Bu bir ReYMeN proje kökü deÄŸil: {proje_koku}")
+        print("Lütfen ReYMeN-Ajan dizininde çalÄ±ÅŸtÄ±rÄ±n.")
         sys.exit(1)
 
     print(f"ğŸ“ ReYMeN-Ajan: {proje_koku}")
@@ -161,10 +161,10 @@ def main():
                 f"ğŸ”´ {m['dizin']}: {m['py_sayisi']} dosya â€” silmeyi deÄŸerlendir"
             )
         elif m["py_sayisi"] > 10:
-            oneriler.append(f"ğŸŸ¡ {m['dizin']}: {m['py_sayisi']} dosya â€” gÃ¶zden geÃ§ir")
+            oneriler.append(f"ğŸŸ¡ {m['dizin']}: {m['py_sayisi']} dosya â€” gözden geçir")
 
     if not oneriler:
-        print("âœ… Mirror dizinleri temiz veya kÃ¼Ã§Ã¼k.")
+        print("âœ… Mirror dizinleri temiz veya küçük.")
     else:
         for o in oneriler:
             print(f"   {o}")

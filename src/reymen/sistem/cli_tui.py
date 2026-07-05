@@ -1,4 +1,4 @@
-﻿"""cli_tui.py - ReYMeNCLI TUI/UI metotlari."""
+"""cli_tui.py - ReYMeNCLI TUI/UI metotlari."""
 
 import logging, os, re, sys, time, json, math, threading, shutil, textwrap
 from datetime import datetime

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """reymen.sistem â€” Sistem modulleri."""
 
 from __future__ import annotations

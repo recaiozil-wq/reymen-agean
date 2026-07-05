@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """reymen.cli â€” ReYMeN CLI modulu.
 
 Slash komut registry (commands.py), profil yonetimi (profiles.py),

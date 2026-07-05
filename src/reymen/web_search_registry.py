@@ -1,7 +1,7 @@
-﻿"""ReYMeN Web Search Provider Registry
+"""ReYMeN Web Search Provider Registry
 ======================================
 
-Central map of registered web providers. BasitleÅŸtirilmiÅŸ ReYMeN sÃ¼rÃ¼mÃ¼ â€”
+Central map of registered web providers. BasitleÅŸtirilmiÅŸ ReYMeN sürümü â€”
 ReYMeN config.yaml baÄŸÄ±mlÄ±lÄ±ÄŸÄ± yoktur, sadece env var + kayÄ±tlÄ± provider'lar.
 
 Active selection:

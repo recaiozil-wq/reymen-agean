@@ -1,4 +1,4 @@
-﻿"""_handle_cron_command handler."""
+"""_handle_cron_command handler."""
 
 import json
 import shlex

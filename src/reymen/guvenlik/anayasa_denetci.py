@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 anayasa_denetci.py â€” Constitutional AI Oz-Denetim (Anthropic, 2022).
 

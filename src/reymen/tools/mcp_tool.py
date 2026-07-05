@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.mcp_tool shim â€” ReYMeN MCP tool fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.mcp_tool shim â€” ReYMeN MCP tool fonksiyonlarÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

@@ -1,12 +1,12 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 reymen/mcp/__init__.py â€” ReYMeN MCP Ä°stemci Paketi.
 
-Model Context Protocol (MCP) sunucularÄ±na baÄŸlanma, tool keÅŸfetme ve Ã§aÄŸÄ±rma.
+Model Context Protocol (MCP) sunucularÄ±na baÄŸlanma, tool keÅŸfetme ve çaÄŸÄ±rma.
 
-Alt ModÃ¼ller:
-  mcp_manager      â€” Async MCP yÃ¶neticisi (singleton)
-  mcp_tool         â€” Motor araÃ§ kaydÄ± (MCP_TOOL_LISTELE / MCP_TOOL_CAGIR)
+Alt Modüller:
+  mcp_manager      â€” Async MCP yöneticisi (singleton)
+  mcp_tool         â€” Motor araç kaydÄ± (MCP_TOOL_LISTELE / MCP_TOOL_CAGIR)
   mcp_catalog      â€” Ã–nceden tanÄ±mlÄ± MCP sunucu kataloÄŸu
   mcp_discovery    â€” config.yaml + .env'den otomatik keÅŸif (MCP_DISCOVERY)
   mcp_reconnect    â€” Heartbeat + otomatik yeniden baÄŸlanma (MCP_RECONNECT_*)
@@ -25,10 +25,10 @@ KullanÄ±m:
     # Heartbeat + reconnect baÅŸlat
     await mcp_reconnect_baslat()
 
-    # Tool Ã§aÄŸÄ±r
+    # Tool çaÄŸÄ±r
     sonuc = await mcp_manager().cagir("github", "issues/list", {"repo": "user/repo"})
 
-    # TÃ¼m tool'larÄ± listele
+    # Tüm tool'larÄ± listele
     tools = mcp_manager().tum_araclari_getir()
 """
 
@@ -55,15 +55,15 @@ __all__ = [
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# ModÃ¼l seviyesinde otomatik keÅŸif (motor._plugin_moduller_yukle() sÄ±rasÄ±nda)
+# Modül seviyesinde otomatik keÅŸif (motor._plugin_moduller_yukle() sÄ±rasÄ±nda)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def otomatik_kesif_yap() -> int:
-    """ModÃ¼l import edildiÄŸinde MCP sunucularÄ±nÄ± otomatik keÅŸfeder.
+    """Modül import edildiÄŸinde MCP sunucularÄ±nÄ± otomatik keÅŸfeder.
 
     Motor._plugin_moduller_yukle() akÄ±ÅŸÄ±na entegredir:
-      "reymen.mcp" import edildiÄŸinde bu fonksiyon Ã§aÄŸrÄ±lÄ±r,
+      "reymen.mcp" import edildiÄŸinde bu fonksiyon çaÄŸrÄ±lÄ±r,
       config.yaml + .env + ReYMeN profilinden MCP sunucularÄ±nÄ± bulur
       ve mcp_manager'a otomatik kaydeder.
 
@@ -74,26 +74,26 @@ def otomatik_kesif_yap() -> int:
         yeni = mcp_kesfet(geri_bildirim=True)
         if yeni > 0:
             logger.info(
-                "[MCP] Otomatik keÅŸif: %d yeni sunucu bulundu (modÃ¼l import)", yeni
+                "[MCP] Otomatik keÅŸif: %d yeni sunucu bulundu (modül import)", yeni
             )
         return yeni
     except Exception as e:
-        logger.debug("[MCP] Otomatik keÅŸif hatasÄ± (modÃ¼l import): %s", e)
+        logger.debug("[MCP] Otomatik keÅŸif hatasÄ± (modül import): %s", e)
         return 0
 
 
-# ModÃ¼l import edildiÄŸinde otomatik keÅŸif Ã§alÄ±ÅŸtÄ±r
+# Modül import edildiÄŸinde otomatik keÅŸif çalÄ±ÅŸtÄ±r
 _otomatik_kesif_sonuc = otomatik_kesif_yap()
 
 
 def _cift_mcp_uyar() -> None:
-    """reymen.arac.native_mcp_client import edilmisse uyar (Ã§ift MCP client)."""
+    """reymen.arac.native_mcp_client import edilmisse uyar (çift MCP client)."""
     try:
         if "reymen.arac.native_mcp_client" in sys.modules:
             logger.warning(
                 "[MCP] âš ï¸ Ã‡ift MCP client tespit edildi! "
-                "reymen.mcp ve reymen.arac.native_mcp_client paralel Ã§alÄ±ÅŸÄ±yor. "
-                "Yeni geliÅŸtirmeler iÃ§in reymen.mcp paketini kullanÄ±n."
+                "reymen.mcp ve reymen.arac.native_mcp_client paralel çalÄ±ÅŸÄ±yor. "
+                "Yeni geliÅŸtirmeler için reymen.mcp paketini kullanÄ±n."
             )
     except Exception as _e:
         __import__("logging").getLogger(__name__).warning(
@@ -102,19 +102,19 @@ def _cift_mcp_uyar() -> None:
 
 
 def baslangicta_baslat() -> None:
-    """Motor yÃ¼klenirken otomatik MCP keÅŸif ve reconnect baÅŸlat.
+    """Motor yüklenirken otomatik MCP keÅŸif ve reconnect baÅŸlat.
 
-    Motor baÅŸlatÄ±lÄ±rken motor_kaydet() iÃ§inden Ã§aÄŸrÄ±lÄ±r:
+    Motor baÅŸlatÄ±lÄ±rken motor_kaydet() içinden çaÄŸrÄ±lÄ±r:
       1. config.yaml + .env'den MCP sunucularÄ±nÄ± keÅŸfeder
-      2. Heartbeat + otomatik yeniden baÄŸlanma dÃ¶ngÃ¼sÃ¼nÃ¼ baÅŸlatÄ±r
+      2. Heartbeat + otomatik yeniden baÄŸlanma döngüsünü baÅŸlatÄ±r
 
     Hata varsa sessizce logla, crash yapma. HalihazÄ±rda reconnect
-    Ã§alÄ±ÅŸÄ±yorsa ikinci kez baÅŸlatma yapÄ±lmaz.
+    çalÄ±ÅŸÄ±yorsa ikinci kez baÅŸlatma yapÄ±lmaz.
     """
     try:
-        # HalihazÄ±rda reconnect Ã§alÄ±ÅŸÄ±yorsa atla
+        # HalihazÄ±rda reconnect çalÄ±ÅŸÄ±yorsa atla
         if mcp_reconnect_durumu().get("aktif", False):
-            logger.debug("[MCP] baslangicta_baslat: reconnect zaten Ã§alÄ±ÅŸÄ±yor")
+            logger.debug("[MCP] baslangicta_baslat: reconnect zaten çalÄ±ÅŸÄ±yor")
             return
 
         # 1. MCP sunucularÄ±nÄ± keÅŸfet
@@ -140,9 +140,9 @@ def baslangicta_baslat() -> None:
 
 
 def motor_kaydet(motor) -> None:
-    """TÃ¼m MCP araÃ§larÄ±nÄ± Motor'a kaydet.
+    """Tüm MCP araçlarÄ±nÄ± Motor'a kaydet.
 
-    Motor baÅŸlatÄ±lÄ±rken Ã§aÄŸrÄ±lÄ±r. SÄ±rasÄ±yla:
+    Motor baÅŸlatÄ±lÄ±rken çaÄŸrÄ±lÄ±r. SÄ±rasÄ±yla:
       1. Ã‡ift MCP client uyarÄ±sÄ± (_cift_mcp_uyar)
       2. MCP_TOOL_LISTELE / MCP_TOOL_CAGIR (mcp_tool)
       3. MCP_DISCOVERY / MCP_DISCOVERY_DURUM (mcp_discovery)
@@ -152,17 +152,17 @@ def motor_kaydet(motor) -> None:
     # Ã‡ift MCP client uyarÄ±sÄ±
     _cift_mcp_uyar()
 
-    # Alt modÃ¼l araÃ§larÄ±nÄ± kaydet
+    # Alt modül araçlarÄ±nÄ± kaydet
     mcp_tool_kaydet(motor)
     mcp_discovery_kaydet(motor)
     mcp_reconnect_kaydet(motor)
 
-    # MCP_OTOMATIK_BASLAT â€” motor baÅŸlangÄ±cÄ±nda Ã§aÄŸrÄ±lacak auto-start tool
+    # MCP_OTOMATIK_BASLAT â€” motor baÅŸlangÄ±cÄ±nda çaÄŸrÄ±lacak auto-start tool
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(
             "MCP_OTOMATIK_BASLAT",
             baslangicta_baslat,
             "MCP sunucularÄ±nÄ± otomatik keÅŸfeder, heartbeat + yeniden baÄŸlanma "
-            "dÃ¶ngÃ¼sÃ¼nÃ¼ baÅŸlatÄ±r. Motor baÅŸlangÄ±cÄ±nda otomatik Ã§aÄŸrÄ±lÄ±r. "
+            "döngüsünü baÅŸlatÄ±r. Motor baÅŸlangÄ±cÄ±nda otomatik çaÄŸrÄ±lÄ±r. "
             "KullanÄ±m: MCP_OTOMATIK_BASLAT() â€” keÅŸif + reconnect tek adÄ±mda.",
         )

@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-cron_scheduler.py â€” ZamanlanmÄ±ÅŸ gÃ¶rev yÃ¶neticisi.
+cron_scheduler.py â€” ZamanlanmÄ±ÅŸ görev yöneticisi.
 
 CronScheduler sinifi ile cron benzeri zamanlanmis gorevleri
-yÃ¶netir. Cron expression parser ile zaman ifadelerini cozumler,
+yönetir. Cron expression parser ile zaman ifadelerini cozumler,
 gorevleri belirtilen zamanlarda calistirir.
 """
 

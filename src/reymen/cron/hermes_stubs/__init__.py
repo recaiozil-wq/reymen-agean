@@ -1,12 +1,12 @@
-﻿"""
-reymen_stubs.py'ye yÃ¶nlendirme â€” geriye uyumluluk katmanÄ±.
+"""
+reymen_stubs.py'ye yönlendirme â€” geriye uyumluluk katmanÄ±.
 
-TÃ¼m import'lar src.reymen.sistem.reymen_stubs'a yÃ¶nlendirilir.
-Bu dosya sadece eski import yollarÄ±nÄ±n kÄ±rÄ±lmamasÄ± iÃ§in korunuyor.
+Tüm import'lar src.reymen.sistem.reymen_stubs'a yönlendirilir.
+Bu dosya sadece eski import yollarÄ±nÄ±n kÄ±rÄ±lmamasÄ± için korunuyor.
 """
 
 from reymen.sistem.reymen_stubs import (  # noqa: F401,F403
-    # BÃ¶lÃ¼m 1: Yol yÃ¶netimi
+    # Bölüm 1: Yol yönetimi
     get_reymen_home,
     get_hermes_home,
     display_reymen_home,
@@ -20,14 +20,14 @@ from reymen.sistem.reymen_stubs import (  # noqa: F401,F403
     get_default_reymen_root,
     get_default_hermes_root,
     set_hermes_home_override,
-    # BÃ¶lÃ¼m 2: Zaman
+    # Bölüm 2: Zaman
     now,
     reset_time_cache,
-    # BÃ¶lÃ¼m 3: Atomik dosya
+    # Bölüm 3: Atomik dosya
     atomic_replace,
     atomic_json_write,
     atomic_yaml_write,
-    # BÃ¶lÃ¼m 4: YardÄ±mcÄ±lar
+    # Bölüm 4: YardÄ±mcÄ±lar
     env_var_enabled,
     base_url_host_matches,
     parse_reasoning_effort,
@@ -59,30 +59,30 @@ from reymen.sistem.reymen_stubs import (  # noqa: F401,F403
     windows_hide_flags,
     _expand_env_vars,
     load_config,
-    # BÃ¶lÃ¼m 5: Config
+    # Bölüm 5: Config
     cfg_get,
     save_config,
     save_env_value,
     is_managed,
     format_managed_message,
     get_compatible_custom_providers,
-    # BÃ¶lÃ¼m 6: Account usage
+    # Bölüm 6: Account usage
     AccountUsageSnapshot,
     CreditsView,
     fetch_account_usage,
     render_account_usage_lines,
     build_credits_view,
     nous_credits_lines,
-    # BÃ¶lÃ¼m 7: i18n
+    # Bölüm 7: i18n
     t,
-    # BÃ¶lÃ¼m 8: ReYMeN uyum
+    # Bölüm 8: ReYMeN uyum
     discover_plugins,
     has_hook,
     invoke_hook,
     get_pre_tool_call_block_message,
     apply_tool_request_middleware,
     run_tool_execution_middleware,
-    # BÃ¶lÃ¼m 9: Eksik stublar
+    # Bölüm 9: Eksik stublar
     SessionDB,
     _get_platform_tools,
     kanban_db,

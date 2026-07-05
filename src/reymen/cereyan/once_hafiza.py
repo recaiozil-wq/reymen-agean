@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 once_hafiza.py â€” Memory-first execution engine.
 
@@ -34,13 +34,13 @@ T = TypeVar("T")
 ROOT = Path(__file__).parent.resolve()
 DB_YOLU = ROOT.parent.parent / ".ReYMeN" / "db" / "ogrenme_merkezi.db"  # consolidated: ogrenmeler.db + ogrenme.db + proaktif_ogrenme
 
-# 6 ay = ~180 gÃ¼n
+# 6 ay = ~180 gün
 GECERLILIK_GUN = 180
 
 _yazma_kilit = threading.Lock()
 
 
-# â”€â”€ Kademeli GÃ¼ven Fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Kademeli Güven Fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _kademeli_guven(basari: int, hata: int) -> float:
@@ -88,7 +88,7 @@ def _kur(con: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_ogrenmeler_gecerli ON ogrenmeler(gecerlilik_tarihi);
     """)
 
-    # Migration: eski tablolara kaynak_url ekle (gÃ¼venli, sadece yoksa)
+    # Migration: eski tablolara kaynak_url ekle (güvenli, sadece yoksa)
     try:
         con.execute("ALTER TABLE ogrenmeler ADD COLUMN kaynak_url TEXT DEFAULT NULL")
     except Exception as _e:
@@ -151,7 +151,7 @@ def kaydet(
 
     with _yazma_kilit:
         with _baglanti() as con:
-            # Daha Ã¶nce aynÄ± hedef+kategori var mÄ±?
+            # Daha önce aynÄ± hedef+kategori var mÄ±?
             var = con.execute(
                 "SELECT id, basari_sayisi, hata_sayisi, guven_skoru FROM ogrenmeler "
                 "WHERE hedef = ? AND kategori = ? LIMIT 1",
@@ -163,7 +163,7 @@ def kaydet(
                 yeni_basari = basari_once + (1 if basari else 0)
                 yeni_hata = hata_once + (0 if basari else 1)
                 toplam = yeni_basari + yeni_hata
-                # Kademeli gÃ¼ven: sigmoid benzeri, 3 baÅŸarÄ±da ~0.75
+                # Kademeli güven: sigmoid benzeri, 3 baÅŸarÄ±da ~0.75
                 guven = round(_kademeli_guven(yeni_basari, yeni_hata), 4)
 
                 con.execute(
@@ -198,7 +198,7 @@ def kaydet(
                 )
                 return kayit_id
             else:
-                # Ä°lk kayÄ±t: guven=0.5 baÅŸlangÄ±Ã§, kademeli artar
+                # Ä°lk kayÄ±t: guven=0.5 baÅŸlangÄ±ç, kademeli artar
                 baslangic_guven = 0.5 if basari else 0.1
                 con.execute(
                     """INSERT INTO ogrenmeler
@@ -262,7 +262,7 @@ def ara(
     if gecerli_mi:
         kosullar.append("gecerlilik_tarihi >= date('now')")
 
-    # Tam eÅŸleÅŸme Ã¶nce, sonra LIKE
+    # Tam eÅŸleÅŸme önce, sonra LIKE
     with _baglanti() as con:
         # 1) Tam eÅŸleÅŸme
         tam_sql = (
@@ -336,7 +336,7 @@ def guven_guncelle(kayit_id: int, basari: bool) -> float:
 
             yeni_basari = var[0] + (1 if basari else 0)
             yeni_hata = var[1] + (0 if basari else 1)
-            # Kademeli gÃ¼ven (sigmoid)
+            # Kademeli güven (sigmoid)
             guven = round(_kademeli_guven(yeni_basari, yeni_hata), 4)
 
             con.execute(
@@ -422,14 +422,14 @@ def isle(
                 en_iyi["hedef"][:40],
                 en_iyi["guven_skoru"],
             )
-            # KullanÄ±m gÃ¼ncelle
+            # KullanÄ±m güncelle
             guven_guncelle(en_iyi["id"], basari=True)
 
             if calistir is None:
                 # Sadece hafÄ±za sorgulama modu
                 return en_iyi, "cache"
 
-            # Ã–nbellekte var ama yine de Ã§alÄ±ÅŸtÄ±r? HayÄ±r â€” direkt dÃ¶ndÃ¼r
+            # Ã–nbellekte var ama yine de çalÄ±ÅŸtÄ±r? HayÄ±r â€” direkt döndür
             return en_iyi, "cache"
 
     if calistir is None:
@@ -479,7 +479,7 @@ def istatistik() -> dict[str, Any]:
     }
 
 
-# â”€â”€ Belirsiz GÃ¶rev Ã‡Ã¶zÃ¼mleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Belirsiz Görev Ã‡özümleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def belirsiz_gorev_cozumle(
@@ -514,7 +514,7 @@ def belirsiz_gorev_cozumle(
     """
     _db_kur()
 
-    # 1) GÃ¶revi normalize et ve anahtar kelimelere ayÄ±r
+    # 1) Görevi normalize et ve anahtar kelimelere ayÄ±r
     kelimeler = _anahtar_kelimeler(hedef)
     if not kelimeler:
         return {
@@ -527,7 +527,7 @@ def belirsiz_gorev_cozumle(
         }
 
     with _baglanti() as con:
-        # 2) TÃ¼m geÃ§erli kayÄ±tlarÄ± Ã§ek
+        # 2) Tüm geçerli kayÄ±tlarÄ± çek
         tum_kayitlar = con.execute(
             "SELECT id, hedef, kategori, icerik, guven_skoru, basari_sayisi, hata_sayisi "
             "FROM ogrenmeler WHERE gecerlilik_tarihi >= date('now') "
@@ -544,7 +544,7 @@ def belirsiz_gorev_cozumle(
             "ham_hedef": hedef,
         }
 
-    # 3) Her kaydÄ±n gÃ¶revle benzerlik skorunu hesapla
+    # 3) Her kaydÄ±n görevle benzerlik skorunu hesapla
     skorlu: list[tuple[float, dict[str, Any]]] = []
     for row in tum_kayitlar:
         kayit = {
@@ -560,12 +560,12 @@ def belirsiz_gorev_cozumle(
         if skor >= esik:
             skorlu.append((skor, kayit))
 
-    # 4) Skora gÃ¶re sÄ±rala
+    # 4) Skora göre sÄ±rala
     skorlu.sort(key=lambda x: x[0], reverse=True)
 
-    # 4b) HiÃ§ kelime eÅŸleÅŸmezse en yÃ¼ksek gÃ¼venli kaydÄ± Ã¶ner (backup)
+    # 4b) Hiç kelime eÅŸleÅŸmezse en yüksek güvenli kaydÄ± öner (backup)
     if not skorlu:
-        # GÃ¼ven skoru >= 0.8 olan en iyi kaydÄ± bul
+        # Güven skoru >= 0.8 olan en iyi kaydÄ± bul
         en_guvenli = max(tum_kayitlar, key=lambda r: r[4]) if tum_kayitlar else None
         if en_guvenli and en_guvenli[4] >= 0.8:
             kayit = {
@@ -580,7 +580,7 @@ def belirsiz_gorev_cozumle(
             kategori = kayit["kategori"]
             kayit_hedef = kayit["hedef"]
             soru = (
-                "HiÃ§bir kayÄ±t tam eÅŸleÅŸmedi ama en gÃ¼venilir bildiÄŸim "
+                "Hiçbir kayÄ±t tam eÅŸleÅŸmedi ama en güvenilir bildiÄŸim "
                 + kategori
                 + " kategorisindeki _"
                 + kayit_hedef
@@ -607,7 +607,7 @@ def belirsiz_gorev_cozumle(
             "ham_hedef": hedef,
         }
 
-    # 5) En iyi tahmini seÃ§
+    # 5) En iyi tahmini seç
     en_iyi_skor, en_iyi_kayit = skorlu[0]
 
     # Alternatifler (farklÄ± kategorilerden)
@@ -647,7 +647,7 @@ def belirsiz_gorev_cozumle(
 
 def _anahtar_kelimeler(metin: str) -> list[str]:
     """Clean text and split into meaningful keywords."""
-    # TÃ¼rkÃ§e karakterleri normalize et
+    # Türkçe karakterleri normalize et
     temiz = metin.lower().strip()
     # Noktalama iÅŸaretlerini kaldÄ±r
     for ch in ".,!?;:()[]{}''\"â€œâ€â€˜â€™â€¦â€“â€“/":
@@ -684,7 +684,7 @@ def _benzerlik_skoru(
     kat_eslesen = sum(1 for k in kelimeler if k in kat_kelimeler)
     kat_skor = kat_eslesen / max(len(kelimeler), 1) * 0.5  # max 0.5 bonus
 
-    # GÃ¼ven skoru bonusu (guven > 0.8 ise +0.1, guven > 0.5 ise +0.05)
+    # Güven skoru bonusu (guven > 0.8 ise +0.1, guven > 0.5 ise +0.05)
     guven_bonus = 0.0
     if kayit["guven_skoru"] >= 0.8:
         guven_bonus = 0.1

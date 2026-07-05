@@ -1,11 +1,11 @@
-﻿"""
+"""
 WiFi aÄŸÄ±ndaki cihazlarÄ± tara â€” IP + MAC adreslerini bul.
 
-SelfHeal test Ã¶rneÄŸi:
+SelfHeal test örneÄŸi:
 1. nmap ile subnet tara
 2. ARP tablosunu oku
-3. SonuÃ§larÄ± tablo olarak gÃ¶ster
-4. Hata olursa â†’ SelfHeal otomatik dÃ¼zeltir
+3. SonuçlarÄ± tablo olarak göster
+4. Hata olursa â†’ SelfHeal otomatik düzeltir
 """
 
 import subprocess, re, sys, json
@@ -14,11 +14,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# â”€â”€ 1. AÄŸ arayÃ¼zÃ¼nÃ¼ bul â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ 1. AÄŸ arayüzünü bul â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def aktif_interface_bul() -> str:
-    """WiFi arayÃ¼zÃ¼nÃ¼n IP'sini bul â€” dynamic ARP entry'si olan tercih edilir."""
+    """WiFi arayüzünün IP'sini bul â€” dynamic ARP entry'si olan tercih edilir."""
     try:
         # Ã–nce arp -a ile dynamic entry'si olan interface'i bul
         arp_r = subprocess.run(
@@ -140,11 +140,11 @@ def main():
     # AÄŸ bilgisi
     ip = aktif_interface_bul()
     if not ip:
-        print("âŒ Aktif aÄŸ arayÃ¼zÃ¼ bulunamadÄ±.")
+        print("âŒ Aktif aÄŸ arayüzü bulunamadÄ±.")
         return
 
     subnet = subnet_bul(ip)
-    print(f"ğŸ“¡ ArayÃ¼z IP: {ip}")
+    print(f"ğŸ“¡ Arayüz IP: {ip}")
     print(f"ğŸŒ Subnet:    {subnet}")
     print()
 
@@ -158,7 +158,7 @@ def main():
     nmap_cihazlar = nmap_tara(subnet)
     print(f"   Nmap'te {len(nmap_cihazlar)} cihaz bulundu")
 
-    # BirleÅŸtir (nmap Ã¶ncelikli)
+    # BirleÅŸtir (nmap öncelikli)
     gorulen_ip = set()
     tum_cihazlar = []
 
@@ -173,7 +173,7 @@ def main():
     # SÄ±rala
     tum_cihazlar.sort(key=lambda x: [int(p) for p in x["ip"].split(".")])
 
-    # Tablo gÃ¶ster
+    # Tablo göster
     print()
     print("â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”")
     print("â”‚ IP                  â”‚ MAC                â”‚ Ãœretici      â”‚")
@@ -188,7 +188,7 @@ def main():
     print("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜")
     print(f"\nğŸ“Š Toplam: {len(tum_cihazlar)} cihaz")
 
-    # JSON Ã§Ä±ktÄ± (self_heal iÃ§in)
+    # JSON çÄ±ktÄ± (self_heal için)
     cikti = {
         "zaman": datetime.now().isoformat(),
         "interface_ip": ip,

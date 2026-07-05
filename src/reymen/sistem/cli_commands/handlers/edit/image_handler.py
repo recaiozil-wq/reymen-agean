@@ -1,4 +1,4 @@
-﻿"""_handle_image_command handler."""
+"""_handle_image_command handler."""
 
 from pathlib import Path
 

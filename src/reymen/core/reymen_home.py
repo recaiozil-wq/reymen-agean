@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-reymen_home.py â€” ~/.reymen/ dizin yapÄ±sÄ±nÄ± yÃ¶netir.
+reymen_home.py â€” ~/.reymen/ dizin yapÄ±sÄ±nÄ± yönetir.
 
 ReYMeN'in ~/.reymen/ yerine ReYMeN'in kendi ev dizini.
-TÃ¼m config, session, state, cache bu altÄ±nda toplanÄ±r.
+Tüm config, session, state, cache bu altÄ±nda toplanÄ±r.
 """
 
 from __future__ import annotations
@@ -23,11 +23,11 @@ _REYMEN_HOME_OVERRIDE: Optional[Path] = None
 SUBDIRS = {
     "profiles": "Profiller (config.yaml, .env, mcp.json)",
     "sessions": "Oturum veritabanlarÄ± (state.db)",
-    "cache": "GeÃ§ici dosyalar (image, audio, video)",
-    "cache/images": "GÃ¶rsel Ã¶nbellek",
-    "cache/audio": "Ses Ã¶nbellek",
-    "cache/videos": "Video Ã¶nbellek",
-    "cache/documents": "DokÃ¼man Ã¶nbellek",
+    "cache": "Geçici dosyalar (image, audio, video)",
+    "cache/images": "Görsel önbellek",
+    "cache/audio": "Ses önbellek",
+    "cache/videos": "Video önbellek",
+    "cache/documents": "Doküman önbellek",
     "skills": "Skill dosyalarÄ±",
     "logs": "Log dosyalarÄ±",
     "state": "KalÄ±cÄ± durum verileri",
@@ -40,7 +40,7 @@ SUBDIRS = {
 
 
 def get_reymen_home() -> Path:
-    """~/.reymen/ yolunu dÃ¶ndÃ¼r.
+    """~/.reymen/ yolunu döndür.
 
     Ã–ncelik sÄ±rasÄ±:
     1. REYMEN_HOME ortam deÄŸiÅŸkeni
@@ -67,7 +67,7 @@ def set_reymen_home(path: Path | str) -> None:
 
 
 def ensure_reymen_home() -> Path:
-    """~/.reymen/ ve tÃ¼m alt dizinlerini oluÅŸturur."""
+    """~/.reymen/ ve tüm alt dizinlerini oluÅŸturur."""
     home = get_reymen_home()
     home.mkdir(parents=True, exist_ok=True)
 
@@ -141,7 +141,7 @@ def state_db_path() -> Path:
 
 
 def hermes_to_reymen_path(hermes_path: str | Path) -> Path:
-    """ReYMeN yolunu ReYMeN yoluna Ã§evir.
+    """ReYMeN yolunu ReYMeN yoluna çevir.
 
     ~/.reymen/xxx -> ~/.reymen/xxx
     """

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 kendini_anlat.py â€” ReYMeN / ReYMeN icin oz refleksiyon araci.
 

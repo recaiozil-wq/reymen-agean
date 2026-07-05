@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Check remaining unclassified DBs"""
 
 import sqlite3, os

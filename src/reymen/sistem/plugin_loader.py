@@ -1,13 +1,13 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 plugin_loader.py â€” ReYMeN Plugin Sistemi (ReYMeN-seviyesi).
 
 Ä°ki plugin kategorisi:
-  1. AraÃ§ plugin'leri â€” plugins/<ad>/__init__.py
-       ArayÃ¼z: plugin_adi, plugin_aciklamasi, kaydet(motor)
+  1. Araç plugin'leri â€” plugins/<ad>/__init__.py
+       Arayüz: plugin_adi, plugin_aciklamasi, kaydet(motor)
 
   2. HafÄ±za plugin'leri â€” plugins/memory/<ad>/__init__.py
-       ArayÃ¼z: AbstraktHafizaSaglayici alt sinifi + kaydet(ctx)
+       Arayüz: AbstraktHafizaSaglayici alt sinifi + kaydet(ctx)
        ctx: HafizaPluginKayit nesnesi
 
 ReYMeN UYUMLULUK:

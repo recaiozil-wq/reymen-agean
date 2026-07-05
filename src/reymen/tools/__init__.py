@@ -1,1 +1,1 @@
-﻿"""ReYMeN tools package â€” ReYMeN tool shim'leri."""
+"""ReYMeN tools package â€” ReYMeN tool shim'leri."""

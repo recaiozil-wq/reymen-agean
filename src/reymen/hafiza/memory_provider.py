@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 memory_provider.py â€” Plugin tabanli bellek saglayici sistemi.
 

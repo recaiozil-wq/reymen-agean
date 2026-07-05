@@ -1,4 +1,4 @@
-﻿"""merkez_db_bakim.py â€” HaftalÄ±k WAL checkpoint + boyut raporu."""
+"""merkez_db_bakim.py â€” HaftalÄ±k WAL checkpoint + boyut raporu."""
 
 import sqlite3, os, json
 from pathlib import Path

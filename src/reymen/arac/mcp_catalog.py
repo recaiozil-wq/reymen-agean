@@ -1,11 +1,11 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """mcp_catalog.py â€” MCP Sunucu KataloÄŸu.
 
 ReYMeN'teki MCP Catalog'un ReYMeN uyarlamasÄ±.
 Ã–nceden tanÄ±mlÄ± MCP sunucularÄ±nÄ± listeler ve
 tek komutla kurulum saÄŸlar.
 
-ToolRegistry'e kayÄ±t iÃ§in:
+ToolRegistry'e kayÄ±t için:
     TOOL_META = {...}
     def run(...)
 """
@@ -30,7 +30,7 @@ TOOL_META = {
         },
         "sunucu_adi": {
             "tip": "str",
-            "aciklama": "Kurulacak/bilgisi alÄ±nacak sunucu adÄ± (kur/bilgi iÃ§in)",
+            "aciklama": "Kurulacak/bilgisi alÄ±nacak sunucu adÄ± (kur/bilgi için)",
             "zorunlu": False,
         },
     },
@@ -45,7 +45,7 @@ TOOL_META = {
 KATALOG = {
     "github": {
         "adi": "GitHub MCP",
-        "aciklama": "GitHub API: issue, PR, repo, dosya yÃ¶netimi",
+        "aciklama": "GitHub API: issue, PR, repo, dosya yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-github"],
         "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": ""},
@@ -61,7 +61,7 @@ KATALOG = {
     },
     "puppeteer": {
         "adi": "Puppeteer MCP",
-        "aciklama": "TarayÄ±cÄ± otomasyonu: sayfa yÃ¼kleme, ekran gÃ¶rÃ¼ntÃ¼sÃ¼, JS Ã§alÄ±ÅŸtÄ±rma",
+        "aciklama": "TarayÄ±cÄ± otomasyonu: sayfa yükleme, ekran görüntüsü, JS çalÄ±ÅŸtÄ±rma",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
         "env": {},
@@ -69,7 +69,7 @@ KATALOG = {
     },
     "sqlite": {
         "adi": "SQLite MCP",
-        "aciklama": "SQLite veritabanÄ±: sorgu, ÅŸema, tablo yÃ¶netimi",
+        "aciklama": "SQLite veritabanÄ±: sorgu, ÅŸema, tablo yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-sqlite", "."],
         "env": {},
@@ -85,15 +85,15 @@ KATALOG = {
     },
     "fetch": {
         "adi": "Web Fetch MCP",
-        "aciklama": "Web sayfalarÄ±nÄ± indirme ve iÃ§erik Ã§Ä±karma",
+        "aciklama": "Web sayfalarÄ±nÄ± indirme ve içerik çÄ±karma",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-fetch"],
         "env": {},
         "dokuman": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch",
     },
     "sequential-thinking": {
-        "adi": "SÄ±ralÄ± DÃ¼ÅŸÃ¼nme MCP",
-        "aciklama": "KarmaÅŸÄ±k problemler iÃ§in adÄ±m adÄ±m dÃ¼ÅŸÃ¼nme zinciri",
+        "adi": "SÄ±ralÄ± DüÅŸünme MCP",
+        "aciklama": "KarmaÅŸÄ±k problemler için adÄ±m adÄ±m düÅŸünme zinciri",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
         "env": {},
@@ -101,7 +101,7 @@ KATALOG = {
     },
     "playwright": {
         "adi": "Playwright MCP",
-        "aciklama": "TarayÄ±cÄ± otomasyonu: sayfa, tÄ±klama, form, ekran gÃ¶rÃ¼ntÃ¼sÃ¼",
+        "aciklama": "TarayÄ±cÄ± otomasyonu: sayfa, tÄ±klama, form, ekran görüntüsü",
         "komut": "npx",
         "args": ["-y", "@playwright/mcp"],
         "env": {},
@@ -109,7 +109,7 @@ KATALOG = {
     },
     "browser-use": {
         "adi": "Browser Use",
-        "aciklama": "AI destekli tarayÄ±cÄ± otomasyonu: gÃ¶rsel + DOM tabanlÄ±",
+        "aciklama": "AI destekli tarayÄ±cÄ± otomasyonu: görsel + DOM tabanlÄ±",
         "komut": "python",
         "args": ["-m", "browser_use"],
         "env": {},
@@ -117,7 +117,7 @@ KATALOG = {
     },
     "memory": {
         "adi": "Memory MCP",
-        "aciklama": "Bilgi grafiÄŸi tabanlÄ± kalÄ±cÄ± bellek yÃ¶netimi",
+        "aciklama": "Bilgi grafiÄŸi tabanlÄ± kalÄ±cÄ± bellek yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-memory"],
         "env": {},
@@ -125,7 +125,7 @@ KATALOG = {
     },
     "postgres": {
         "adi": "PostgreSQL MCP",
-        "aciklama": "PostgreSQL veritabanÄ±: sorgu, ÅŸema, tablo yÃ¶netimi",
+        "aciklama": "PostgreSQL veritabanÄ±: sorgu, ÅŸema, tablo yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-postgres"],
         "env": {"DATABASE_URL": ""},
@@ -133,7 +133,7 @@ KATALOG = {
     },
     "redis": {
         "adi": "Redis MCP",
-        "aciklama": "Redis Ã¶nbellek: anahtar-deÄŸer iÅŸlemleri, pub/sub",
+        "aciklama": "Redis önbellek: anahtar-deÄŸer iÅŸlemleri, pub/sub",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-redis"],
         "env": {"REDIS_URL": ""},
@@ -141,7 +141,7 @@ KATALOG = {
     },
     "docker": {
         "adi": "Docker MCP",
-        "aciklama": "Docker konteyner yÃ¶netimi: container, image, compose",
+        "aciklama": "Docker konteyner yönetimi: container, image, compose",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-docker"],
         "env": {},
@@ -149,7 +149,7 @@ KATALOG = {
     },
     "kubernetes": {
         "adi": "Kubernetes MCP",
-        "aciklama": "Kubernetes kÃ¼me yÃ¶netimi: pod, service, deployment",
+        "aciklama": "Kubernetes küme yönetimi: pod, service, deployment",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-kubernetes"],
         "env": {"KUBECONFIG": ""},
@@ -157,7 +157,7 @@ KATALOG = {
     },
     "aws": {
         "adi": "AWS MCP",
-        "aciklama": "AWS kaynak yÃ¶netimi: S3, EC2, Lambda, DynamoDB",
+        "aciklama": "AWS kaynak yönetimi: S3, EC2, Lambda, DynamoDB",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-aws"],
         "env": {"AWS_ACCESS_KEY_ID": "", "AWS_SECRET_ACCESS_KEY": "", "AWS_REGION": ""},
@@ -165,7 +165,7 @@ KATALOG = {
     },
     "gcp": {
         "adi": "Google Cloud MCP",
-        "aciklama": "GCP kaynak yÃ¶netimi: Storage, Compute, BigQuery",
+        "aciklama": "GCP kaynak yönetimi: Storage, Compute, BigQuery",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-gcp"],
         "env": {"GOOGLE_APPLICATION_CREDENTIALS": ""},
@@ -173,7 +173,7 @@ KATALOG = {
     },
     "azure": {
         "adi": "Azure MCP",
-        "aciklama": "Azure kaynak yÃ¶netimi: Blob, VM, Functions",
+        "aciklama": "Azure kaynak yönetimi: Blob, VM, Functions",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-azure"],
         "env": {"AZURE_SUBSCRIPTION_ID": "", "AZURE_TENANT_ID": ""},
@@ -181,7 +181,7 @@ KATALOG = {
     },
     "jira": {
         "adi": "Jira MCP",
-        "aciklama": "Jira issue, proje, sprint yÃ¶netimi",
+        "aciklama": "Jira issue, proje, sprint yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-jira"],
         "env": {"JIRA_API_TOKEN": "", "JIRA_EMAIL": "", "JIRA_URL": ""},
@@ -189,7 +189,7 @@ KATALOG = {
     },
     "linear": {
         "adi": "Linear MCP",
-        "aciklama": "Linear issue, proje, takvim yÃ¶netimi",
+        "aciklama": "Linear issue, proje, takvim yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-linear"],
         "env": {"LINEAR_API_KEY": ""},
@@ -197,7 +197,7 @@ KATALOG = {
     },
     "notion": {
         "adi": "Notion MCP",
-        "aciklama": "Notion sayfa, veritabanÄ±, arama yÃ¶netimi",
+        "aciklama": "Notion sayfa, veritabanÄ±, arama yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-notion"],
         "env": {"NOTION_API_KEY": ""},
@@ -205,7 +205,7 @@ KATALOG = {
     },
     "google-maps": {
         "adi": "Google Haritalar MCP",
-        "aciklama": "Google Haritalar: yer arama, yÃ¶n tarifi, mesafe",
+        "aciklama": "Google Haritalar: yer arama, yön tarifi, mesafe",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-google-maps"],
         "env": {"GOOGLE_MAPS_API_KEY": ""},
@@ -213,7 +213,7 @@ KATALOG = {
     },
     "google-drive": {
         "adi": "Google Drive MCP",
-        "aciklama": "Google Drive: dosya listeleme, okuma, yÃ¼kleme",
+        "aciklama": "Google Drive: dosya listeleme, okuma, yükleme",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-google-drive"],
         "env": {"GOOGLE_DRIVE_API_KEY": ""},
@@ -221,7 +221,7 @@ KATALOG = {
     },
     "gmail": {
         "adi": "Gmail MCP",
-        "aciklama": "Gmail: okuma, gÃ¶nderme, etiket yÃ¶netimi",
+        "aciklama": "Gmail: okuma, gönderme, etiket yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-gmail"],
         "env": {"GMAIL_API_KEY": ""},
@@ -229,7 +229,7 @@ KATALOG = {
     },
     "slack": {
         "adi": "Slack MCP",
-        "aciklama": "Slack: mesaj, kanal, dosya, arama yÃ¶netimi",
+        "aciklama": "Slack: mesaj, kanal, dosya, arama yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-slack"],
         "env": {"SLACK_BOT_TOKEN": ""},
@@ -245,7 +245,7 @@ KATALOG = {
     },
     "spotify": {
         "adi": "Spotify MCP",
-        "aciklama": "Spotify: Ã§alma listesi, ÅŸarkÄ±, arama",
+        "aciklama": "Spotify: çalma listesi, ÅŸarkÄ±, arama",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-spotify"],
         "env": {"SPOTIFY_CLIENT_ID": "", "SPOTIFY_CLIENT_SECRET": ""},
@@ -261,7 +261,7 @@ KATALOG = {
     },
     "time": {
         "adi": "Zaman MCP",
-        "aciklama": "Zaman: saat dilimi, tarih dÃ¶nÃ¼ÅŸÃ¼mÃ¼, dÃ¼nya saati",
+        "aciklama": "Zaman: saat dilimi, tarih dönüÅŸümü, dünya saati",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-time"],
         "env": {},
@@ -269,7 +269,7 @@ KATALOG = {
     },
     "math": {
         "adi": "Matematik MCP",
-        "aciklama": "Matematik: hesaplama, dÃ¶nÃ¼ÅŸÃ¼m, istatistik",
+        "aciklama": "Matematik: hesaplama, dönüÅŸüm, istatistik",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-math"],
         "env": {},
@@ -277,7 +277,7 @@ KATALOG = {
     },
     "arxiv": {
         "adi": "ArXiv MCP",
-        "aciklama": "ArXiv: makale arama, Ã¶zet, PDF indirme",
+        "aciklama": "ArXiv: makale arama, özet, PDF indirme",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-arxiv"],
         "env": {},
@@ -285,7 +285,7 @@ KATALOG = {
     },
     "wikipedia": {
         "adi": "Wikipedia MCP",
-        "aciklama": "Wikipedia: madde arama, Ã¶zet, kategori",
+        "aciklama": "Wikipedia: madde arama, özet, kategori",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-wikipedia"],
         "env": {},
@@ -301,7 +301,7 @@ KATALOG = {
     },
     "firecrawl": {
         "adi": "Firecrawl MCP",
-        "aciklama": "Web scraping: sayfa iÃ§eriÄŸi Ã§Ä±karma, tarama, dÃ¶nÃ¼ÅŸtÃ¼rme",
+        "aciklama": "Web scraping: sayfa içeriÄŸi çÄ±karma, tarama, dönüÅŸtürme",
         "komut": "npx",
         "args": ["-y", "firecrawl-mcp"],
         "env": {"FIRECRAWL_API_KEY": ""},
@@ -309,7 +309,7 @@ KATALOG = {
     },
     "stripe": {
         "adi": "Stripe MCP",
-        "aciklama": "Stripe: Ã¶deme, abonelik, fatura, mÃ¼ÅŸteri yÃ¶netimi",
+        "aciklama": "Stripe: ödeme, abonelik, fatura, müÅŸteri yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-stripe"],
         "env": {"STRIPE_SECRET_KEY": ""},
@@ -317,7 +317,7 @@ KATALOG = {
     },
     "sentry": {
         "adi": "Sentry MCP",
-        "aciklama": "Sentry: hata izleme, performans, issue yÃ¶netimi",
+        "aciklama": "Sentry: hata izleme, performans, issue yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-sentry"],
         "env": {"SENTRY_AUTH_TOKEN": "", "SENTRY_ORG": ""},
@@ -325,7 +325,7 @@ KATALOG = {
     },
     "cloudflare": {
         "adi": "Cloudflare MCP",
-        "aciklama": "Cloudflare: DNS, Worker, KV, R2, Cache yÃ¶netimi",
+        "aciklama": "Cloudflare: DNS, Worker, KV, R2, Cache yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-cloudflare"],
         "env": {"CLOUDFLARE_API_TOKEN": ""},
@@ -341,7 +341,7 @@ KATALOG = {
     },
     "netlify": {
         "adi": "Netlify MCP",
-        "aciklama": "Netlify: site, deploy, fonksiyon, form yÃ¶netimi",
+        "aciklama": "Netlify: site, deploy, fonksiyon, form yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-netlify"],
         "env": {"NETLIFY_AUTH_TOKEN": ""},
@@ -349,7 +349,7 @@ KATALOG = {
     },
     "figma": {
         "adi": "Figma MCP",
-        "aciklama": "Figma: dosya, component, frame, varlÄ±k yÃ¶netimi",
+        "aciklama": "Figma: dosya, component, frame, varlÄ±k yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-figma"],
         "env": {"FIGMA_ACCESS_TOKEN": ""},
@@ -357,7 +357,7 @@ KATALOG = {
     },
     "openai": {
         "adi": "OpenAI MCP",
-        "aciklama": "OpenAI: model Ã§aÄŸrÄ±sÄ±, embedding, dosya, asistan",
+        "aciklama": "OpenAI: model çaÄŸrÄ±sÄ±, embedding, dosya, asistan",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-openai"],
         "env": {"OPENAI_API_KEY": ""},
@@ -365,7 +365,7 @@ KATALOG = {
     },
     "anthropic": {
         "adi": "Anthropic MCP",
-        "aciklama": "Anthropic: Claude modeli, mesajlaÅŸma, dosya yÃ¼kleme",
+        "aciklama": "Anthropic: Claude modeli, mesajlaÅŸma, dosya yükleme",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-anthropic"],
         "env": {"ANTHROPIC_API_KEY": ""},
@@ -397,7 +397,7 @@ KATALOG = {
     },
     "apify": {
         "adi": "Apify MCP",
-        "aciklama": "Apify: web kazÄ±ma, actor Ã§alÄ±ÅŸtÄ±rma, veri depolama",
+        "aciklama": "Apify: web kazÄ±ma, actor çalÄ±ÅŸtÄ±rma, veri depolama",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-apify"],
         "env": {"APIFY_API_KEY": ""},
@@ -421,7 +421,7 @@ KATALOG = {
     },
     "s3": {
         "adi": "S3 MCP",
-        "aciklama": "Amazon S3: bucket, dosya yÃ¼kleme/indirme/silme",
+        "aciklama": "Amazon S3: bucket, dosya yükleme/indirme/silme",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-s3"],
         "env": {"AWS_ACCESS_KEY_ID": "", "AWS_SECRET_ACCESS_KEY": "", "AWS_REGION": "", "S3_BUCKET": ""},
@@ -429,7 +429,7 @@ KATALOG = {
     },
     "elasticsearch": {
         "adi": "Elasticsearch MCP",
-        "aciklama": "Elasticsearch: indeks, arama, belge yÃ¶netimi",
+        "aciklama": "Elasticsearch: indeks, arama, belge yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-elasticsearch"],
         "env": {"ELASTICSEARCH_URL": "", "ELASTICSEARCH_API_KEY": ""},
@@ -445,7 +445,7 @@ KATALOG = {
     },
     "prometheus": {
         "adi": "Prometheus MCP",
-        "aciklama": "Prometheus: metrik sorgu, alert, hedef yÃ¶netimi",
+        "aciklama": "Prometheus: metrik sorgu, alert, hedef yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-prometheus"],
         "env": {"PROMETHEUS_URL": ""},
@@ -453,7 +453,7 @@ KATALOG = {
     },
     "kafka": {
         "adi": "Kafka MCP",
-        "aciklama": "Kafka: topic, mesaj gÃ¶nderme/alma, consumer grup",
+        "aciklama": "Kafka: topic, mesaj gönderme/alma, consumer grup",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-kafka"],
         "env": {"KAFKA_BROKERS": ""},
@@ -461,7 +461,7 @@ KATALOG = {
     },
     "rabbitmq": {
         "adi": "RabbitMQ MCP",
-        "aciklama": "RabbitMQ: kuyruk, exchange, binding yÃ¶netimi",
+        "aciklama": "RabbitMQ: kuyruk, exchange, binding yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-rabbitmq"],
         "env": {"RABBITMQ_URL": ""},
@@ -477,7 +477,7 @@ KATALOG = {
     },
     "pm2": {
         "adi": "PM2 MCP",
-        "aciklama": "PM2: process yÃ¶netimi, log, monitÃ¶r, restart",
+        "aciklama": "PM2: process yönetimi, log, monitör, restart",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-pm2"],
         "env": {},
@@ -493,7 +493,7 @@ KATALOG = {
     },
     "svn": {
         "adi": "SVN MCP",
-        "aciklama": "Subversion: checkout, commit, diff, log yÃ¶netimi",
+        "aciklama": "Subversion: checkout, commit, diff, log yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-svn"],
         "env": {},
@@ -501,7 +501,7 @@ KATALOG = {
     },
     "cron": {
         "adi": "Cron MCP",
-        "aciklama": "Cron: iÅŸ zamanlama, tetikleme, log gÃ¶rÃ¼ntÃ¼leme",
+        "aciklama": "Cron: iÅŸ zamanlama, tetikleme, log görüntüleme",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-cron"],
         "env": {},
@@ -509,7 +509,7 @@ KATALOG = {
     },
     "websocket": {
         "adi": "WebSocket MCP",
-        "aciklama": "WebSocket: baÄŸlantÄ± yÃ¶netimi, mesaj alÄ±ÅŸveriÅŸi",
+        "aciklama": "WebSocket: baÄŸlantÄ± yönetimi, mesaj alÄ±ÅŸveriÅŸi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-websocket"],
         "env": {},
@@ -517,7 +517,7 @@ KATALOG = {
     },
     "mqtt": {
         "adi": "MQTT MCP",
-        "aciklama": "MQTT: topic, publish, subscribe, broker yÃ¶netimi",
+        "aciklama": "MQTT: topic, publish, subscribe, broker yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-mqtt"],
         "env": {"MQTT_BROKER_URL": ""},
@@ -525,7 +525,7 @@ KATALOG = {
     },
     "pdf": {
         "adi": "PDF MCP",
-        "aciklama": "PDF: oluÅŸturma, birleÅŸtirme, dÃ¶nÃ¼ÅŸtÃ¼rme, metin Ã§Ä±karma",
+        "aciklama": "PDF: oluÅŸturma, birleÅŸtirme, dönüÅŸtürme, metin çÄ±karma",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-pdf"],
         "env": {},
@@ -533,7 +533,7 @@ KATALOG = {
     },
     "csv": {
         "adi": "CSV MCP",
-        "aciklama": "CSV: okuma, dÃ¶nÃ¼ÅŸtÃ¼rme, sorgulama, analiz",
+        "aciklama": "CSV: okuma, dönüÅŸtürme, sorgulama, analiz",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-csv"],
         "env": {},
@@ -541,7 +541,7 @@ KATALOG = {
     },
     "excel": {
         "adi": "Excel MCP",
-        "aciklama": "Excel: .xlsx okuma, yazma, formÃ¼l, grafik",
+        "aciklama": "Excel: .xlsx okuma, yazma, formül, grafik",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-excel"],
         "env": {},
@@ -549,7 +549,7 @@ KATALOG = {
     },
     "wordpress": {
         "adi": "WordPress MCP",
-        "aciklama": "WordPress: yazÄ±, sayfa, medya, kullanÄ±cÄ± yÃ¶netimi",
+        "aciklama": "WordPress: yazÄ±, sayfa, medya, kullanÄ±cÄ± yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-wordpress"],
         "env": {"WORDPRESS_URL": "", "WORDPRESS_APP_PASSWORD": ""},
@@ -557,7 +557,7 @@ KATALOG = {
     },
     "shopify": {
         "adi": "Shopify MCP",
-        "aciklama": "Shopify: Ã¼rÃ¼n, sipariÅŸ, mÃ¼ÅŸteri, envanter yÃ¶netimi",
+        "aciklama": "Shopify: ürün, sipariÅŸ, müÅŸteri, envanter yönetimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-shopify"],
         "env": {"SHOPIFY_ACCESS_TOKEN": "", "SHOPIFY_STORE_URL": ""},
@@ -583,7 +583,7 @@ def _katalog_kaydet():
 
 
 def listele() -> str:
-    """Katalogdaki tÃ¼m MCP sunucularÄ±nÄ± listele."""
+    """Katalogdaki tüm MCP sunucularÄ±nÄ± listele."""
     satirlar = ["ğŸ“¦ MCP Sunucu KataloÄŸu", "=" * 40, ""]
 
     for ad, bilgi in KATALOG.items():
@@ -610,14 +610,14 @@ def bilgi(sunucu_adi: str) -> str:
     bilgi = KATALOG[sunucu_adi]
     satirlar = [
         f"ğŸ“– {bilgi['adi']}",
-        f"  AÃ§Ä±klama: {bilgi['aciklama']}",
+        f"  AçÄ±klama: {bilgi['aciklama']}",
         f"  Komut: {bilgi['komut']} {' '.join(bilgi['args'])}",
     ]
 
     if bilgi.get("env"):
         satirlar.append(f"  Gerekli env: {', '.join(bilgi['env'].keys())}")
     if bilgi.get("dokuman"):
-        satirlar.append(f"  DokÃ¼man: {bilgi['dokuman']}")
+        satirlar.append(f"  Doküman: {bilgi['dokuman']}")
 
     # Config'de var mÄ± kontrol et
     config_yolu = Path.cwd() / "config.yaml"
@@ -683,14 +683,14 @@ def kur(sunucu_adi: str) -> str:
         if env_eksik:
             satirlar.append(f"âš ï¸  Eksik env: {', '.join(env_eksik)}")
             satirlar.append(f"   .env dosyasÄ±na ekleyin.")
-        satirlar.append(f"   Kullanmak iÃ§in motor'u yeniden baÅŸlatÄ±n.")
+        satirlar.append(f"   Kullanmak için motor'u yeniden baÅŸlatÄ±n.")
         return "\n".join(satirlar)
     else:
         return f"[MCP_CATALOG] {bilgi['adi']} eklenemedi."
 
 
 def run(islem: str, sunucu_adi: str = "") -> str:
-    """MCP kataloÄŸunu yÃ¶net.
+    """MCP kataloÄŸunu yönet.
 
     Args:
         islem: 'listele', 'kur', 'bilgi'
@@ -706,11 +706,11 @@ def run(islem: str, sunucu_adi: str = "") -> str:
         return listele()
     elif islem == "bilgi":
         if not sunucu_adi:
-            return "[MCP_CATALOG] 'bilgi' iÃ§in 'sunucu_adi' gerekli."
+            return "[MCP_CATALOG] 'bilgi' için 'sunucu_adi' gerekli."
         return bilgi(sunucu_adi)
     elif islem == "kur":
         if not sunucu_adi:
-            return "[MCP_CATALOG] 'kur' iÃ§in 'sunucu_adi' gerekli."
+            return "[MCP_CATALOG] 'kur' için 'sunucu_adi' gerekli."
         return kur(sunucu_adi)
     else:
         return f"[MCP_CATALOG] Bilinmeyen iÅŸlem: '{islem}'. Åunlar: listele, kur, bilgi"

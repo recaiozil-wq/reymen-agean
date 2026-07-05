@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """account_usage.py â€” Hesap Kullanim Gecmisi.
 
 Provider bazinda kullanim gecmisi, aylik/ gunluk raporlar,

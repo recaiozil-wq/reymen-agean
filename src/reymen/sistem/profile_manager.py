@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-profile_manager.py â€” ReYMeN Ã‡oklu Profil YÃ¶neticisi.
+profile_manager.py â€” ReYMeN Ã‡oklu Profil Yöneticisi.
 
-config.yaml'daki profiles: bÃ¶lÃ¼mÃ¼nÃ¼ okur, profil deÄŸiÅŸtirme ve listeleme
-iÅŸlemlerini yÃ¶netir. Her profil farklÄ± providers/modeller kullanabilir.
+config.yaml'daki profiles: bölümünü okur, profil deÄŸiÅŸtirme ve listeleme
+iÅŸlemlerini yönetir. Her profil farklÄ± providers/modeller kullanabilir.
 
 KullanÄ±m:
     from profile_manager import ProfileManager
@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# --- YAML yÃ¼kleyici ---
+# --- YAML yükleyici ---
 try:
     import yaml
 
@@ -32,7 +32,7 @@ except ImportError:
 
 
 class ProfileManager:
-    """Profil yÃ¶neticisi â€” config.yaml'daki profilleri okur ve yÃ¶netir."""
+    """Profil yöneticisi â€” config.yaml'daki profilleri okur ve yönetir."""
 
     def __init__(self, config_path: Optional[str] = None):
         if config_path is None:
@@ -44,7 +44,7 @@ class ProfileManager:
         self._yukle()
 
     def _yukle(self) -> None:
-        """Profilleri config.yaml'dan yÃ¼kle."""
+        """Profilleri config.yaml'dan yükle."""
         if not _YAML_MEVCUT:
             logger.error("PyYAML kurulu degil, profil yuklemesi yapilamadi")
             return
@@ -162,7 +162,7 @@ class ProfileManager:
         )
 
     def profil_listele(self) -> str:
-        """TÃ¼m profilleri listele."""
+        """Tüm profilleri listele."""
         if not self._profiller:
             return "[Profil] UYARI: Hicbir profil tanimlanmamis."
 

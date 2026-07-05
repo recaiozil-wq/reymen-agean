@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """bedrock_adapter.py â€” AWS Bedrock Provider Adapteri.
 
 AWS Bedrock'a AWS SigV4 imzali istekler gonderir.

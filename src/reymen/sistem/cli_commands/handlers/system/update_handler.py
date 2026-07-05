@@ -1,4 +1,4 @@
-﻿"""_handle_update_command handler."""
+"""_handle_update_command handler."""
 
 
 def _handle_update_command(cli) -> bool:

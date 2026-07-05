@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 ğŸ“Š analitik.py â€” ReYMeN Kalite/Analitik Motoru.
 
@@ -487,7 +487,7 @@ th{{color:#8b949e;font-weight:600}}
 
 <div class="kart">
 <h2>ğŸ¢ Provider Bazli</h2>
-<table><tr><th>Provider</th><th>Ã‡aÄŸrÄ±</th><th>Token</th><th>Maliyet</th><th>Ort. SÃ¼re</th></tr>
+<table><tr><th>Provider</th><th>Ã‡aÄŸrÄ±</th><th>Token</th><th>Maliyet</th><th>Ort. Süre</th></tr>
 {''.join(f'<tr><td>{r["provider"]}</td><td>{r["cagri"]}</td><td>{r["token"]:,}</td><td>${r["maliyet"]}</td><td>{r["ortalama_sure_ms"]}ms</td></tr>' for r in p)}
 </table>
 </div>

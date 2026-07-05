@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 TTS Tool â€” Metni sese cevirir (edge-tts).
 ReYMeN icin native TTS araci.

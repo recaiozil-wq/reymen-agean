@@ -1,4 +1,4 @@
-﻿"""_handle_rollback_command handler."""
+"""_handle_rollback_command handler."""
 
 
 def _handle_rollback_command(cli, command: str):

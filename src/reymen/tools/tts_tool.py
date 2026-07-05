@@ -1,7 +1,7 @@
-﻿"""ReYMeN tools.tts_tool shim â€” ReYMeN TTS fonksiyonlarÄ±nÄ± ReYMeN voice_engine'e yÃ¶nlendirir.
+"""ReYMeN tools.tts_tool shim â€” ReYMeN TTS fonksiyonlarÄ±nÄ± ReYMeN voice_engine'e yönlendirir.
 
-Bu modÃ¼l, ReYMeN Agent'in tools/tts_tool.py'sini taklit eder.
-TÃ¼m iÅŸlevler ReYMeN'in voice_engine.py'sine yÃ¶nlendirilir.
+Bu modül, ReYMeN Agent'in tools/tts_tool.py'sini taklit eder.
+Tüm iÅŸlevler ReYMeN'in voice_engine.py'sine yönlendirilir.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ def _get_provider(config: Dict[str, Any]) -> str:
 
 
 def _import_elevenlabs() -> None:
-    """ElevenLabs SDK kontrolÃ¼ â€” yoksa ImportError."""
+    """ElevenLabs SDK kontrolü â€” yoksa ImportError."""
     try:
         import elevenlabs  # noqa: F401
     except ImportError:
@@ -40,7 +40,7 @@ def _import_elevenlabs() -> None:
 
 
 def _import_sounddevice() -> None:
-    """sounddevice kontrolÃ¼ â€” yoksa ImportError."""
+    """sounddevice kontrolü â€” yoksa ImportError."""
     try:
         import sounddevice  # noqa: F401
     except ImportError:
@@ -54,10 +54,10 @@ def stream_tts_to_speaker(
     stream_callback=None,
     stop_event=None,
 ) -> None:
-    """ReYMeN stream_tts_to_speaker â€” ReYMeN voice_engine'e yÃ¶nlendirir.
+    """ReYMeN stream_tts_to_speaker â€” ReYMeN voice_engine'e yönlendirir.
 
     Basit implementasyon: ses dosyasÄ±na kaydedip oynatÄ±r.
-    GerÃ§ek streaming iÃ§in elevenlabs veya baÅŸka bir streaming TTS gerekir.
+    Gerçek streaming için elevenlabs veya baÅŸka bir streaming TTS gerekir.
     """
     try:
         from reymen.arac.voice_engine import VoiceRegistry
@@ -93,16 +93,16 @@ def text_to_speech_tool(
     output_path: Optional[str] = None,
     provider: Optional[str] = None,
 ) -> str:
-    """ReYMeN text_to_speech_tool â€” ReYMeN voice_engine'e yÃ¶nlendirir.
+    """ReYMeN text_to_speech_tool â€” ReYMeN voice_engine'e yönlendirir.
 
     Args:
-        text: Sese Ã§evrilecek metin
+        text: Sese çevrilecek metin
         voice: Ses adÄ± (opsiyonel)
         output_path: Ã‡Ä±ktÄ± dosyasÄ± yolu (opsiyonel)
         provider: TTS saÄŸlayÄ±cÄ±sÄ± ('edge', 'openai', vb.)
 
     Returns:
-        str: JSON formatÄ±nda sonuÃ§
+        str: JSON formatÄ±nda sonuç
     """
     import json
 
@@ -141,7 +141,7 @@ def speech_to_text_tool(
     language: str = "tr",
     provider: Optional[str] = None,
 ) -> str:
-    """ReYMeN speech_to_text_tool â€” ReYMeN voice_engine'e yÃ¶nlendirir.
+    """ReYMeN speech_to_text_tool â€” ReYMeN voice_engine'e yönlendirir.
 
     Args:
         audio_path: Ses dosyasÄ± yolu
@@ -149,7 +149,7 @@ def speech_to_text_tool(
         provider: STT saÄŸlayÄ±cÄ±sÄ± ('whisper', 'openai', vb.)
 
     Returns:
-        str: JSON formatÄ±nda sonuÃ§
+        str: JSON formatÄ±nda sonuç
     """
     import json
 

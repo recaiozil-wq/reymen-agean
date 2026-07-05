@@ -1,12 +1,12 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 once_hafiza.py â€” "Ã–nce HafÄ±zaya Bak" prensibi.
 
-Her gÃ¶rev Ã¶ncesi:
-  1. HafÄ±zada (FTS5 skills + vektÃ¶rel hafÄ±za) benzer Ã§Ã¶zÃ¼m var mÄ± kontrol et
-  2. VARSA â†’ direkt uygula, sÃ¼reyi kÄ±salt
+Her görev öncesi:
+  1. HafÄ±zada (FTS5 skills + vektörel hafÄ±za) benzer çözüm var mÄ± kontrol et
+  2. VARSA â†’ direkt uygula, süreyi kÄ±salt
   3. YOKSA â†’ dene, baÅŸarÄ±lÄ±ysa kaydet
-  4. HATA OLDUYSA â†’ analiz et, dÃ¼zelt, kaydet
+  4. HATA OLDUYSA â†’ analiz et, düzelt, kaydet
 
 KullanÄ±m:
     from reymen.sistem.once_hafiza import OnceHafiza
@@ -46,7 +46,7 @@ from reymen.cereyan.once_hafiza import (
     eski_kayitlari_temizle as _cereyan_temizle,
 )
 
-# Module-level alias (aynÄ± isimle kullanÄ±m iÃ§in)
+# Module-level alias (aynÄ± isimle kullanÄ±m için)
 _kademeli_guven = _cereyan_kademeli_guven
 
 
@@ -54,16 +54,16 @@ class OnceHafiza:
     """
     Ã–nce HafÄ±zaya Bak prensibi.
 
-    Her iÅŸlem Ã¶ncesi:
-    1. HafÄ±zada benzer Ã§Ã¶zÃ¼m ara
+    Her iÅŸlem öncesi:
+    1. HafÄ±zada benzer çözüm ara
     2. Bulursan direkt uygula (tekrar keÅŸfetme)
     3. Bulamazsan dene + kaydet
-    4. Hata olursa analiz et + dÃ¼zelt + kaydet
+    4. Hata olursa analiz et + düzelt + kaydet
     """
 
     @staticmethod
     def _kademeli_guven(basari: int, hata: int) -> float:
-        """Sigmoid gÃ¼ven â€” cereyan/once_hafiza.py'ye delege eder (tek kaynak)."""
+        """Sigmoid güven â€” cereyan/once_hafiza.py'ye delege eder (tek kaynak)."""
         return _cereyan_kademeli_guven(basari, hata)
 
     def __init__(
@@ -87,7 +87,7 @@ class OnceHafiza:
     # â”€â”€ VeritabanÄ± Kurulumu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _db_kur(self) -> None:
-        """FTS5 Ã¶ÄŸrenme + hata veritabanlarÄ±nÄ± kur."""
+        """FTS5 öÄŸrenme + hata veritabanlarÄ±nÄ± kur."""
         import sqlite3
 
         # Ã–ÄŸrenme DB
@@ -159,15 +159,15 @@ class OnceHafiza:
     # â”€â”€ ADIM 1: HafÄ±zada Ara â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hafizada_ara(self, hedef: str, kategori: str = "") -> dict[str, Any] | None:
-        """HafÄ±zada benzer Ã§Ã¶zÃ¼m ara.
+        """HafÄ±zada benzer çözüm ara.
 
         Args:
-            hedef: KullanÄ±cÄ± hedefi / gÃ¶rev tanÄ±mÄ±.
+            hedef: KullanÄ±cÄ± hedefi / görev tanÄ±mÄ±.
             kategori: "kali", "dron", "cad", "windows" veya "" (filtresiz).
 
         Returns:
             {"hedef": str, "cozum": str, "kaynak": str, "guven": float} veya None.
-            guven < 0.5 ise {"durum": "belirsiz", ...} dÃ¶ner.
+            guven < 0.5 ise {"durum": "belirsiz", ...} döner.
         """
         import sqlite3
 
@@ -216,7 +216,7 @@ class OnceHafiza:
 
                     guven_skor = row[6] if len(row) > 6 and row[6] is not None else 1.0
 
-                    # GÃ¼ven < 0.5 â†’ belirsiz
+                    # Güven < 0.5 â†’ belirsiz
                     if guven_skor < 0.5:
                         logger.warning(
                             "[OnceHafiza] âš ï¸ Guven skoru dusuk (%.2f): %s",
@@ -229,15 +229,15 @@ class OnceHafiza:
                             "cozum": row[1],
                             "kaynak": row[2] or "ogrenme",
                             "guven": guven_skor,
-                            "uyari": f"âš ï¸ Bu Ã§Ã¶zÃ¼mÃ¼n gÃ¼ven skoru dÃ¼ÅŸÃ¼k ({guven_skor:.2f}) â€” doÄŸruluÄŸundan emin deÄŸil!",
+                            "uyari": f"âš ï¸ Bu çözümün güven skoru düÅŸük ({guven_skor:.2f}) â€” doÄŸruluÄŸundan emin deÄŸil!",
                         }
 
-                    # GeÃ§erlilik kontrolÃ¼
+                    # Geçerlilik kontrolü
                     gecerli = row[5] if len(row) > 5 else None
                     su_an = datetime.now(timezone.utc).strftime("%Y-%m-%d")
                     gecerlilik_asmis = gecerli and gecerli < su_an if gecerli else False
 
-                    # GÃ¼ven skoru + son kullanÄ±m gÃ¼ncelle (kademeli sigmoid)
+                    # Güven skoru + son kullanÄ±m güncelle (kademeli sigmoid)
                     if len(row) > 6:
                         basari_say = (
                             row[3] if len(row) > 3 else 1
@@ -276,7 +276,7 @@ class OnceHafiza:
                         sonuc["kategori"] = row[7]
                     if gecerlilik_asmis:
                         sonuc["uyari"] = (
-                            f"âš ï¸ Bu bilginin geÃ§erlilik tarihi {gecerli} â€” gÃ¼ncelliÄŸini yitirmiÅŸ olabilir!"
+                            f"âš ï¸ Bu bilginin geçerlilik tarihi {gecerli} â€” güncelliÄŸini yitirmiÅŸ olabilir!"
                         )
                     return sonuc
             except Exception as _e:
@@ -309,7 +309,7 @@ class OnceHafiza:
 
                     guven_skor = row[6] if len(row) > 6 and row[6] is not None else 1.0
 
-                    # GÃ¼ven < 0.5 â†’ belirsiz
+                    # Güven < 0.5 â†’ belirsiz
                     if guven_skor < 0.5:
                         logger.warning(
                             "[OnceHafiza] âš ï¸ Guven skoru dusuk (kismi): %.2f", guven_skor
@@ -320,7 +320,7 @@ class OnceHafiza:
                             "cozum": row[1],
                             "kaynak": row[2] or "ogrenme_kismi",
                             "guven": guven_skor,
-                            "uyari": f"âš ï¸ KÄ±smi eÅŸleÅŸme ama gÃ¼ven skoru dÃ¼ÅŸÃ¼k ({guven_skor:.2f})",
+                            "uyari": f"âš ï¸ KÄ±smi eÅŸleÅŸme ama güven skoru düÅŸük ({guven_skor:.2f})",
                         }
 
                     return {
@@ -350,16 +350,16 @@ class OnceHafiza:
         kategori: str = "",
         kaynak_url: str | None = None,
     ) -> None:
-        """BaÅŸarÄ±lÄ± Ã§Ã¶zÃ¼mÃ¼ Ã¶ÄŸrenme DB'sine kaydet.
+        """BaÅŸarÄ±lÄ± çözümü öÄŸrenme DB'sine kaydet.
 
-        Varsa: basari_sayisi++ gÃ¼ncelle, guven_skoru yeniden hesapla
-        Yoksa: yeni kayÄ±t ekle, gecerlilik_tarihi = bugÃ¼n + 6 ay
+        Varsa: basari_sayisi++ güncelle, guven_skoru yeniden hesapla
+        Yoksa: yeni kayÄ±t ekle, gecerlilik_tarihi = bugün + 6 ay
 
         Args:
-            hedef: GÃ¶rev tanÄ±mÄ±
-            cozum: Ã‡Ã¶zÃ¼m iÃ§eriÄŸi
+            hedef: Görev tanÄ±mÄ±
+            cozum: Ã‡özüm içeriÄŸi
             kaynak: Bilgi kaynaÄŸÄ± (kesif, web, kullanici, video)
-            kategori: Kategori yolu (Ã¶rn. kali/network/nmap)
+            kategori: Kategori yolu (örn. kali/network/nmap)
             kaynak_url: Bilginin kaynak URL'si (varsa)
         """
         import sqlite3
@@ -369,7 +369,7 @@ class OnceHafiza:
             try:
                 su_an = datetime.now(timezone.utc)
                 bugun = su_an.strftime("%Y-%m-%d")
-                # +6 ay (basit: 180 gÃ¼n)
+                # +6 ay (basit: 180 gün)
                 gelecek = su_an.replace(
                     month=su_an.month + 6 if su_an.month <= 6 else su_an.month - 6,
                     year=su_an.year + (1 if su_an.month > 6 else 0),
@@ -386,7 +386,7 @@ class OnceHafiza:
                     hata = mevcut[1]
                     guven = round(self._kademeli_guven(basari, hata), 4)
                 else:
-                    guven = 0.5  # H16: ilk kayÄ±tta 1.0 deÄŸil 0.5 baÅŸlangÄ±Ã§
+                    guven = 0.5  # H16: ilk kayÄ±tta 1.0 deÄŸil 0.5 baÅŸlangÄ±ç
 
                 con.execute(
                     "INSERT INTO ogrenmeler "
@@ -433,13 +433,13 @@ class OnceHafiza:
     # â”€â”€ ADIM 3: Hata Kaydet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hata_kaydet(self, hedef: str, hata: str, tb: str = "") -> None:
-        """Hata kaydÄ± tut. AyrÄ±ca ogrenmeler'de hata_sayisi++ ve guven_skoru gÃ¼ncelle."""
+        """Hata kaydÄ± tut. AyrÄ±ca ogrenmeler'de hata_sayisi++ ve guven_skoru güncelle."""
         import sqlite3
 
         try:
             con = sqlite3.connect(self.ogrenme_db, timeout=5)
             try:
-                # ogrenmeler'de varsa hata_sayisi++ ve guven_skoru gÃ¼ncelle
+                # ogrenmeler'de varsa hata_sayisi++ ve guven_skoru güncelle
                 mevcut = con.execute(
                     "SELECT basari_sayisi, hata_sayisi FROM ogrenmeler WHERE hedef = ?",
                     (hedef[:500],),
@@ -483,7 +483,7 @@ class OnceHafiza:
             logger.warning("[fix_01_sessiz_except] Exception")
 
     def hata_cozum_bul(self, hedef: str, hata: str) -> dict[str, Any] | None:
-        """Benzer hata iÃ§in daha Ã¶nce Ã§Ã¶zÃ¼m bulunmuÅŸ mu?
+        """Benzer hata için daha önce çözüm bulunmuÅŸ mu?
 
         Returns:
             {"cozum": str} veya None
@@ -511,7 +511,7 @@ class OnceHafiza:
         return None
 
     def hata_cozuldu_isaretle(self, hedef: str, cozum: str) -> None:
-        """Ã‡Ã¶zÃ¼len hatayÄ± iÅŸaretle."""
+        """Ã‡özülen hatayÄ± iÅŸaretle."""
         import sqlite3
 
         try:
@@ -532,15 +532,15 @@ class OnceHafiza:
             logger.warning("[OnceHafiza] except Exception (L457): %s", Exception)
             pass
 
-    # â”€â”€ ADIM 4: Analiz Et (LLM Ã§aÄŸrÄ±sÄ± gerektirmez, regex+skor bazlÄ±) â”€â”€
+    # â”€â”€ ADIM 4: Analiz Et (LLM çaÄŸrÄ±sÄ± gerektirmez, regex+skor bazlÄ±) â”€â”€
 
     def analiz_et(self, hedef: str, hata: str) -> str:
-        """Hata analizi yap, dÃ¼zeltme Ã¶nerisi Ã¼ret.
+        """Hata analizi yap, düzeltme önerisi üret.
 
-        LLM'siz Ã§alÄ±ÅŸÄ±r: regex + skor bazlÄ± hata sÄ±nÄ±flandÄ±rmasÄ±.
+        LLM'siz çalÄ±ÅŸÄ±r: regex + skor bazlÄ± hata sÄ±nÄ±flandÄ±rmasÄ±.
 
         Returns:
-            DÃ¼zeltme Ã¶nerisi stringi.
+            Düzeltme önerisi stringi.
         """
         import re
 
@@ -567,11 +567,11 @@ class OnceHafiza:
 
         cozum_onerileri = {
             "import_hatasi": "Eksik paket: `pip install <paket>` veya sys.path kontrol",
-            "syntax_hatasi": "Kodda yazÄ±m hatasÄ±: satÄ±r bazlÄ± incele + dÃ¼zelt",
-            "baglanti_hatasi": "AÄŸ baÄŸlantÄ±sÄ± kesik: servis Ã§alÄ±ÅŸÄ±yor mu kontrol et",
+            "syntax_hatasi": "Kodda yazÄ±m hatasÄ±: satÄ±r bazlÄ± incele + düzelt",
+            "baglanti_hatasi": "AÄŸ baÄŸlantÄ±sÄ± kesik: servis çalÄ±ÅŸÄ±yor mu kontrol et",
             "api_hatasi": "API anahtarÄ±/sÄ±nÄ±r sorunu: yetkilendirme veya rate limit",
             "dosya_hatasi": "Dosya yolu hatalÄ±: dizin var mÄ± kontrol et",
-            "tip_hatasi": "DeÄŸiÅŸken tipi uyuÅŸmazlÄ±ÄŸÄ±: type cast veya None kontrolÃ¼",
+            "tip_hatasi": "DeÄŸiÅŸken tipi uyuÅŸmazlÄ±ÄŸÄ±: type cast veya None kontrolü",
             "dll_hatasi": "Windows DLL/baÄŸÄ±mlÄ±lÄ±k: yeniden derle veya baÄŸÄ±mlÄ±lÄ±k kur",
         }
 
@@ -589,11 +589,11 @@ class OnceHafiza:
         kategori: str = "",
         kaynak_url: str | None = None,
     ) -> dict[str, Any]:
-        """Ana iÅŸlem dÃ¶ngÃ¼sÃ¼: Ã–nce hafÄ±zaya bak.
+        """Ana iÅŸlem döngüsü: Ã–nce hafÄ±zaya bak.
 
         Args:
-            hedef: YapÄ±lacak gÃ¶rev / iÅŸlem.
-            calistirici: Ä°ÅŸlemi Ã§alÄ±ÅŸtÄ±racak fonksiyon (None=simÃ¼lasyon).
+            hedef: YapÄ±lacak görev / iÅŸlem.
+            calistirici: Ä°ÅŸlemi çalÄ±ÅŸtÄ±racak fonksiyon (None=simülasyon).
             otomatik_kaydet: BaÅŸarÄ±lÄ± sonucu otomatik kaydet.
             otomatik_coz: HatayÄ± otomatik analiz et.
             kategori: "kali", "dron", "cad" veya boÅŸ.
@@ -605,7 +605,7 @@ class OnceHafiza:
         """
         logger.info("[OnceHafiza] === Ä°slem basliyor: %s ===", hedef[:60])
 
-        # â”€â”€ ARA: HafÄ±zada benzer Ã§Ã¶zÃ¼m var mÄ±? â”€â”€
+        # â”€â”€ ARA: HafÄ±zada benzer çözüm var mÄ±? â”€â”€
         kayit = self.hafizada_ara(hedef, kategori=kategori)
         if kayit:
             if kayit.get("durum") == "belirsiz":
@@ -633,7 +633,7 @@ class OnceHafiza:
             if calistirici:
                 sonuc = calistirici(hedef)
             else:
-                # SimÃ¼lasyon: hedefin kendisini sonuÃ§ olarak dÃ¶ndÃ¼r
+                # Simülasyon: hedefin kendisini sonuç olarak döndür
                 sonuc = {"output": hedef, "exit_code": 0}
 
             # BaÅŸarÄ±lÄ± â†’ kaydet
@@ -655,7 +655,7 @@ class OnceHafiza:
             # Hata kaydÄ±
             self.hata_kaydet(hedef, hata_str, tb)
 
-            # Benzer hata iÃ§in daha Ã¶nce Ã§Ã¶zÃ¼m bulunmuÅŸ mu?
+            # Benzer hata için daha önce çözüm bulunmuÅŸ mu?
             if otomatik_coz:
                 hata_cozum = self.hata_cozum_bul(hedef, hata_str)
                 if hata_cozum:
@@ -707,7 +707,7 @@ def isle(
     kategori: str = "",
     kaynak_url: str | None = None,
 ) -> dict[str, Any]:
-    """KullanmasÄ± kolay modÃ¼l-level fonksiyon."""
+    """KullanmasÄ± kolay modül-level fonksiyon."""
     return _get_once_hafiza().isle(
         hedef, calistirici, kategori=kategori, kaynak_url=kaynak_url
     )
@@ -725,7 +725,7 @@ def kaydet(
     kaynak: str = "kesif",
     kaynak_url: str | None = None,
 ) -> None:
-    """Ã‡Ã¶zÃ¼mÃ¼ kaydet."""
+    """Ã‡özümü kaydet."""
     _get_once_hafiza().kaydet(
         hedef, cozum, kategori=kategori, kaynak=kaynak, kaynak_url=kaynak_url
     )
@@ -744,7 +744,7 @@ if __name__ == "__main__":
 
     oh = OnceHafiza()
 
-    # Test 1: HiÃ§ kayÄ±t yokken
+    # Test 1: Hiç kayÄ±t yokken
     print("\n[Test 1] Ilk arama (bos)")
     r = oh.isle("dosya_sifreleme_cozumu")
     print(f"  Durum: {r['durum']}, Kaynak: {r['kaynak']}")

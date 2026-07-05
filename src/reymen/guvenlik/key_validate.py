@@ -1,7 +1,7 @@
-﻿# -*- coding: utf-8 -*-
-"""key_validate.py â€” API anahtarÄ± doÄŸrulama modÃ¼lÃ¼.
+# -*- coding: utf-8 -*-
+"""key_validate.py â€” API anahtarÄ± doÄŸrulama modülü.
 
-Kurulum sÄ±rasÄ±nda ve her baÅŸlangÄ±Ã§ta API key'lerinin
+Kurulum sÄ±rasÄ±nda ve her baÅŸlangÄ±çta API key'lerinin
 varlÄ±ÄŸÄ±nÄ± ve formatÄ±nÄ± kontrol eder.
 
 KullanÄ±m:
@@ -15,9 +15,9 @@ import os
 import re
 from typing import Dict, List, Optional, Tuple
 
-# Provider key tanÄ±mlarÄ±: (env_adÄ±, zorunlu mu?, format_regex, aÃ§Ä±klama)
+# Provider key tanÄ±mlarÄ±: (env_adÄ±, zorunlu mu?, format_regex, açÄ±klama)
 KEY_TANIMLARI: Dict[str, Tuple[bool, Optional[str], str]] = {
-    # (zorunlu, format_regex, aÃ§Ä±klama)
+    # (zorunlu, format_regex, açÄ±klama)
     "DEEPSEEK_API_KEY": (
         True,
         r"^sk-[A-Za-z0-9]{20,}$",
@@ -55,7 +55,7 @@ KEY_TANIMLARI: Dict[str, Tuple[bool, Optional[str], str]] = {
     ),
 }
 
-# Telegram bot token'larÄ± (opsiyonel, format kontrollÃ¼)
+# Telegram bot token'larÄ± (opsiyonel, format kontrollü)
 BOT_TOKEN_TANIMLARI: Dict[str, Tuple[bool, str]] = {
     "BOT_TOKEN_REYMEN": (False, "ReYMeN Ana Bot"),
     "BOT_TOKEN_PASA": (False, "Pasa_38 Bot"),
@@ -68,7 +68,7 @@ BOT_TOKEN_REGEX = re.compile(r"^\d{8,10}:[A-Za-z0-9_-]{30,}$")
 
 
 def key_format_kontrol(key: str, regex: Optional[str]) -> bool:
-    """Key formatÄ±nÄ± kontrol et. regex=None ise sadece boÅŸ kontrolÃ¼ yap."""
+    """Key formatÄ±nÄ± kontrol et. regex=None ise sadece boÅŸ kontrolü yap."""
     if not key or key == "buraya_yaz":
         return False
     if regex is None:
@@ -77,11 +77,11 @@ def key_format_kontrol(key: str, regex: Optional[str]) -> bool:
 
 
 def key_kontrol() -> Dict[str, List[str]]:
-    """TÃ¼m API anahtarlarÄ±nÄ± kontrol et.
+    """Tüm API anahtarlarÄ±nÄ± kontrol et.
 
     Returns:
         {
-            "eksik_zorunlu": ["DEEPSEEK_API_KEY"],   # HiÃ§ yok veya buraya_yaz
+            "eksik_zorunlu": ["DEEPSEEK_API_KEY"],   # Hiç yok veya buraya_yaz
             "format_hatali": ["OPENAI_API_KEY"],      # Var ama format yanlÄ±ÅŸ
             "eksik_opsiyonel": ["GROQ_API_KEY"],      # Opsiyonel ama yok
             "uyari": ["BOT_TOKEN_PASA"]               # Bot token formatÄ± hatalÄ±
@@ -118,7 +118,7 @@ def key_kontrol() -> Dict[str, List[str]]:
 
 
 def ozet_ver(kontrol_sonuc: Dict[str, List[str]]) -> str:
-    """Kontrol sonucunu okunabilir metne Ã§evir."""
+    """Kontrol sonucunu okunabilir metne çevir."""
     satirlar = []
 
     if kontrol_sonuc["eksik_zorunlu"]:
@@ -139,20 +139,20 @@ def ozet_ver(kontrol_sonuc: Dict[str, List[str]]) -> str:
     if kontrol_sonuc["uyari"]:
         satirlar.append("âš ï¸ BOT TOKEN UYARILARI:")
         for k in kontrol_sonuc["uyari"]:
-            satirlar.append(f"   â€¢ {k} â€” format kontrolÃ¼ baÅŸarÄ±sÄ±z")
+            satirlar.append(f"   â€¢ {k} â€” format kontrolü baÅŸarÄ±sÄ±z")
 
     if not any(kontrol_sonuc.values()):
-        satirlar.append("âœ… TÃ¼m API anahtarlarÄ± tamam ve formatlarÄ± doÄŸru.")
+        satirlar.append("âœ… Tüm API anahtarlarÄ± tamam ve formatlarÄ± doÄŸru.")
 
     return "\n".join(satirlar)
 
 
 def env_dogrula(env_path: str) -> Optional[str]:
-    """.env dosyasÄ±nÄ± oku ve doÄŸrula. Hata varsa mesaj dÃ¶ndÃ¼r."""
+    """.env dosyasÄ±nÄ± oku ve doÄŸrula. Hata varsa mesaj döndür."""
     if not os.path.isfile(env_path):
         return (
             f".env dosyasÄ± bulunamadÄ±: {env_path}\n"
-            "Ã‡Ã¶zÃ¼m: cp .env.example .env (Linux) veya copy .env.example .env (Windows)"
+            "Ã‡özüm: cp .env.example .env (Linux) veya copy .env.example .env (Windows)"
         )
     return None
 

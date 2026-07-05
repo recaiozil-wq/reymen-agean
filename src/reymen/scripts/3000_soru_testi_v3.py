@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 3000 soru testi - Hafif surum, direkt DeepSeek API cagrisi.
 Background'da calisir, her 50 soruda log basar.

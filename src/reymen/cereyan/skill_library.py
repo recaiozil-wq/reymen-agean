@@ -1,10 +1,10 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-skill_library.py â€” Skill kÃ¼tÃ¼phane yÃ¶neticisi.
+skill_library.py â€” Skill kütüphane yöneticisi.
 
-Skill dosyalarÄ±nÄ± bir kÃ¼tÃ¼phane veritabanÄ±nda (SQLite) yÃ¶netir:
+Skill dosyalarÄ±nÄ± bir kütüphane veritabanÄ±nda (SQLite) yönetir:
 - KayÄ±t formatÄ±: {id, baslik, icerik_ozeti, etiketler, kaynak, aktif}
-- Skill dosyalarÄ±nÄ± (.md) bir dizinden kÃ¼tÃ¼phaneye senkronize etme
+- Skill dosyalarÄ±nÄ± (.md) bir dizinden kütüphaneye senkronize etme
 - Etiket/baslik bazinda arama
 - CRUD iÅŸlemleri (kaydet, get, sil)
 
@@ -90,7 +90,7 @@ def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
         elif key == "description":
             meta["icerik_ozeti"] = val.strip('"').strip("'")
 
-    # id yoksa dosya adÄ±ndan tÃ¼ret
+    # id yoksa dosya adÄ±ndan türet
     if "id" not in meta:
         meta["id"] = ""
 
@@ -116,7 +116,7 @@ def _kur(con: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_skills_aktif      ON skills(aktif);
         CREATE INDEX IF NOT EXISTS idx_skills_etiketler  ON skills(etiketler);
     """)
-    # Migration: eski tabloya kolon ekleme (gÃ¼venli)
+    # Migration: eski tabloya kolon ekleme (güvenli)
     for kolon, tip in [
         ("baslik", "TEXT NOT NULL DEFAULT ''"),
         ("icerik_ozeti", "TEXT NOT NULL DEFAULT ''"),
@@ -160,11 +160,11 @@ def _db_kur():
 
 class SkillLibrary:
     """
-    Skill kÃ¼tÃ¼phane yÃ¶neticisi.
+    Skill kütüphane yöneticisi.
 
-    Skill'leri bir SQLite veritabanÄ±nda yÃ¶netir:
+    Skill'leri bir SQLite veritabanÄ±nda yönetir:
     - kaydet / get / sil / ara
-    - sync: Bir dizindeki .md dosyalarÄ±nÄ± kÃ¼tÃ¼phaneye ekle/gÃ¼ncelle
+    - sync: Bir dizindeki .md dosyalarÄ±nÄ± kütüphaneye ekle/güncelle
     """
 
     def __init__(self, db_yolu: str | Path | None = None):
@@ -188,7 +188,7 @@ class SkillLibrary:
 
     def kaydet(self, skill_dict: dict[str, Any]) -> str:
         """
-        Skill'i kÃ¼tÃ¼phaneye ekle veya gÃ¼ncelle (upsert).
+        Skill'i kütüphaneye ekle veya güncelle (upsert).
 
         Args:
             skill_dict: {
@@ -210,7 +210,7 @@ class SkillLibrary:
         baslik = skill_dict.get("baslik", "").strip()
         icerik_ozeti = skill_dict.get("icerik_ozeti", "").strip()
 
-        # Etiketler: list -> virgÃ¼lle ayrÄ±lmÄ±ÅŸ string
+        # Etiketler: list -> virgülle ayrÄ±lmÄ±ÅŸ string
         etiketler_raw = skill_dict.get("etiketler", "")
         if isinstance(etiketler_raw, list):
             etiketler = ", ".join(
@@ -261,7 +261,7 @@ class SkillLibrary:
 
         Args:
             sorgu: Aranan metin
-            limit: Maksimum sonuÃ§ sayÄ±sÄ±
+            limit: Maksimum sonuç sayÄ±sÄ±
 
         Returns:
             [{"id", "baslik", "icerik_ozeti", "etiketler", "kaynak", "aktif", "son_guncelleme"}, ...]
@@ -276,7 +276,7 @@ class SkillLibrary:
 
         con = self._con()
         try:
-            # 1) Tam eÅŸleÅŸme: tÃ¼m kelimeler baslik veya etiketlerde
+            # 1) Tam eÅŸleÅŸme: tüm kelimeler baslik veya etiketlerde
             kosullar = []
             params: list[str] = []
             for kelime in kelimeler:
@@ -294,7 +294,7 @@ class SkillLibrary:
                 params + [limit],
             ).fetchall()
 
-            # 2) Az sonuÃ§ geldiyse LIKE ile geniÅŸlet (tek kelime bazÄ±nda)
+            # 2) Az sonuç geldiyse LIKE ile geniÅŸlet (tek kelime bazÄ±nda)
             if len(rows) < limit:
                 gorulen_ids = {r["id"] for r in rows}
                 ek_kosullar = []
@@ -349,12 +349,12 @@ class SkillLibrary:
 
     def sync(self, kaynak_dizin: str | Path) -> dict[str, int]:
         """
-        Bir dizindeki .md skill dosyalarÄ±nÄ± kÃ¼tÃ¼phaneye senkronize et.
+        Bir dizindeki .md skill dosyalarÄ±nÄ± kütüphaneye senkronize et.
 
-        Her .md dosyasÄ± iÃ§in:
+        Her .md dosyasÄ± için:
         1. YAML front-matter'Ä± ayrÄ±ÅŸtÄ±r
-        2. Skill kaydÄ± oluÅŸtur/gÃ¼ncelle (upsert)
-        3. Dosya yoksa kÃ¼tÃ¼phaneden silme (isteÄŸe baÄŸlÄ±)
+        2. Skill kaydÄ± oluÅŸtur/güncelle (upsert)
+        3. Dosya yoksa kütüphaneden silme (isteÄŸe baÄŸlÄ±)
 
         Args:
             kaynak_dizin: .md dosyalarÄ±nÄ±n bulunduÄŸu dizin
@@ -370,7 +370,7 @@ class SkillLibrary:
         md_dosyalari = sorted(kaynak.rglob("*.md"))
         logger.info("[SkillLib] Sync basladi: %s (%d dosya)", kaynak, len(md_dosyalari))
 
-        # Mevcut ID'leri al (stale tespiti iÃ§in)
+        # Mevcut ID'leri al (stale tespiti için)
         con = self._con()
         try:
             mevcut_ids = set(
@@ -434,7 +434,7 @@ class SkillLibrary:
                 logger.warning("[SkillLib] Sync hatasi [%s]: %s", fp.name, e)
                 hata += 1
 
-        # Stale temizliÄŸi: kÃ¼tÃ¼phanede olup diskte olmayanlarÄ± sil (opsiyonel)
+        # Stale temizliÄŸi: kütüphanede olup diskte olmayanlarÄ± sil (opsiyonel)
         silinen = 0
         for sid in mevcut_ids:
             if sid not in islenen_ids:
@@ -510,7 +510,7 @@ class SkillLibrary:
 
     def sil(self, skill_id: str) -> bool:
         """
-        Skill'i kÃ¼tÃ¼phaneden sil.
+        Skill'i kütüphaneden sil.
 
         Args:
             skill_id: Silinecek skill ID'si
@@ -536,17 +536,17 @@ class SkillLibrary:
             finally:
                 con.close()
 
-    # â”€â”€ TÃ¼m Skill'leri Listele â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Tüm Skill'leri Listele â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def tumu(
         self, aktif_mi: bool | None = None, limit: int = 100
     ) -> list[dict[str, Any]]:
         """
-        TÃ¼m skill'leri listele.
+        Tüm skill'leri listele.
 
         Args:
-            aktif_mi: None = tÃ¼mÃ¼, True = sadece aktif, False = sadece pasif
-            limit: Maksimum sonuÃ§ sayÄ±sÄ±
+            aktif_mi: None = tümü, True = sadece aktif, False = sadece pasif
+            limit: Maksimum sonuç sayÄ±sÄ±
 
         Returns:
             [{"id", "baslik", "icerik_ozeti", "etiketler", "kaynak", "aktif", ...}, ...]
@@ -593,7 +593,7 @@ class SkillLibrary:
     # â”€â”€ Ä°statistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> dict[str, Any]:
-        """KÃ¼tÃ¼phane istatistikleri."""
+        """Kütüphane istatistikleri."""
         con = self._con()
         try:
             toplam = con.execute("SELECT COUNT(*) FROM skills").fetchone()[0]
@@ -615,12 +615,12 @@ class SkillLibrary:
             con.close()
 
 
-# â”€â”€ ModÃ¼l seviyesinde singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Modül seviyesinde singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _lib: SkillLibrary | None = None
 
 
 def get_library(db_yolu: str | Path | None = None) -> SkillLibrary:
-    """Singleton SkillLibrary Ã¶rneÄŸi al."""
+    """Singleton SkillLibrary örneÄŸi al."""
     global _lib
     if _lib is None:
         _lib = SkillLibrary(db_yolu)
@@ -631,7 +631,7 @@ def get_library(db_yolu: str | Path | None = None) -> SkillLibrary:
 
 
 def kaydet(skill_dict: dict[str, Any]) -> str:
-    """Skill ekle/gÃ¼ncelle (kolay kullanÄ±m)."""
+    """Skill ekle/güncelle (kolay kullanÄ±m)."""
     return get_library().kaydet(skill_dict)
 
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 slack_gateway.py â€” Slack Mesaj Gonderme Gateway (Webhook).

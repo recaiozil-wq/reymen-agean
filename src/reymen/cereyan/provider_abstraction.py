@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 provider_abstraction.py â€” ReYMeN SaÄŸlayÄ±cÄ± Soyutlama KatmanÄ± (cereyan).
 
@@ -22,7 +22,7 @@ API anahtarÄ± arama sÄ±rasÄ± (provider_abstraction.py):
     3. credential_pool (reymen.sistem.credential_persistence)
     4. Her profil .env'si (AppData/Local/reymen/profiles/<profil>/.env)
 
-TÃ¼m dokÃ¼mantasyon TÃ¼rkÃ§e'dir.
+Tüm dokümantasyon Türkçe'dir.
 """
 
 from __future__ import annotations
@@ -50,13 +50,13 @@ _VARSAYILAN_SICAKLIK: float = 0.7
 
 @dataclass
 class ProviderYanit:
-    """SaÄŸlayÄ±cÄ±dan dÃ¶nen yanÄ±t.
+    """SaÄŸlayÄ±cÄ±dan dönen yanÄ±t.
 
     Attributes:
         metin:      LLM yanÄ±t metni.
         provider:   KullanÄ±lan saÄŸlayÄ±cÄ± adÄ±.
         model:      KullanÄ±lan model adÄ±.
-        sure_sn:    Ä°stek sÃ¼resi (saniye).
+        sure_sn:    Ä°stek süresi (saniye).
         basarili:   BaÅŸarÄ±lÄ± mÄ±?
         hata:       Hata mesajÄ± (baÅŸarÄ±sÄ±zsa).
     """
@@ -73,13 +73,13 @@ class ProviderYanit:
 
 
 class ProviderHatasi(Exception):
-    """SaÄŸlayÄ±cÄ± Ã§aÄŸrÄ±larÄ± sÄ±rasÄ±nda oluÅŸan genel hata."""
+    """SaÄŸlayÄ±cÄ± çaÄŸrÄ±larÄ± sÄ±rasÄ±nda oluÅŸan genel hata."""
 
     pass
 
 
 class ProviderGecersizKey(ProviderHatasi):
-    """API anahtarÄ± geÃ§ersiz (401/403)."""
+    """API anahtarÄ± geçersiz (401/403)."""
 
     pass
 
@@ -118,8 +118,8 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
     """API anahtarÄ±nÄ± sÄ±rayla dener: os.environ â†’ config â†’ credential_pool.
 
     Args:
-        provider: SaÄŸlayÄ±cÄ± adÄ± (Ã¶r. "deepseek").
-        config:   config.yaml'nin tamamÄ± (veya providers sÃ¶zlÃ¼ÄŸÃ¼).
+        provider: SaÄŸlayÄ±cÄ± adÄ± (ör. "deepseek").
+        config:   config.yaml'nin tamamÄ± (veya providers sözlüÄŸü).
 
     Returns:
         Bulunan anahtar ya da "".
@@ -161,7 +161,7 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
 
-    # 4. WCM / profil .env'si â€” zaten os.environ'a yÃ¼klenmiÅŸ olmalÄ±
+    # 4. WCM / profil .env'si â€” zaten os.environ'a yüklenmiÅŸ olmalÄ±
     # (profil .env'si ReYMeN tarafÄ±ndan os.environ'a eklenir)
 
     return ""
@@ -171,10 +171,10 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
 
 
 class ProviderBase(abc.ABC):
-    """TÃ¼m saÄŸlayÄ±cÄ±larÄ±n tÃ¼remesi gereken soyut temel sÄ±nÄ±f.
+    """Tüm saÄŸlayÄ±cÄ±larÄ±n türemesi gereken soyut temel sÄ±nÄ±f.
 
     Alt sÄ±nÄ±flar tanÄ±mlamalÄ±:
-        ad:               SaÄŸlayÄ±cÄ± kÄ±sa adÄ± (Ã¶r. "deepseek").
+        ad:               SaÄŸlayÄ±cÄ± kÄ±sa adÄ± (ör. "deepseek").
         varsayilan_model: VarsayÄ±lan model adÄ±.
         varsayilan_url:   VarsayÄ±lan API base URL.
         api_key_env:      Ortam deÄŸiÅŸkeni adÄ±.
@@ -197,13 +197,13 @@ class ProviderBase(abc.ABC):
         api_key: Optional[str] = None,
         config: Optional[dict[str, Any]] = None,
     ) -> None:
-        """SaÄŸlayÄ±cÄ± Ã¶rneÄŸini baÅŸlatÄ±r.
+        """SaÄŸlayÄ±cÄ± örneÄŸini baÅŸlatÄ±r.
 
         Args:
             model:    Model adÄ± (None = varsayÄ±lan).
             base_url: API base URL (None = varsayÄ±lan).
             api_key:  API anahtarÄ± (None = otomatik bul).
-            config:   config.yaml sÃ¶zlÃ¼ÄŸÃ¼ (anahtar aramasÄ± iÃ§in).
+            config:   config.yaml sözlüÄŸü (anahtar aramasÄ± için).
         """
         self._model = model or self.varsayilan_model
         self._base_url = (base_url or self.varsayilan_url).rstrip("/")
@@ -242,7 +242,7 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """Ham API Ã§aÄŸrÄ±sÄ± â€” alt sÄ±nÄ±flar uygulamalÄ±."""
+        """Ham API çaÄŸrÄ±sÄ± â€” alt sÄ±nÄ±flar uygulamalÄ±."""
         ...
 
     @abc.abstractmethod
@@ -252,9 +252,9 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """Streaming API Ã§aÄŸrÄ±sÄ± â€” alt sÄ±nÄ±flar uygulamalÄ±."""
+        """Streaming API çaÄŸrÄ±sÄ± â€” alt sÄ±nÄ±flar uygulamalÄ±."""
         ...
-        # yield ''  # noqa  â€” Generator olduÄŸu iÃ§in dummy yield
+        # yield ''  # noqa  â€” Generator olduÄŸu için dummy yield
         if False:
             yield ""
 
@@ -262,7 +262,7 @@ class ProviderBase(abc.ABC):
 
     @staticmethod
     def _hatayi_siniflandir(hata: Exception) -> ProviderHatasi:
-        """HTTP hatasÄ±nÄ± tÃ¼rÃ¼ne gÃ¶re sÄ±nÄ±flandÄ±rÄ±r."""
+        """HTTP hatasÄ±nÄ± türüne göre sÄ±nÄ±flandÄ±rÄ±r."""
         mesaj = str(hata).lower()
         try:
             resp = getattr(hata, "response", None)
@@ -290,7 +290,7 @@ class ProviderBase(abc.ABC):
             return ProviderZamanAsimi(str(hata))
         return ProviderHatasi(str(hata))
 
-    # â”€â”€ YÃ¼ksek seviye API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Yüksek seviye API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def chat(
         self,
@@ -298,7 +298,7 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """LLM'den yanÄ±t Ã¼retir.
+        """LLM'den yanÄ±t üretir.
 
         Args:
             mesajlar:      [{"role": "user", "content": "..."}, ...]
@@ -365,7 +365,7 @@ class ProviderBase(abc.ABC):
 class OpenAIUyumluProvider(ProviderBase):
     """OpenAI /v1/chat/completions endpoint'ine istek atan ortak sÄ±nÄ±f.
 
-    deepseek, openai, xai, openrouter gibi tÃ¼m OpenAI-uyumlu saÄŸlayÄ±cÄ±lar
+    deepseek, openai, xai, openrouter gibi tüm OpenAI-uyumlu saÄŸlayÄ±cÄ±lar
     bu sÄ±nÄ±fÄ± kullanÄ±r â€” sadece ad, varsayilan_model, varsayilan_url ve
     api_key_env deÄŸerlerini tanÄ±mlarlar.
     """
@@ -621,17 +621,17 @@ def get_provider(
     base_url: Optional[str] = None,
     config: Optional[dict[str, Any]] = None,
 ) -> Optional[ProviderBase]:
-    """SaÄŸlayÄ±cÄ± Ã¶rneÄŸi dÃ¶ndÃ¼rÃ¼r.
+    """SaÄŸlayÄ±cÄ± örneÄŸi döndürür.
 
     Args:
         name:     SaÄŸlayÄ±cÄ± adÄ± (deepseek|openai|anthropic|xai|openrouter).
         model:    Model adÄ± (None = varsayÄ±lan).
         api_key:  API anahtarÄ± (None = otomatik bul).
         base_url: API base URL (None = varsayÄ±lan).
-        config:   config.yaml sÃ¶zlÃ¼ÄŸÃ¼ (anahtar aramasÄ± iÃ§in).
+        config:   config.yaml sözlüÄŸü (anahtar aramasÄ± için).
 
     Returns:
-        ProviderBase Ã¶rneÄŸi veya None (bilinmeyen saÄŸlayÄ±cÄ±).
+        ProviderBase örneÄŸi veya None (bilinmeyen saÄŸlayÄ±cÄ±).
     """
     sinif = _PROVIDER_SINIFLAR.get(name)
     if sinif is None:
@@ -656,10 +656,10 @@ def get_fallback_zinciri(
 
     Args:
         birincil: Birincil saÄŸlayÄ±cÄ± adÄ±.
-        config:   config.yaml sÃ¶zlÃ¼ÄŸÃ¼.
+        config:   config.yaml sözlüÄŸü.
 
     Returns:
-        KullanÄ±ma hazÄ±r ProviderBase Ã¶rnekleri listesi.
+        KullanÄ±ma hazÄ±r ProviderBase örnekleri listesi.
     """
     zincir: list[ProviderBase] = []
     eklenen: set[str] = set()
@@ -686,7 +686,7 @@ def saglayiciyi_yapilandir(
     config: dict[str, Any],
 ) -> dict[str, Any]:
     """config.yaml'daki model.provider deÄŸerini okuyarak
-    get_provider iÃ§in hazÄ±r config sÃ¶zlÃ¼ÄŸÃ¼ dÃ¶ndÃ¼rÃ¼r.
+    get_provider için hazÄ±r config sözlüÄŸü döndürür.
 
     config.yaml beklenen yapÄ±:
         model:

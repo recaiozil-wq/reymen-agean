@@ -1,7 +1,7 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-zamanlayici.py â€” ZamanlanmÄ±ÅŸ gÃ¶rev yÃ¶neticisi (cron).
-Belirli aralÄ±klarla (dakika/saat/gÃ¼n) alt ajan gÃ¶revleri baÅŸlatÄ±r.
+zamanlayici.py â€” ZamanlanmÄ±ÅŸ görev yöneticisi (cron).
+Belirli aralÄ±klarla (dakika/saat/gün) alt ajan görevleri baÅŸlatÄ±r.
 Thread tabanlÄ±, non-daemon â€” bot restart yiyene kadar yaÅŸar.
 """
 
@@ -26,7 +26,7 @@ _jobs: dict = {}
 _kilit = threading.Lock()
 _scheduler_thread: Optional[threading.Thread] = None
 _scheduler_calissin = threading.Event()
-_scheduler_calissin.set()  # BaÅŸlangÄ±Ã§ta Ã§alÄ±ÅŸsÄ±n
+_scheduler_calissin.set()  # BaÅŸlangÄ±çta çalÄ±ÅŸsÄ±n
 
 
 # â”€â”€ Job CRUD â”€â”€
@@ -56,12 +56,12 @@ def _yukle():
 def cron_ekle(
     job_id: str, gorev: str, aralik_saniye: int, baglam: str = "", max_adim: int = 5
 ) -> str:
-    """Yeni zamanlanmÄ±ÅŸ gÃ¶rev ekle.
+    """Yeni zamanlanmÄ±ÅŸ görev ekle.
 
     Args:
         job_id: Benzersiz kimlik
-        gorev: Alt ajana verilecek gÃ¶rev
-        aralik_saniye: Ã‡alÄ±ÅŸma aralÄ±ÄŸÄ± (Ã¶rn 1800 = 30dk)
+        gorev: Alt ajana verilecek görev
+        aralik_saniye: Ã‡alÄ±ÅŸma aralÄ±ÄŸÄ± (örn 1800 = 30dk)
         baglam: Opsiyonel baÄŸlam bilgisi
         max_adim: Maksimum ReAct adÄ±mÄ±
 
@@ -76,7 +76,7 @@ def cron_ekle(
             "aralik_saniye": aralik_saniye,
             "baglam": baglam,
             "max_adim": max_adim,
-            "son_ts": 0,  # HiÃ§ Ã§alÄ±ÅŸmadÄ±
+            "son_ts": 0,  # Hiç çalÄ±ÅŸmadÄ±
             "son_durum": "",
             "aktif": True,
             "olusma_ts": time.time(),
@@ -87,7 +87,7 @@ def cron_ekle(
 
 
 def cron_sil(job_id: str) -> str:
-    """ZamanlanmÄ±ÅŸ gÃ¶revi sil."""
+    """ZamanlanmÄ±ÅŸ görevi sil."""
     with _kilit:
         if job_id not in _jobs:
             return f"[Cron] '{job_id}' bulunamadi."
@@ -97,7 +97,7 @@ def cron_sil(job_id: str) -> str:
 
 
 def cron_listele() -> list[dict]:
-    """TÃ¼m cron gÃ¶revlerini listeler."""
+    """Tüm cron görevlerini listeler."""
     with _kilit:
         return [
             {
@@ -113,7 +113,7 @@ def cron_listele() -> list[dict]:
 
 
 def cron_durdur(job_id: str) -> str:
-    """Bir cron gÃ¶revini duraklat."""
+    """Bir cron görevini duraklat."""
     with _kilit:
         if job_id not in _jobs:
             return f"[Cron] '{job_id}' bulunamadi."
@@ -123,7 +123,7 @@ def cron_durdur(job_id: str) -> str:
 
 
 def cron_devam_et(job_id: str) -> str:
-    """DuraklatÄ±lmÄ±ÅŸ cron gÃ¶revini devam ettir."""
+    """DuraklatÄ±lmÄ±ÅŸ cron görevini devam ettir."""
     with _kilit:
         if job_id not in _jobs:
             return f"[Cron] '{job_id}' bulunamadi."
@@ -134,7 +134,7 @@ def cron_devam_et(job_id: str) -> str:
 
 
 def cron_calistir_simdi(job_id: str) -> str:
-    """Bir cron gÃ¶revini hemen Ã§alÄ±ÅŸtÄ±r (sÄ±radaki zamanÄ± beklemeden)."""
+    """Bir cron görevini hemen çalÄ±ÅŸtÄ±r (sÄ±radaki zamanÄ± beklemeden)."""
     with _kilit:
         if job_id not in _jobs:
             return f"[Cron] '{job_id}' bulunamadi."
@@ -144,11 +144,11 @@ def cron_calistir_simdi(job_id: str) -> str:
     return f"[Cron] '{job_id}' siraya alindi."
 
 
-# â”€â”€ Scheduler DÃ¶ngÃ¼sÃ¼ â”€â”€
+# â”€â”€ Scheduler Döngüsü â”€â”€
 
 
 def _log_yaz(job_id: str, durum: str, detay: str = ""):
-    """Her cron Ã§alÄ±ÅŸmasÄ±nÄ± log dosyasÄ±na yazar."""
+    """Her cron çalÄ±ÅŸmasÄ±nÄ± log dosyasÄ±na yazar."""
     log_file = _CRON_LOG_DIR / f"{job_id}.log"
     try:
         with open(log_file, "a", encoding="utf-8") as f:
@@ -158,7 +158,7 @@ def _log_yaz(job_id: str, durum: str, detay: str = ""):
 
 
 def _gorev_calistir(job_id: str, job: dict):
-    """Bir cron gÃ¶revini alt ajan ile Ã§alÄ±ÅŸtÄ±rÄ±r."""
+    """Bir cron görevini alt ajan ile çalÄ±ÅŸtÄ±rÄ±r."""
     try:
         from reymen.cereyan.alt_ajan import alt_ajan_yoneticisi
 
@@ -198,7 +198,7 @@ def _gorev_calistir(job_id: str, job: dict):
 
 
 def _scheduler_dongusu():
-    """Ana scheduler dÃ¶ngÃ¼sÃ¼ â€” 30sn'de bir kontrol eder."""
+    """Ana scheduler döngüsü â€” 30sn'de bir kontrol eder."""
     while _scheduler_calissin.is_set():
         try:
             simdi = time.time()
@@ -236,7 +236,7 @@ def scheduler_baslat():
     _scheduler_calissin.set()
     _scheduler_thread = threading.Thread(
         target=_scheduler_dongusu,
-        daemon=False,  # Bot yaÅŸadÄ±kÃ§a yaÅŸar
+        daemon=False,  # Bot yaÅŸadÄ±kça yaÅŸar
         name="cron-scheduler",
     )
     _scheduler_thread.start()

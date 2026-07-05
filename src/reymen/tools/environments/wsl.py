@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.environments.wsl shim â€” ReYMeN WSL ortamÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.environments.wsl shim â€” ReYMeN WSL ortamÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

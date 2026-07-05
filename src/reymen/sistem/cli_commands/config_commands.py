@@ -1,7 +1,7 @@
-﻿"""KonfigÃ¼rasyon komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
+"""Konfigürasyon komutlarÄ± â€” MixinCommands alt modülü.
 
 Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
-MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± içerir.
 """
 
 import logging
@@ -43,7 +43,7 @@ from .handlers.config.fast import _handle_fast_command as _delegate_fast
 
 
 class MixinCommands:
-    """KonfigÃ¼rasyon komutlarÄ±."""
+    """Konfigürasyon komutlarÄ±."""
 
     def _handle_profile_command(self):
         """Display active profile name and home directory."""

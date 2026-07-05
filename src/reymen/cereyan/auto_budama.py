@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """auto_budama.py â€” ReYMeN otomatik hafiza budama (memory consolidation).
 
 Sorun: Kayitlar ttl_saat=0 (sonsuz) ile kaydediliyor, hic silinemiyor.

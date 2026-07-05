@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.environments â€” ortam siniflari."""
+"""ReYMeN tools.environments â€” ortam siniflari."""
 
 from __future__ import annotations
 

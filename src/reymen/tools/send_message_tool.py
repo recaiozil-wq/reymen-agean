@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.send_message_tool shim â€” ReYMeN mesajlaÅŸma fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.send_message_tool shim â€” ReYMeN mesajlaÅŸma fonksiyonlarÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def _parse_target_ref(target: str) -> Dict[str, Any]:
-    """ReYMeN _parse_target_ref â€” hedef referansÄ±nÄ± Ã§Ã¶zÃ¼mler."""
+    """ReYMeN _parse_target_ref â€” hedef referansÄ±nÄ± çözümler."""
     return {"platform": "telegram", "chat_id": target}
 
 
@@ -21,7 +21,7 @@ def _send_to_platform(
     message: str,
     **kwargs,
 ) -> bool:
-    """ReYMeN _send_to_platform â€” mesajÄ± platforma gÃ¶nderir."""
+    """ReYMeN _send_to_platform â€” mesajÄ± platforma gönderir."""
     try:
         if platform == "telegram":
             token = os.getenv("TELEGRAM_BOT_TOKEN", "")
@@ -52,13 +52,13 @@ def _send_to_platform(
 
 
 def telegram_gonder(chat_id: str, mesaj: str) -> str:
-    """ReYMeN telegram_gonder â€” ReYMeN Telegram API'sine yÃ¶nlendirir."""
+    """ReYMeN telegram_gonder â€” ReYMeN Telegram API'sine yönlendirir."""
     success = _send_to_platform("telegram", chat_id, mesaj)
     return json.dumps({"success": success, "chat_id": chat_id})
 
 
 def telegram_resim_gonder(chat_id: str, resim_yolu: str, altyazi: str = "") -> str:
-    """ReYMeN telegram_resim_gonder â€” ReYMeN Telegram API'sine yÃ¶nlendirir."""
+    """ReYMeN telegram_resim_gonder â€” ReYMeN Telegram API'sine yönlendirir."""
     try:
         token = os.getenv("TELEGRAM_BOT_TOKEN", "")
         if not token:

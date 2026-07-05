@@ -1,19 +1,19 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 auto_recovery.py â€” ReYMeN Otomatik Kurtarma ve Watchdog Sistemi.
 
-TÃ¼m sistem bileÅŸenlerini izler, heartbeat timeout'larÄ±nÄ± kontrol eder,
+Tüm sistem bileÅŸenlerini izler, heartbeat timeout'larÄ±nÄ± kontrol eder,
 stuck/kilitlenmiÅŸ durumlarÄ± tespit eder ve otomatik kurtarma dener.
 
 BileÅŸenler:
-    - ComponentWatcher: Her bileÅŸen iÃ§in heartbeat + timeout izleme
-    - AutoRecovery: Ana kurtarma yÃ¶neticisi (state machine + bridge entegre)
+    - ComponentWatcher: Her bileÅŸen için heartbeat + timeout izleme
+    - AutoRecovery: Ana kurtarma yöneticisi (state machine + bridge entegre)
 
 KullanÄ±m:
     recovery = AutoRecovery(state_machine, bridge)
     recovery.watch("provider", heartbeat_interval=15, timeout=45)
     recovery.start()
-    # Periyodik olarak recovery.tick() Ã§aÄŸrÄ±lÄ±r
+    # Periyodik olarak recovery.tick() çaÄŸrÄ±lÄ±r
     recovery.stop()
 """
 
@@ -41,7 +41,7 @@ class ComponentStatus(Enum):
 
 @dataclass
 class WatchConfig:
-    """Her bileÅŸen iÃ§in watchdog yapÄ±landÄ±rmasÄ±."""
+    """Her bileÅŸen için watchdog yapÄ±landÄ±rmasÄ±."""
 
     name: str
     heartbeat_interval_sec: float = 15.0
@@ -84,7 +84,7 @@ class ComponentWatcher:
         with self._lock:
             self.state.last_heartbeat = time.time()
             if self.state.status in (ComponentStatus.STALE, ComponentStatus.FAILING):
-                # Heartbeat geldi â€” dÃ¼zelmiÅŸ olabilir
+                # Heartbeat geldi â€” düzelmiÅŸ olabilir
                 self.state.status = ComponentStatus.HEALTHY
                 self.state.last_status_change = time.time()
                 logger.info(f"[Watcher/{self.config.name}] Heartbeat alindi -> HEALTHY")
@@ -212,9 +212,9 @@ class ComponentWatcher:
 
 
 class AutoRecovery:
-    """Ana otomatik kurtarma yÃ¶neticisi.
+    """Ana otomatik kurtarma yöneticisi.
 
-    TÃ¼m bileÅŸenleri izler, state machine ve bridge ile entegre Ã§alÄ±ÅŸÄ±r.
+    Tüm bileÅŸenleri izler, state machine ve bridge ile entegre çalÄ±ÅŸÄ±r.
     """
 
     def __init__(
@@ -247,7 +247,7 @@ class AutoRecovery:
         # VarsayÄ±lan kurtarma handler'larÄ±
         self._default_handlers: Dict[str, List[RecoveryHandler]] = {}
 
-    # â”€â”€ BileÅŸen yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ BileÅŸen yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def watch(
         self,
@@ -305,7 +305,7 @@ class AutoRecovery:
         logger.info(f"[AutoRecovery] Izleme durduruldu: {name}")
 
     def heartbeat(self, component: str) -> None:
-        """BileÅŸen canlÄ±lÄ±k sinyali gÃ¶nder."""
+        """BileÅŸen canlÄ±lÄ±k sinyali gönder."""
         with self._lock:
             watcher = self._watchers.get(component)
         if watcher:
@@ -330,9 +330,9 @@ class AutoRecovery:
                 )
 
     def on_recovery(self, component: str, handler: RecoveryHandler) -> None:
-        """Bir bileÅŸen iÃ§in kurtarma handler'Ä± ekle.
+        """Bir bileÅŸen için kurtarma handler'Ä± ekle.
 
-        HenÃ¼z oluÅŸturulmamÄ±ÅŸ bileÅŸenler iÃ§in de kaydedilir (future watchers).
+        Henüz oluÅŸturulmamÄ±ÅŸ bileÅŸenler için de kaydedilir (future watchers).
         """
         with self._lock:
             if component not in self._default_handlers:
@@ -343,7 +343,7 @@ class AutoRecovery:
         if watcher:
             watcher.on_recovery(handler)
 
-    # â”€â”€ Ana dÃ¶ngÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Ana döngü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def start(self) -> None:
         """Arka plan watchdog thread'ini baÅŸlat."""
@@ -368,10 +368,10 @@ class AutoRecovery:
         logger.info("[AutoRecovery] Watchdog durduruldu")
 
     def tick(self) -> Dict[str, Any]:
-        """Tek bir kontrol dÃ¶ngÃ¼sÃ¼ (manuel Ã§aÄŸrÄ± iÃ§in).
+        """Tek bir kontrol döngüsü (manuel çaÄŸrÄ± için).
 
         Returns:
-            Kontrol sonuÃ§larÄ±
+            Kontrol sonuçlarÄ±
         """
         self._tick_count += 1
         self._last_tick = time.time()
@@ -449,7 +449,7 @@ class AutoRecovery:
                 results["dead"].append(name)
                 logger.error(f"[AutoRecovery] OLU: {name} â€” kurtarilamaz durumda")
 
-        # Ã‡ok fazla Ã¶lÃ¼ bileÅŸen varsa sistemi Ã§Ã¶kert
+        # Ã‡ok fazla ölü bileÅŸen varsa sistemi çökert
         if len(results["dead"]) >= self._max_concurrent_failures:
             self._system_crashed = True
             if self._state_machine:
@@ -461,7 +461,7 @@ class AutoRecovery:
         return results
 
     def _loop(self) -> None:
-        """Arka plan watchdog dÃ¶ngÃ¼sÃ¼."""
+        """Arka plan watchdog döngüsü."""
         while True:
             with self._lock:
                 if not self._running:
@@ -475,7 +475,7 @@ class AutoRecovery:
     # â”€â”€ Durum sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def status_report(self) -> Dict[str, Any]:
-        """TÃ¼m sistem durum raporu."""
+        """Tüm sistem durum raporu."""
         with self._lock:
             watcher_statuses = {}
             for name, watcher in self._watchers.items():
@@ -532,7 +532,7 @@ if __name__ == "__main__":
     # Kurtarma handler'Ä±
     w1.on_recovery(lambda n, e: True)  # her zaman baÅŸarÄ±lÄ±
 
-    # Heartbeat gÃ¶nder
+    # Heartbeat gönder
     recovery.heartbeat("provider")
     recovery.heartbeat("session")
 

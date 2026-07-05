@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 ReYMeN Terminal Tool â€” Direkt PowerShell/Bash Komut Ã‡alÄ±ÅŸtÄ±rÄ±cÄ±
 
@@ -31,7 +31,7 @@ class C:
 
 # â”€â”€ Hata SÄ±nÄ±flarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class TerminalHatasi(Exception):
-    """Terminal Ã§alÄ±ÅŸtÄ±rma hatasÄ±."""
+    """Terminal çalÄ±ÅŸtÄ±rma hatasÄ±."""
 
     pass
 
@@ -50,16 +50,16 @@ def terminal_calistir(
     env_ek: dict = None,
 ) -> dict:
     """
-    PowerShell veya Bash'te komut Ã§alÄ±ÅŸtÄ±r.
+    PowerShell veya Bash'te komut çalÄ±ÅŸtÄ±r.
 
     Parametreler:
         komut    : Ã‡alÄ±ÅŸtÄ±rÄ±lacak komut (string)
         shell    : "auto" (otomatik), "powershell", "bash", "cmd"
-        timeout  : Maksimum bekleme sÃ¼resi (saniye)
+        timeout  : Maksimum bekleme süresi (saniye)
         workdir  : Ã‡alÄ±ÅŸma dizini (None = cwd)
         env_ek   : Ortam deÄŸiÅŸkeni ekle (dict)
 
-    DÃ¶nÃ¼ÅŸ:
+    DönüÅŸ:
         {
             "basarili": True/False,
             "cikti": "stdout + stderr",
@@ -111,7 +111,7 @@ def terminal_calistir(
             "shell": shell,
         }
     except subprocess.TimeoutExpired:
-        raise TerminalTimeout(f"Komut {timeout}s iÃ§inde bitmedi: {komut[:60]}...")
+        raise TerminalTimeout(f"Komut {timeout}s içinde bitmedi: {komut[:60]}...")
     except FileNotFoundError as e:
         raise TerminalHatasi(f"Shell bulunamadÄ±: {e}")
     except Exception as e:
@@ -119,13 +119,13 @@ def terminal_calistir(
 
 
 def terminal_kaliteli_cikti(sonuc: dict) -> str:
-    """Terminal sonucunu renkli ve dÃ¼zenli gÃ¶ster."""
+    """Terminal sonucunu renkli ve düzenli göster."""
     c = sonuc
     renk = C.GRN if c["basarili"] else C.RED
     satirlar = [
         f"\n{C.BOLD}{'â•'*50}{C.RESET}",
         f"  {C.BOLD}Shell:{C.RESET} {c.get('shell','?')}",
-        f"  {C.BOLD}SÃ¼re:{C.RESET} {c.get('sure','?')}s",
+        f"  {C.BOLD}Süre:{C.RESET} {c.get('sure','?')}s",
         f"  {C.BOLD}Ã‡Ä±kÄ±ÅŸ:{C.RESET} {renk}{c.get('exit_code','?')}{C.RESET}",
         f"  {C.BOLD}Durum:{C.RESET} {renk}{'âœ… BaÅŸarÄ±lÄ±' if c['basarili'] else 'âŒ Hata'}{C.RESET}",
         f"{C.BOLD}{'â”€'*50}{C.RESET}",
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="ReYMeN Terminal Tool â€” PowerShell/Bash komut Ã§alÄ±ÅŸtÄ±rÄ±cÄ±"
+        description="ReYMeN Terminal Tool â€” PowerShell/Bash komut çalÄ±ÅŸtÄ±rÄ±cÄ±"
     )
     parser.add_argument("komut", nargs="*", help="Ã‡alÄ±ÅŸtÄ±rÄ±lacak komut")
     parser.add_argument(
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--timeout", type=int, default=60)
     parser.add_argument(
-        "--json", action="store_true", help="Ã‡Ä±ktÄ±yÄ± JSON formatÄ±nda gÃ¶ster"
+        "--json", action="store_true", help="Ã‡Ä±ktÄ±yÄ± JSON formatÄ±nda göster"
     )
     parser.add_argument("--workdir", default=None)
 
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     if not args.komut:
         # Ä°nteraktif mod
         print(f"{C.BOLD}{C.BLU}ReYMeN Terminal Tool{C.RESET}")
-        print(f"  {C.YEL}Ã‡Ä±kmak iÃ§in: exit veya Ctrl+C{C.RESET}")
+        print(f"  {C.YEL}Ã‡Ä±kmak için: exit veya Ctrl+C{C.RESET}")
         print()
         while True:
             try:

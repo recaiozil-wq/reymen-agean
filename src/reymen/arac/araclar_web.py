@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 araclar_web.py â€” Web arama + sayfa icerik cekme (cok kaynakli, dayanikli).
 
-Web arama: SearchDispatcher'a yÃ¶nlendirir (reymen.arac.web_search_engine).
+Web arama: SearchDispatcher'a yönlendirir (reymen.arac.web_search_engine).
 Sayfa icerik cekme: Playwright > urllib fallback.
 
 API anahtari gerekmez (DuckDuckGo fallback her zaman calisir).
@@ -41,11 +41,11 @@ def _http_get(
         return r.read().decode(charset, errors="replace")
 
 
-# â”€â”€ Ana arama fonksiyonu (SearchDispatcher'a yÃ¶nlendirir) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Ana arama fonksiyonu (SearchDispatcher'a yönlendirir) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def web_ara(sorgu: str, adet: int = 5) -> str:
-    """Internette arar. SearchDispatcher'a yÃ¶nlendirir (auto-detect)."""
+    """Internette arar. SearchDispatcher'a yönlendirir (auto-detect)."""
     dispatcher = _get_dispatcher()
     return dispatcher.ara(sorgu, engine="auto", max_sonuc=adet)
 

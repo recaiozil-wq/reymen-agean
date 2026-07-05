@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-image_gen_engine.py â€” Ã‡ok back-end'li gÃ¶rsel Ã¼retim motoru (ABC tabanlÄ±).
+image_gen_engine.py â€” Ã‡ok back-end'li görsel üretim motoru (ABC tabanlÄ±).
 
 ImageGenEngine ABC:
   - Soyut calistir(prompt, en, boy) â†’ str
@@ -8,10 +8,10 @@ ImageGenEngine ABC:
 Engine'ler:
   - FALEngine       â€” fal.ai API (FAL_KEY ortam deÄŸiÅŸkeni)
   - OpenAIEngine    â€” DALL-E (OPENAI_API_KEY ortam deÄŸiÅŸkeni)
-  - StubEngine      â€” local dummy (baÄŸÄ±mlÄ±lÄ±k gerektirmez, simÃ¼le eder)
+  - StubEngine      â€” local dummy (baÄŸÄ±mlÄ±lÄ±k gerektirmez, simüle eder)
 
 ImageGenRegistry:
-  - engine kaydet / seÃ§ (ad ile) / calistir
+  - engine kaydet / seç (ad ile) / calistir
   - VarsayÄ±lan engine: stub (FAL_KEY varsa FAL, OPENAI_API_KEY varsa OpenAI)
 
 Motor tool:
@@ -52,16 +52,16 @@ _USER_AGENT = "ReYMeN-Ajan/1.0"
 
 
 class ImageGenEngine(ABC):
-    """TÃ¼m gÃ¶rsel Ã¼retim engine'leri iÃ§in soyut taban sÄ±nÄ±fÄ±."""
+    """Tüm görsel üretim engine'leri için soyut taban sÄ±nÄ±fÄ±."""
 
     @property
     @abstractmethod
     def ad(self) -> str:
-        """Engine'in benzersiz adÄ± (kÃ¼Ã§Ã¼k harf)."""
+        """Engine'in benzersiz adÄ± (küçük harf)."""
 
     @abstractmethod
     def calistir(self, prompt: str, en: str = "1024", boy: str = "1024") -> str:
-        """GÃ¶rsel Ã¼ret, formatlÄ± [MEDIA] metni dÃ¶ndÃ¼r."""
+        """Görsel üret, formatlÄ± [MEDIA] metni döndür."""
         ...
 
     def __init__(self) -> None:
@@ -106,7 +106,7 @@ class ImageGenEngine(ABC):
 
 
 class FALEngine(ImageGenEngine):
-    """FAL.ai FLUX modeli ile gÃ¶rsel Ã¼retir. FAL_KEY ortam deÄŸiÅŸkeni gerekli."""
+    """FAL.ai FLUX modeli ile görsel üretir. FAL_KEY ortam deÄŸiÅŸkeni gerekli."""
 
     @property
     def ad(self) -> str:
@@ -131,7 +131,7 @@ class FALEngine(ImageGenEngine):
         return _FAL_RUN_URL
 
     def _get_fal_model_name(self) -> str:
-        """KullanÄ±lan model adÄ±nÄ± dÃ¶ndÃ¼r (log/teÅŸhis iÃ§in)."""
+        """KullanÄ±lan model adÄ±nÄ± döndür (log/teÅŸhis için)."""
         model = os.environ.get("FAL_MODEL", "").strip()
         if not model:
             model = os.environ.get("FAL_IMAGE_MODEL", "").strip()
@@ -203,7 +203,7 @@ class FALEngine(ImageGenEngine):
 
 
 class OpenAIEngine(ImageGenEngine):
-    """OpenAI DALL-E ile gÃ¶rsel Ã¼retir. OPENAI_API_KEY ortam deÄŸiÅŸkeni gerekli."""
+    """OpenAI DALL-E ile görsel üretir. OPENAI_API_KEY ortam deÄŸiÅŸkeni gerekli."""
 
     @property
     def ad(self) -> str:
@@ -266,9 +266,9 @@ class OpenAIEngine(ImageGenEngine):
 
 
 class xAIEngine(ImageGenEngine):
-    """xAI / Grok gÃ¶rsel Ã¼retim engine'i. XAI_API_KEY ortam deÄŸiÅŸkeni gerekli.
+    """xAI / Grok görsel üretim engine'i. XAI_API_KEY ortam deÄŸiÅŸkeni gerekli.
 
-    xAI gÃ¶rsel Ã¼retim API'sini kullanÄ±r (OpenAI DALL-E ile benzer formatta).
+    xAI görsel üretim API'sini kullanÄ±r (OpenAI DALL-E ile benzer formatta).
     Endpoint: https://api.x.ai/v1/images/generations
     Model: grok-imagine-image (varsayÄ±lan) veya grok-imagine-image-quality
     Desteklenen boyutlar: 1024x1024, 1024x1792, 1792x1024
@@ -409,12 +409,12 @@ class ReplicateEngine(ImageGenEngine):
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# Stub Engine (local dummy / simÃ¼le)
+# Stub Engine (local dummy / simüle)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class StubEngine(ImageGenEngine):
-    """Local dummy engine. API key gerekmez. GÃ¶rsel Ã¼retmez, simÃ¼le eder."""
+    """Local dummy engine. API key gerekmez. Görsel üretmez, simüle eder."""
 
     @property
     def ad(self) -> str:
@@ -435,7 +435,7 @@ class StubEngine(ImageGenEngine):
 
 
 class ImageGenRegistry:
-    """GÃ¶rsel Ã¼retim engine'lerini kaydet, seÃ§ ve Ã§alÄ±ÅŸtÄ±r."""
+    """Görsel üretim engine'lerini kaydet, seç ve çalÄ±ÅŸtÄ±r."""
 
     def __init__(self) -> None:
         self._engines: dict[str, ImageGenEngine] = {}
@@ -502,7 +502,7 @@ def _get_registry() -> ImageGenRegistry:
     global _registry
     if _registry is None:
         _registry = ImageGenRegistry()
-        # Stub her zaman Ã§alÄ±ÅŸÄ±r
+        # Stub her zaman çalÄ±ÅŸÄ±r
         _registry.kaydet(StubEngine())
         # FAL
         try:
@@ -535,7 +535,7 @@ def _get_registry() -> ImageGenRegistry:
 def resim_olustur(
     prompt: str, en: str = "1024", boy: str = "1024", backend: str = ""
 ) -> str:
-    """RESIM_OLUSTUR tool'u â€” backend parametresi ile Ã§oklu gÃ¶rsel Ã¼retim.
+    """RESIM_OLUSTUR tool'u â€” backend parametresi ile çoklu görsel üretim.
 
     Args:
         prompt: Gorsel tanimi.

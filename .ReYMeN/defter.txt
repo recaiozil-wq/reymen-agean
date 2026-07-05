@@ -1,0 +1,7 @@
+
+2026-07-05 TANILANDI: conversation_loop.py 3 bug
+- Kimlik çelişkisi (satır 2571-2579) → DeepSeek boş yanıt
+- Loop break (satır 1462) → model soru sorarsa loop biter
+- Prompt sızıntısı → identity confusion + fallback
+- Kaynak: kullanıcı paste analizi + 4 API testi
+- Karar #38 decisions.md'de

@@ -1,4 +1,4 @@
-﻿"""
+"""
 ğŸ¨ ReYMeN Image Gen Provider â€” Image generation layer.
 
 No API key required, fed from configuration,
@@ -99,7 +99,7 @@ def save_b64_image(b64_data: str, provider: str, prompt: str) -> Tuple[str, str]
     local_path = IMAGE_CACHE / local_name
 
     try:
-        # Base64 verisini temizle (data:image/...;base64, Ã¶nekini kaldÄ±r)
+        # Base64 verisini temizle (data:image/...;base64, önekini kaldÄ±r)
         if "," in b64_data:
             b64_data = b64_data.split(",", 1)[1]
         image_bytes = base64.b64decode(b64_data)
@@ -145,7 +145,7 @@ def discover_providers() -> List[Dict[str, str]]:
                 }
             )
 
-    # Fallback: provider bulunamazsa varsayÄ±lan listeyi dÃ¶ndÃ¼r
+    # Fallback: provider bulunamazsa varsayÄ±lan listeyi döndür
     if not providers:
         providers = [
             {"id": "fal", "name": "FAL.ai", "path": ""},
@@ -159,7 +159,7 @@ def discover_providers() -> List[Dict[str, str]]:
 
 
 # ---------------------------------------------------------------------------
-# Basit provider implementasyonu (API key gerektirmez - demo/simÃ¼le)
+# Basit provider implementasyonu (API key gerektirmez - demo/simüle)
 # ---------------------------------------------------------------------------
 
 
@@ -175,17 +175,17 @@ def generate_image_simple(
     2. If not available, try real APIs (from env vars)
     3. If nothing works, return a simulated image
     """
-    # Ã–nce eklenti Ã¼zerinden dene
+    # Ã–nce eklenti üzerinden dene
     result = _try_plugin_provider(prompt, provider_id, aspect_ratio, model)
     if result.get("success"):
         return result
 
-    # Eklenti yoksa veya Ã§alÄ±ÅŸmazsa, provider tipine gÃ¶re dene
+    # Eklenti yoksa veya çalÄ±ÅŸmazsa, provider tipine göre dene
     result = _try_direct_api(prompt, provider_id, aspect_ratio, model)
     if result.get("success"):
         return result
 
-    # HiÃ§biri Ã§alÄ±ÅŸmazsa placeholder gÃ¶rsel oluÅŸtur
+    # Hiçbiri çalÄ±ÅŸmazsa placeholder görsel oluÅŸtur
     return _generate_placeholder(prompt, provider_id, model)
 
 
@@ -233,9 +233,9 @@ def _try_plugin_provider(
 
     except ImportError as e:
         logger.debug(f"[IMG] Plugin import hatasÄ± ({provider_id}): {e}")
-        return error_response(f"Plugin yÃ¼klenemedi: {e}", provider_id)
+        return error_response(f"Plugin yüklenemedi: {e}", provider_id)
     except Exception as e:
-        logger.debug(f"[IMG] Plugin Ã§alÄ±ÅŸma hatasÄ± ({provider_id}): {e}")
+        logger.debug(f"[IMG] Plugin çalÄ±ÅŸma hatasÄ± ({provider_id}): {e}")
         return error_response(f"Plugin hatasÄ±: {e}", provider_id)
 
 
@@ -245,7 +245,7 @@ def _try_direct_api(
     """Try real APIs â€” read keys from environment variables."""
     import requests
 
-    # Aspect ratio'yu API parametresine Ã§evir
+    # Aspect ratio'yu API parametresine çevir
     size_map = {
         "1:1": "1024x1024",
         "16:9": "1792x1024",
@@ -336,14 +336,14 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
     local_name = f"{provider_id}_placeholder_{hash_str}.html"
     local_path = IMAGE_CACHE / local_name
 
-    # SVG placeholder â€” gÃ¶rselin ne olacaÄŸÄ±nÄ± gÃ¶ster
+    # SVG placeholder â€” görselin ne olacaÄŸÄ±nÄ± göster
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#1a1a2e"/>
   <rect x="32" y="32" width="448" height="448" rx="16" fill="#16213e" stroke="#0f3460" stroke-width="2"/>
   <text x="256" y="200" text-anchor="middle" font-family="Arial" font-size="48" fill="#e94560">ğŸ¨</text>
   <text x="256" y="270" text-anchor="middle" font-family="Arial" font-size="14" fill="#a0a0b0">{_escape_svg(prompt[:60])}</text>
   <text x="256" y="300" text-anchor="middle" font-family="Arial" font-size="12" fill="#606080">{provider_id.upper()}</text>
-  <text x="256" y="340" text-anchor="middle" font-family="Arial" font-size="10" fill="#404060">âš ï¸ API anahtarÄ± bulunamadÄ± â€” placeholder gÃ¶steriliyor</text>
+  <text x="256" y="340" text-anchor="middle" font-family="Arial" font-size="10" fill="#404060">âš ï¸ API anahtarÄ± bulunamadÄ± â€” placeholder gösteriliyor</text>
 </svg>"""
 
     # SVG'yi data URI olarak kullan
@@ -357,7 +357,7 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
         model=model or "placeholder",
         provider=provider_id,
         metadata={
-            "note": "API key bulunamadÄ± â€” placeholder gÃ¶rsel",
+            "note": "API key bulunamadÄ± â€” placeholder görsel",
             "prompt": prompt,
             "local_path": str(local_path),
         },
@@ -375,7 +375,7 @@ def _escape_svg(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# GeÃ§miÅŸ yÃ¶netimi
+# GeçmiÅŸ yönetimi
 # ---------------------------------------------------------------------------
 
 
@@ -390,7 +390,7 @@ def get_history(limit: int = 50) -> List[Dict[str, Any]]:
         data.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
         return data[:limit]
     except Exception as e:
-        logger.warning(f"[IMG] GeÃ§miÅŸ okuma hatasÄ±: {e}")
+        logger.warning(f"[IMG] GeçmiÅŸ okuma hatasÄ±: {e}")
         return []
 
 
@@ -405,7 +405,7 @@ def add_history(entry: Dict[str, Any]) -> None:
             encoding="utf-8",
         )
     except Exception as e:
-        logger.warning(f"[IMG] GeÃ§miÅŸ yazma hatasÄ±: {e}")
+        logger.warning(f"[IMG] GeçmiÅŸ yazma hatasÄ±: {e}")
 
 
 def clear_history() -> None:

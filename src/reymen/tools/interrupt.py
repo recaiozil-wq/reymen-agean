@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.interrupt shim (override) â€” ReYMeN interrupt yÃ¶netimini ReYMeN'e yÃ¶nlendirir."""
+"""ReYMeN tools.interrupt shim (override) â€” ReYMeN interrupt yönetimini ReYMeN'e yönlendirir."""
 
 from __future__ import annotations
 

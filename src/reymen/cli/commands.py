@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """commands.py â€” Slash komut registry ve handler yonlendirme.
 
 Bu modul, ``ReYMeN_cli/commands.py`` ile ayni ``CommandDef`` yapisini kullanir,

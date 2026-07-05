@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """container_sandbox.py â€” Docker container'da shell komutlarini izole calistir.
 
 Terminal komutlarini (KOMUT_CALISTIR) Docker container icinde calistirarak

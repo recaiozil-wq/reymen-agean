@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 tool_guardrails.py â€” Arac guvenlik modulu.
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 reymen_stubs.py â€” ReYMeN ReYMeN Uyumluluk Katmani (birleÅŸtirilmiÅŸ).
 
@@ -9,7 +9,7 @@ Eski dosyalarÄ±n birleÅŸimi:
   - reymen/cron/hermes_stubs/i18n.py (46 satÄ±r)
   - reymen/sistem/hermes_uyum.py (126 satÄ±r)
 
-TÃ¼m ReYMeN API Ã§aÄŸrÄ±larÄ± bu dosya Ã¼zerinden ReYMeN'e yÃ¶nlendirilir.
+Tüm ReYMeN API çaÄŸrÄ±larÄ± bu dosya üzerinden ReYMeN'e yönlendirilir.
 Hermes Agent referans alÄ±nmÄ±ÅŸtÄ±r. Apache 2.0 LisansÄ±.
 """
 
@@ -28,14 +28,14 @@ from typing import Any, Callable, Dict, List, Optional, Union
 logger = logging.getLogger(__file__)
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# BÃ–LÃœM 1: Yol ve Dizin YÃ¶netimi (eski hermes_stubs/__init__.py)
+# BÃ–LÃœM 1: Yol ve Dizin Yönetimi (eski hermes_stubs/__init__.py)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _REYMEN_DIR: Optional[Path] = None
 
 
 def _get_reymen_root() -> Path:
-    """ReYMeN proje kÃ¶kÃ¼nÃ¼ dÃ¶ndÃ¼r."""
+    """ReYMeN proje kökünü döndür."""
     return Path(__file__).resolve().parent.parent  # sistem/ -> reymen/
 
 
@@ -47,7 +47,7 @@ def set_hermes_home_override(path: Union[str, Path]) -> Any:
 
 
 def get_reymen_home() -> Path:
-    """ReYMeN proje kÃ¶kÃ¼nÃ¼ dÃ¶ndÃ¼r (ReYMeN'siz)."""
+    """ReYMeN proje kökünü döndür (ReYMeN'siz)."""
     if _REYMEN_DIR:
         return _REYMEN_DIR
     return _get_reymen_root()
@@ -289,7 +289,7 @@ def _expand_env_vars(cfg: Any) -> Any:
 
 
 def load_config() -> Dict[str, Any]:
-    """Basit config yÃ¼kleme â€” .env dosyasÄ±ndan."""
+    """Basit config yükleme â€” .env dosyasÄ±ndan."""
     try:
         import dotenv
 
@@ -307,7 +307,7 @@ def load_config() -> Dict[str, Any]:
 
 
 def cfg_get(cfg: Optional[Dict[str, Any]], *keys: str, default: Any = None) -> Any:
-    """Ä°Ã§ iÃ§e dict'ten gÃ¼venli deÄŸer okuma."""
+    """Ä°ç içe dict'ten güvenli deÄŸer okuma."""
     if not cfg or not keys:
         return default
     current: Any = cfg
@@ -416,7 +416,7 @@ def t(key: str, **kwargs: Any) -> str:
 
 
 def discover_plugins() -> list:
-    """Plugin keÅŸfi â€” PluginManager.discover() Ã¼zerinden."""
+    """Plugin keÅŸfi â€” PluginManager.discover() üzerinden."""
     try:
         from reymen.sistem.plugin_manager import PluginManager
 
@@ -650,7 +650,7 @@ def get_session_listing(*a, **kw):
 
 
 class SessionDB:
-    """SessionDB wrapper â€” session_db.py'yi basit bir arayÃ¼zle sarar."""
+    """SessionDB wrapper â€” session_db.py'yi basit bir arayüzle sarar."""
 
     def __init__(self, db_path: Optional[Union[str, Path]] = None):
         if db_path is None:
@@ -736,7 +736,7 @@ kanban_db = _kanban_db_stub
 
 
 def _ensure_stubs() -> None:
-    """TÃ¼m stub'larÄ± doÄŸrula (sadece import kontrolÃ¼)."""
+    """Tüm stub'larÄ± doÄŸrula (sadece import kontrolü)."""
     _stubs = [
         get_reymen_home,
         get_hermes_home,

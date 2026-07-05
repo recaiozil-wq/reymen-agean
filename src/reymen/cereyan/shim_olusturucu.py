@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """shim_olusturucu.py â€” Eksik ReYMeN modulleri icin otomatik shim uretimi.
 
 ModuleNotFoundError kalibini tani, ayni hata 3+ dosyada tekrarlanirsa
@@ -106,7 +106,7 @@ def _shim_olustur(modul_adi: str, log_fn=print) -> str | None:
 """Otomatik olusturulan shim â€” {modul_adi}
 
 Eksik ReYMeN modulu yerine gecer. Import hatasini susturur.
-GerÃ§ek fonksiyonellik yok, sadece namespace doldurur.
+Gerçek fonksiyonellik yok, sadece namespace doldurur.
 """
 
 

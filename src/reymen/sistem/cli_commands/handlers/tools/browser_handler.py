@@ -1,4 +1,4 @@
-﻿"""_handle_browser_command handler."""
+"""_handle_browser_command handler."""
 
 import logging
 import os

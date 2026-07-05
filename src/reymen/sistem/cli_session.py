@@ -1,4 +1,4 @@
-﻿"""cli_session.py - ReYMeNCLI Session metotlari."""
+"""cli_session.py - ReYMeNCLI Session metotlari."""
 
 import logging, os, re, sys, time, json, threading
 from datetime import datetime

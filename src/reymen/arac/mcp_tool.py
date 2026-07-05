@@ -1,7 +1,7 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """mcp_tool.py â€” MCP (Model Context Protocol) Ä°stemci AracÄ±.
 
-MCP sunucularÄ±na baÄŸlanÄ±r ve araÃ§larÄ±nÄ± ReYMeN'e aÃ§ar.
+MCP sunucularÄ±na baÄŸlanÄ±r ve araçlarÄ±nÄ± ReYMeN'e açar.
 JSON-RPC 2.0 over stdio veya HTTP.
 """
 
@@ -50,7 +50,7 @@ class MCPSunucusu:
                     "clientInfo": {"name": "ReYMeN", "version": "1.0"},
                 },
             )
-            # AraÃ§ listesini al
+            # Araç listesini al
             yanit = self._json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
             return True
@@ -104,7 +104,7 @@ class MCPSunucusu:
 
 
 class MCPIstemci:
-    """Ã‡oklu MCP sunucusu yÃ¶neticisi."""
+    """Ã‡oklu MCP sunucusu yöneticisi."""
 
     def __init__(self):
         self._sunucular: dict[str, MCPSunucusu] = {}
@@ -144,7 +144,7 @@ class MCPIstemci:
         return {ad: s.araclar() for ad, s in self._sunucular.items()}
 
     def motor_kaydet(self, motor):
-        """TÃ¼m MCP araÃ§larÄ±nÄ± motora kaydet."""
+        """Tüm MCP araçlarÄ±nÄ± motora kaydet."""
         for sunucu_ad, araclar in self.tum_araclar().items():
             for arac in araclar:
                 arac_adi = f"MCP_{sunucu_ad.upper()}_{arac['name'].upper()}"
@@ -183,4 +183,4 @@ def mcp_istemci() -> MCPIstemci:
 if __name__ == "__main__":
     istemci = MCPIstemci()
     print(f"Sunucular: {istemci.durum()}")
-    print(f"AraÃ§lar: {istemci.tum_araclar()}")
+    print(f"Araçlar: {istemci.tum_araclar()}")

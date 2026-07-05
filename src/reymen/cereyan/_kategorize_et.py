@@ -1,5 +1,5 @@
-﻿#!/usr/bin/env python3
-"""TÃ¼m skilleri 27 kategori altÄ±nda topla - 5N1K sistemine gÃ¶re"""
+#!/usr/bin/env python3
+"""Tüm skilleri 27 kategori altÄ±nda topla - 5N1K sistemine göre"""
 
 import os, shutil, sys
 
@@ -10,7 +10,7 @@ PROFIL = str(
     Path.home() / "AppData" / "Local" / "reymen" / "profiles" / "kiral38" / "skills"
 )
 
-# Kategori eÅŸleÅŸtirme - her skill klasÃ¶r adÄ± hangi kategoriye gider?
+# Kategori eÅŸleÅŸtirme - her skill klasör adÄ± hangi kategoriye gider?
 KATEGORI = {
     # AI_ML (varsayÄ±lan)
     "default": "AI_ML",
@@ -118,7 +118,7 @@ KATEGORI = {
 
 
 def kategoribul(ad):
-    """Skill adÄ±na gÃ¶re kategori bul"""
+    """Skill adÄ±na göre kategori bul"""
     ad_lower = ad.lower().replace("-", " ").replace("_", " ")
     for anahtar, kategori in KATEGORI.items():
         if anahtar != "default" and anahtar in ad_lower:
@@ -146,7 +146,7 @@ def main():
             hedef_kat = os.path.join(SKILLER, kategori)
             os.makedirs(hedef_kat, exist_ok=True)
 
-            # TÃ¼m .md dosyalarÄ±nÄ± kopyala
+            # Tüm .md dosyalarÄ±nÄ± kopyala
             for kok, dirs, files in os.walk(klasor_yol):
                 for f in files:
                     if not f.endswith(".md"):
@@ -176,7 +176,7 @@ def main():
     print(f"\n  Kopyalanan: {toplam}")
     print(f"  Hata: {hata}")
 
-    # SayÄ±mlarÄ± gÃ¶ster
+    # SayÄ±mlarÄ± göster
     print(f"\n  KATEGORÄ° DAÄILIMI:")
     for kat in sorted(os.listdir(SKILLER)):
         kat_yol = os.path.join(SKILLER, kat)

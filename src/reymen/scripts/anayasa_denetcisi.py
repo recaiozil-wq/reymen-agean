@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 anayasa_denetcisi.py â€” Turkish content moderation / filtering module.
 
@@ -13,17 +13,17 @@ Exports:
 import re
 
 # ---------------------------------------------------------------------------
-# Safe words that are always allowed (kesin geÃ§iÅŸ listesi)
+# Safe words that are always allowed (kesin geçiÅŸ listesi)
 # ---------------------------------------------------------------------------
 _KESIN_GEC: frozenset = frozenset(
     {
         "merhaba",
         "selam",
-        "teÅŸekkÃ¼r",
-        "teÅŸekkÃ¼rler",
-        "gÃ¼naydÄ±n",
+        "teÅŸekkür",
+        "teÅŸekkürler",
+        "günaydÄ±n",
         "iyi geceler",
-        "lÃ¼tfen",
+        "lütfen",
         "rica",
         "yardÄ±m",
     }
@@ -38,11 +38,11 @@ _ENGELLI_DESENLER: list = [
         r"(?:\bamÄ±na\s*koyayÄ±m|"
         r"\bamk\b|"
         r"\bananÄ±\s*sik|"
-        r"\borospu\s*[Ã§c]o[cÃ§]u[ÄŸg]u|"
+        r"\borospu\s*[çc]o[cç]u[ÄŸg]u|"
         r"\boroÅ¡pu|"
         r"\boroÅŸpu|"
         r"\bsik(?:tir|ik|)\b|"
-        r"\bpiÃ§\b|"
+        r"\bpiç\b|"
         r"\bibne\b|"
         r"\byavÅŸak\b|"
         r"\baptal\s*herif|"
@@ -59,10 +59,10 @@ _ENGELLI_DESENLER: list = [
         r"\bbomb\s*making|"
         r"\bexplosive\s*device|"
         r"\bzararl[Ä±i]\s*yazÄ±lÄ±m|"
-        r"\bnasÄ±l\s*Ã¶ldÃ¼r|"
+        r"\bnasÄ±l\s*öldür|"
         r"\bcinayet\s*iÅŸle|"
-        r"\badam\s*Ã¶ldÃ¼r|"
-        r"\bÃ¶ldÃ¼rmek\s*iÃ§in)",
+        r"\badam\s*öldür|"
+        r"\böldürmek\s*için)",
         re.IGNORECASE,
     ),
     # Three or more consecutive URLs (with OR without spaces between them)
@@ -78,11 +78,11 @@ _ENGELLI_DESENLER: list = [
 # ---------------------------------------------------------------------------
 _KIBAR_IFADELER: re.Pattern = re.compile(
     r"\b(?:"
-    r"lÃ¼tfen|teÅŸekkÃ¼r\s*ederim|teÅŸekkÃ¼rler|rica\s*ederim|"
+    r"lütfen|teÅŸekkür\s*ederim|teÅŸekkürler|rica\s*ederim|"
     r"afferin|saÄŸ\s*ol|saÄŸol|ellerine\s*saÄŸlÄ±k|"
-    r"memnun\s*oldum|kusura\s*bakma|Ã¶zÃ¼r\s*dilerim|"
+    r"memnun\s*oldum|kusura\s*bakma|özür\s*dilerim|"
     r"pardon|afedersiniz|yardÄ±mcÄ±\s*olabilir|"
-    r"iyi\s*Ã§alÄ±ÅŸmalar|kolay\s*gelsin|hayÄ±rlÄ±\s*iÅŸler"
+    r"iyi\s*çalÄ±ÅŸmalar|kolay\s*gelsin|hayÄ±rlÄ±\s*iÅŸler"
     r")\b",
     re.IGNORECASE,
 )
@@ -93,7 +93,7 @@ def _desen_tarama(text: str) -> tuple:
     for pat in _ENGELLI_DESENLER:
         m = pat.search(text)
         if m:
-            return (True, f"Uygunsuz iÃ§erik tespit edildi: '{m.group()}'")
+            return (True, f"Uygunsuz içerik tespit edildi: '{m.group()}'")
     return (False, "")
 
 

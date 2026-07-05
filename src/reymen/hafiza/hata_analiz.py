@@ -1,22 +1,22 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-hata_analiz.py â€” Hata SonrasÄ± Analiz ve Otomatik DÃ¼zeltme.
+hata_analiz.py â€” Hata SonrasÄ± Analiz ve Otomatik Düzeltme.
 
-GÃ¶rev hata verdiÄŸinde conversation_loop.py tarafÄ±ndan Ã§aÄŸrÄ±lÄ±r:
+Görev hata verdiÄŸinde conversation_loop.py tarafÄ±ndan çaÄŸrÄ±lÄ±r:
   1. Hata mesajÄ±nÄ± parse et
-  2. Benzer hata geÃ§miÅŸini hafÄ±zada ara
-  3. Ã‡Ã¶zÃ¼m Ã¶nerisi Ã¼ret
-  4. Otomatik dÃ¼zeltme dene (seÃ§ilen hata tipleri iÃ§in)
+  2. Benzer hata geçmiÅŸini hafÄ±zada ara
+  3. Ã‡özüm önerisi üret
+  4. Otomatik düzeltme dene (seçilen hata tipleri için)
 
 AkÄ±ÅŸ:
-  GÃ¶rev â†’ HATA â†’ analiz_et(hata, hedef)
+  Görev â†’ HATA â†’ analiz_et(hata, hedef)
     â”œâ”€ HafÄ±zada benzer hata var mÄ±?
-    â”‚  â”œâ”€ EVET â†’ Ã¶nceki Ã§Ã¶zÃ¼mÃ¼ uygula
-    â”‚  â””â”€ HAYIR â†’ Ã§Ã¶zÃ¼m Ã¶nerisi Ã¼ret
-    â”œâ”€ Otomatik dÃ¼zeltilebilir mi?
-    â”‚  â”œâ”€ EVET â†’ dÃ¼zelt ve tekrar dene
+    â”‚  â”œâ”€ EVET â†’ önceki çözümü uygula
+    â”‚  â””â”€ HAYIR â†’ çözüm önerisi üret
+    â”œâ”€ Otomatik düzeltilebilir mi?
+    â”‚  â”œâ”€ EVET â†’ düzelt ve tekrar dene
     â”‚  â””â”€ HAYIR â†’ raporla
-    â””â”€ Kaydet (yeni hata + Ã§Ã¶zÃ¼m)
+    â””â”€ Kaydet (yeni hata + çözüm)
 """
 
 import logging
@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 ROOT = Path(__file__).parent.resolve()  # reymen/hafiza/
 PROJE = ROOT.parent.parent  # hermes_projesi/
 
-# KaydedilmiÅŸ hata Ã§Ã¶zÃ¼mleri (HATA_COZUM_DB)
+# KaydedilmiÅŸ hata çözümleri (HATA_COZUM_DB)
 HATA_DB_YOLU = PROJE / ".ReYMeN" / "hata_cozumleri.md"
 SKILLS_DIR = PROJE / ".ReYMeN" / "skills"
 
@@ -44,13 +44,13 @@ SKILLS_DIR = PROJE / ".ReYMeN" / "skills"
 
 
 class HataSinifi:
-    """Hata tÃ¼rÃ¼ ve dÃ¼zeltme stratejisi."""
+    """Hata türü ve düzeltme stratejisi."""
 
     MODUL_EKSIK = "modul_eksik"  # ImportError
     DOSYA_EKSIK = "dosya_eksik"  # FileNotFoundError
     IZIN_REDDI = "izin_reddi"  # PermissionError
     BAGLANTI_HATASI = "baglanti_hatasi"  # ConnectionError / timeout
-    API_HATASI = "api_hatasi"  # API dÃ¶ndÃ¼ hata
+    API_HATASI = "api_hatasi"  # API döndü hata
     SENTAKS_HATASI = "sentaks_hatasi"  # SyntaxError / lint
     TIP_HATASI = "tip_hatasi"  # TypeError
     DIGER = "diger"  # SÄ±nÄ±flandÄ±rÄ±lamayan
@@ -69,12 +69,12 @@ HATA_SINIFLARI = {
     },
     "izin_reddi": {
         "desen": r"(PermissionError|Access denied|EACCES)",
-        "cozum": "Yetki kontrolÃ¼, admin modu",
+        "cozum": "Yetki kontrolü, admin modu",
         "otomatik": False,
     },
     "baglanti_hatasi": {
         "desen": r"(ConnectionError|Connection refused|timeout|TIMEOUT|network unreachable)",
-        "cozum": "BaÄŸlantÄ± kontrolÃ¼, yeniden dene",
+        "cozum": "BaÄŸlantÄ± kontrolü, yeniden dene",
         "otomatik": True,
     },
     "api_hatasi": {
@@ -84,12 +84,12 @@ HATA_SINIFLARI = {
     },
     "sentaks_hatasi": {
         "desen": r"(SyntaxError|invalid syntax|syntax error|lint hatasÄ±)",
-        "cozum": "Kod dÃ¼zeltme",
+        "cozum": "Kod düzeltme",
         "otomatik": True,
     },
     "tip_hatasi": {
         "desen": r"(TypeError|expected.*got|unsupported operand)",
-        "cozum": "Tip dÃ¶nÃ¼ÅŸÃ¼mÃ¼, parametre kontrolÃ¼",
+        "cozum": "Tip dönüÅŸümü, parametre kontrolü",
         "otomatik": True,
     },
 }
@@ -121,21 +121,21 @@ def hata_siniflandir(hata_mesaji: str) -> Tuple[str, dict]:
 
 
 def hata_cozumu_ara(hata_sinifi: str, hedef: str) -> Optional[str]:
-    """Daha Ã¶nce kaydedilmiÅŸ hata Ã§Ã¶zÃ¼mlerini hafÄ±zada ara.
+    """Daha önce kaydedilmiÅŸ hata çözümlerini hafÄ±zada ara.
 
     Args:
-        hata_sinifi: Hata sÄ±nÄ±fÄ± (Ã¶rn. "modul_eksik")
-        hedef: GÃ¶revin hedef metni
+        hata_sinifi: Hata sÄ±nÄ±fÄ± (örn. "modul_eksik")
+        hedef: Görevin hedef metni
 
     Returns:
-        str: Ã‡Ã¶zÃ¼m metni (varsa), None: bulunamadÄ±
+        str: Ã‡özüm metni (varsa), None: bulunamadÄ±
     """
     # 1. HATA_COZUM_DB'ye bak
     try:
         if HATA_DB_YOLU.exists():
             icerik = HATA_DB_YOLU.read_text(encoding="utf-8", errors="replace")
 
-            # Hata sÄ±nÄ±fÄ±na gÃ¶re bÃ¶lÃ¼me bak
+            # Hata sÄ±nÄ±fÄ±na göre bölüme bak
             bolum_ici = icerik.find(f"## {hata_sinifi}")
             if bolum_ici != -1:
                 bolum_sonu = icerik.find("\n## ", bolum_ici + 3)
@@ -154,7 +154,7 @@ def hata_cozumu_ara(hata_sinifi: str, hedef: str) -> Optional[str]:
                         return satir.strip()
 
     except Exception as e:
-        log.warning("Hata Ã§Ã¶zÃ¼mÃ¼ aranirken hata: %s", e)
+        log.warning("Hata çözümü aranirken hata: %s", e)
 
     return None
 
@@ -165,13 +165,13 @@ def hata_cozumu_ara(hata_sinifi: str, hedef: str) -> Optional[str]:
 
 
 def hata_cozumu_kaydet(hata_sinifi: str, hata_mesaji: str, cozum: str, hedef: str):
-    """Bulunan/kullanÄ±lan hata Ã§Ã¶zÃ¼mÃ¼nÃ¼ HATA_COZUM_DB'ye kaydet.
+    """Bulunan/kullanÄ±lan hata çözümünü HATA_COZUM_DB'ye kaydet.
 
     Args:
         hata_sinifi: Hata sÄ±nÄ±fÄ±
         hata_mesaji: Orijinal hata mesajÄ±
-        cozum: Uygulanan Ã§Ã¶zÃ¼m
-        hedef: GÃ¶revin hedefi
+        cozum: Uygulanan çözüm
+        hedef: Görevin hedefi
     """
     try:
         from datetime import datetime
@@ -186,7 +186,7 @@ def hata_cozumu_kaydet(hata_sinifi: str, hata_mesaji: str, cozum: str, hedef: st
         if HATA_DB_YOLU.exists():
             mevcut = HATA_DB_YOLU.read_text(encoding="utf-8", errors="replace")
 
-            # BÃ¶lÃ¼m baÅŸlÄ±ÄŸÄ± var mÄ±?
+            # Bölüm baÅŸlÄ±ÄŸÄ± var mÄ±?
             bolum_basligi = f"## {hata_sinifi}"
             if bolum_basligi in mevcut:
                 mevcut = mevcut.replace(bolum_basligi, f"{bolum_basligi}\n{yeni_kayit}")
@@ -197,16 +197,16 @@ def hata_cozumu_kaydet(hata_sinifi: str, hata_mesaji: str, cozum: str, hedef: st
         else:
             HATA_DB_YOLU.parent.mkdir(parents=True, exist_ok=True)
             icerik = (
-                f"# Hata Ã‡Ã¶zÃ¼mleri â€” ReYMeN\n\n"
-                f"_Otomatik kaydedilen hata-Ã§Ã¶zÃ¼m eÅŸleÅŸmeleri._\n\n"
+                f"# Hata Ã‡özümleri â€” ReYMeN\n\n"
+                f"_Otomatik kaydedilen hata-çözüm eÅŸleÅŸmeleri._\n\n"
                 f"## {hata_sinifi}\n{yeni_kayit}\n"
             )
             HATA_DB_YOLU.write_text(icerik, encoding="utf-8")
 
-        log.info("Hata Ã§Ã¶zÃ¼mÃ¼ kaydedildi: %s â†’ %s", hata_sinifi, cozum[:60])
+        log.info("Hata çözümü kaydedildi: %s â†’ %s", hata_sinifi, cozum[:60])
 
     except Exception as e:
-        log.warning("Hata Ã§Ã¶zÃ¼mÃ¼ kaydedilirken hata: %s", e)
+        log.warning("Hata çözümü kaydedilirken hata: %s", e)
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -215,11 +215,11 @@ def hata_cozumu_kaydet(hata_sinifi: str, hata_mesaji: str, cozum: str, hedef: st
 
 
 def hata_analiz_et(hata_mesaji: str, hedef: str) -> dict:
-    """Hata analizini yap, Ã§Ã¶zÃ¼m Ã¶nerisi Ã¼ret.
+    """Hata analizini yap, çözüm önerisi üret.
 
     Args:
         hata_mesaji: Hata mesajÄ± (veya traceback)
-        hedef: GÃ¶revin hedef metni
+        hedef: Görevin hedef metni
 
     Returns:
         dict: {
@@ -234,10 +234,10 @@ def hata_analiz_et(hata_mesaji: str, hedef: str) -> dict:
     # 1. SÄ±nÄ±flandÄ±r
     sinif_adi, sinif_bilgi = hata_siniflandir(hata_mesaji)
 
-    # 2. HafÄ±zada Ã§Ã¶zÃ¼m ara
+    # 2. HafÄ±zada çözüm ara
     hafiza_cozum = hata_cozumu_ara(sinif_adi, hedef)
 
-    # 3. Ã‡Ã¶zÃ¼m Ã¶nerisi oluÅŸtur
+    # 3. Ã‡özüm önerisi oluÅŸtur
     if hafiza_cozum:
         cozum_onerisi = hafiza_cozum
     else:

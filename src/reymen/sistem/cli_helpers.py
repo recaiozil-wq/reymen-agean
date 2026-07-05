@@ -1,4 +1,4 @@
-﻿from typing import Any
+from typing import Any
 
 #!/usr/bin/env python3
 """

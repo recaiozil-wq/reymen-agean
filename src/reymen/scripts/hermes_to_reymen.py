@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 hermes_to_reymen.py â€” ReYMeN state.db â†’ ReYMeN hafiza toplu import.
 
@@ -75,13 +75,13 @@ def kategori_bul(hedef: str, title: str = "") -> str:
 
 
 def session_notu_al(session, messages) -> str:
-    """Session'dan kÄ±sa bir kazanÄ±m notu Ã§Ä±kar."""
+    """Session'dan kÄ±sa bir kazanÄ±m notu çÄ±kar."""
     title = session.get("title") or ""
     source = session.get("source") or ""
     msg_count = len(messages)
     cost = session.get("estimated_cost_usd") or 0
 
-    # KullanÄ±cÄ± mesajlarÄ±nÄ± Ã¶zetle
+    # KullanÄ±cÄ± mesajlarÄ±nÄ± özetle
     user_msgs = [
         m["content"][:200] for m in messages if m["role"] == "user" and m.get("content")
     ]
@@ -103,7 +103,7 @@ def session_notu_al(session, messages) -> str:
 
 
 def ilerleme_goster(current, total, width=40):
-    """Ä°lerleme Ã§ubuÄŸu."""
+    """Ä°lerleme çubuÄŸu."""
     done = int(width * current / total)
     bar = "â–ˆ" * done + "â–‘" * (width - done)
     sys.stdout.write(f"\r  [{bar}] {current}/{total} ({current*100//total}%)")
@@ -132,7 +132,7 @@ def main():
     sessions = [dict(row) for row in c.fetchall()]
     log.info("Toplam %d session bulundu", len(sessions))
 
-    # â”€â”€ 2. Zaten iÅŸlenmiÅŸ session ID'lerini Ã§Ä±kar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ 2. Zaten iÅŸlenmiÅŸ session ID'lerini çÄ±kar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _hafiza.initialize("hermes_import", baslik="ReYMeNâ†’ReYMeN toplu import")
     islenmis = set()
 

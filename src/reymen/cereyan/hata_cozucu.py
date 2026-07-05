@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 hata_cozucu.py â€” Windows hata tespit, kodlama ve cozum yoneticisi.
 
@@ -61,8 +61,8 @@ try:
 except ImportError:
     _WIN_API_VAR = False
 
-# â”€â”€ Hata kodu sayaÃ§ dosyasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-_SAYAC_DOSYASI = HATA_KLASORU / "_sayaÃ§.txt"
+# â”€â”€ Hata kodu sayaç dosyasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+_SAYAC_DOSYASI = HATA_KLASORU / "_sayaç.txt"
 
 
 def _sonraki_hata_kodu() -> str:

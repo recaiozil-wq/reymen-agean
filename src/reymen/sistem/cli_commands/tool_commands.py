@@ -1,7 +1,7 @@
-﻿"""Tool Ã§aÄŸrÄ± komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
+"""Tool çaÄŸrÄ± komutlarÄ± â€” MixinCommands alt modülü.
 
 Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
-MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± içerir.
 """
 
 import logging
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """Tool Ã§aÄŸrÄ± komutlarÄ±."""
+    """Tool çaÄŸrÄ± komutlarÄ±."""
 
     def _handle_tools_command(self, cmd: str):
         """Handle /tools [list|disable|enable] slash commands.

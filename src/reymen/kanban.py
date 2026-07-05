@@ -1,7 +1,7 @@
-﻿"""ğŸ“Š Kanban Board + Worker â€” ReYMeN Kanban Worker seviyesinde.
+"""ğŸ“Š Kanban Board + Worker â€” ReYMeN Kanban Worker seviyesinde.
 
-GÃ¶revleri kanban panosunda yÃ¶netir. Kartlar kolonlar arasÄ±nda taÅŸÄ±nabilir,
-Ã¶nceliklendirilebilir, deadline takibi yapÄ±labilir. Worker lifecycle
+Görevleri kanban panosunda yönetir. Kartlar kolonlar arasÄ±nda taÅŸÄ±nabilir,
+önceliklendirilebilir, deadline takibi yapÄ±labilir. Worker lifecycle
 (orient â†’ work â†’ heartbeat â†’ block/complete) desteÄŸi sunar.
 
 Ã–rnek::
@@ -52,7 +52,7 @@ __all__ = [
 # Priority
 # ---------------------------------------------------------------------------
 class Priority(IntEnum):
-    """Kart Ã¶ncelik seviyeleri (dÃ¼ÅŸÃ¼k sayÄ± = yÃ¼ksek Ã¶ncelik)."""
+    """Kart öncelik seviyeleri (düÅŸük sayÄ± = yüksek öncelik)."""
 
     CRITICAL = 0
     HIGH = 1
@@ -78,7 +78,7 @@ class Priority(IntEnum):
         }
         if s in aliases:
             return aliases[s]
-        raise ValueError(f"GeÃ§ersiz Ã¶ncelik: {value!r}")
+        raise ValueError(f"Geçersiz öncelik: {value!r}")
 
     def __str__(self) -> str:
         return self.name
@@ -90,7 +90,7 @@ class Priority(IntEnum):
 class CardStatus(str):
     """Kart durumu (state machine)."""
 
-    BACKLOG = "backlog"  # HenÃ¼z baÅŸlanmadÄ±
+    BACKLOG = "backlog"  # Henüz baÅŸlanmadÄ±
     TODO = "todo"  # SÄ±radaki
     READY = "ready"  # BaÄŸÄ±mlÄ±lÄ±klarÄ± tamam, baÅŸlanabilir
     INPROGRESS = "in_progress"  # Ã‡alÄ±ÅŸÄ±lÄ±yor
@@ -98,7 +98,7 @@ class CardStatus(str):
     REVIEW = "review"  # Ä°nceleme bekliyor
     DONE = "done"  # TamamlandÄ±
 
-    # GeÃ§erli geÃ§iÅŸler
+    # Geçerli geçiÅŸler
     _GECISLER = {
         BACKLOG: [TODO, READY, DONE],
         TODO: [READY, INPROGRESS, DONE],
@@ -111,17 +111,17 @@ class CardStatus(str):
 
     @classmethod
     def gecerli_mi(cls, from_status: str, to_status: str) -> bool:
-        """GeÃ§erli bir durum geÃ§iÅŸi mi kontrol et."""
+        """Geçerli bir durum geçiÅŸi mi kontrol et."""
         gecisler = cls._GECISLER.get(from_status, [])
         return to_status in gecisler
 
 
 # ---------------------------------------------------------------------------
-# RunRecord â€” her worker Ã§alÄ±ÅŸtÄ±rma kaydÄ±
+# RunRecord â€” her worker çalÄ±ÅŸtÄ±rma kaydÄ±
 # ---------------------------------------------------------------------------
 @dataclass
 class RunRecord:
-    """Worker Ã§alÄ±ÅŸtÄ±rma kaydÄ±."""
+    """Worker çalÄ±ÅŸtÄ±rma kaydÄ±."""
 
     worker: str  # Worker profil adÄ±
     started_at: str  # ISO timestamp
@@ -348,7 +348,7 @@ class Board:
     # -- Kart iÅŸlemleri -----------------------------------------------------
 
     def _kolon_ismi(self, status: str) -> str:
-        """status deÄŸerini kolon adÄ±na Ã§evir."""
+        """status deÄŸerini kolon adÄ±na çevir."""
         status_to_column = {
             "backlog": "backlog",
             "todo": "todo",
@@ -369,19 +369,19 @@ class Board:
         return card
 
     def move(self, card_id: str, to_column: str) -> Card:
-        """KartÄ± bir kolona taÅŸÄ±. Status geÃ§iÅŸini kontrol eder."""
+        """KartÄ± bir kolona taÅŸÄ±. Status geçiÅŸini kontrol eder."""
         card = self.find(card_id)
         if card is None:
             raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
 
-        # AynÄ± durum â†’ idempotent, sessiz geÃ§
+        # AynÄ± durum â†’ idempotent, sessiz geç
         if card.status == to_column:
             return card
 
-        # Status geÃ§iÅŸ kontrolÃ¼
+        # Status geçiÅŸ kontrolü
         if not CardStatus.gecerli_mi(card.status, to_column):
             raise ValueError(
-                f"GeÃ§ersiz durum geÃ§iÅŸi: '{card.status}' -> '{to_column}'. "
+                f"Geçersiz durum geçiÅŸi: '{card.status}' -> '{to_column}'. "
                 f"Ä°zin verilenler: {CardStatus._GECISLER.get(card.status, [])}"
             )
 
@@ -389,7 +389,7 @@ class Board:
         if target is None:
             raise ValueError(f"Hedef kolon '{to_column}' bulunamadÄ±")
 
-        # Kaynaktan Ã§Ä±kar
+        # Kaynaktan çÄ±kar
         for col in self.columns:
             if col.get(card_id):
                 col.remove(card_id)
@@ -414,7 +414,7 @@ class Board:
         for child_id in list(card.children):
             child = self.find(child_id)
             if child and child.status == "todo":
-                # TÃ¼m parent'larÄ± done mÄ± kontrol et
+                # Tüm parent'larÄ± done mÄ± kontrol et
                 tum_parent_done = all(
                     (p := self.find(pid)) and p.status == "done"
                     for pid in child.parents
@@ -424,7 +424,7 @@ class Board:
                     changed.append(child.title)
 
     def set_status(self, card_id: str, new_status: str) -> Card:
-        """KartÄ±n durumunu gÃ¼ncelle (otomatik kolon taÅŸÄ±ma ile)."""
+        """KartÄ±n durumunu güncelle (otomatik kolon taÅŸÄ±ma ile)."""
         col_name = self._kolon_ismi(new_status)
         return self.move(card_id, col_name)
 
@@ -462,7 +462,7 @@ class Board:
         return [c for c in self.all_cards() if c.is_overdue()]
 
     def cards_by_assignee(self, assignee: str) -> list[Card]:
-        """Bir worker'a atanmÄ±ÅŸ tÃ¼m kartlarÄ± dÃ¶ndÃ¼r."""
+        """Bir worker'a atanmÄ±ÅŸ tüm kartlarÄ± döndür."""
         return [
             c
             for c in self.all_cards()
@@ -472,7 +472,7 @@ class Board:
     # -- Worker lifecycle ---------------------------------------------------
 
     def claim(self, card_id: str, worker: str) -> Card:
-        """Worker bir kartÄ± Ã¼stlenir â†’ in_progress."""
+        """Worker bir kartÄ± üstlenir â†’ in_progress."""
         card = self.find(card_id)
         if card is None:
             raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
@@ -624,7 +624,7 @@ _VARSAYILAN_PANO_YOLU = Path("~/.reymen/kanban_board.json").expanduser()
 
 
 def _pano() -> Board:
-    """Global board singleton'Ä±nÄ± dÃ¶ndÃ¼r (JSON'dan yÃ¼kler)."""
+    """Global board singleton'Ä±nÄ± döndür (JSON'dan yükler)."""
     pano_yolu = _VARSAYILAN_PANO_YOLU
     if pano_yolu.exists():
         return Board.load(pano_yolu)
@@ -640,7 +640,7 @@ def _pano_kaydet(board: Board) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Worker API â€” motor tool'larÄ± iÃ§in fonksiyonlar
+# Worker API â€” motor tool'larÄ± için fonksiyonlar
 # ---------------------------------------------------------------------------
 
 
@@ -657,7 +657,7 @@ def kanban_create(
 
     Args:
         title: Kart baÅŸlÄ±ÄŸÄ±.
-        description: AÃ§Ä±klama.
+        description: AçÄ±klama.
         assignee: Worker profil adÄ±.
         priority: Ã–ncelik (CRITICAL/HIGH/MEDIUM/LOW/BACKLOG).
         parents: BaÄŸÄ±mlÄ± olunan kart ID'leri (child otomatik 'todo' olur).
@@ -696,7 +696,7 @@ def kanban_create(
 
 
 def kanban_show(card_id: str) -> str:
-    """Kart detayÄ±nÄ± gÃ¶ster.
+    """Kart detayÄ±nÄ± göster.
 
     Args:
         card_id: Kart ID'si.
@@ -717,7 +717,7 @@ def kanban_show(card_id: str) -> str:
         f"  Deadline: {card.deadline or 'â€”'}",
         f"  Etiketler: {', '.join(card.tags) if card.tags else 'â€”'}",
         f"  OluÅŸturma: {card.created_at[:19]}",
-        f"  GÃ¼ncelleme: {card.updated_at[:19]}",
+        f"  Güncelleme: {card.updated_at[:19]}",
     ]
 
     if card.parents:
@@ -762,7 +762,7 @@ def kanban_complete(
     Args:
         card_id: Kart ID'si.
         summary: Ã–zet (downstream worker'larÄ±n okuyacaÄŸÄ±).
-        metadata: JSON string metadata (Ã¶rn. changed_files, tests_passed).
+        metadata: JSON string metadata (örn. changed_files, tests_passed).
 
     Returns:
         Ä°ÅŸlem sonucu.
@@ -779,7 +779,7 @@ def kanban_block(card_id: str, reason: str) -> str:
 
     Args:
         card_id: Kart ID'si.
-        reason: Blok nedeni. 'review-required: ' Ã¶neki dashboard'da gÃ¶sterilir.
+        reason: Blok nedeni. 'review-required: ' öneki dashboard'da gösterilir.
 
     Returns:
         Ä°ÅŸlem sonucu.
@@ -817,7 +817,7 @@ def kanban_comment(card_id: str, body: str) -> str:
 
     Args:
         card_id: Kart ID'si.
-        body: Yorum metni (JSON formatÄ±nda metadata iÃ§erebilir).
+        body: Yorum metni (JSON formatÄ±nda metadata içerebilir).
 
     Returns:
         Ä°ÅŸlem sonucu.
@@ -832,7 +832,7 @@ def kanban_comment(card_id: str, body: str) -> str:
 
 
 def kanban_heartbeat(card_id: str, worker: str, message: str = "") -> str:
-    """Worker heartbeat gÃ¶nder.
+    """Worker heartbeat gönder.
 
     Args:
         card_id: Kart ID'si.
@@ -852,7 +852,7 @@ def kanban_heartbeat(card_id: str, worker: str, message: str = "") -> str:
 
 
 def kanban_claim(card_id: str, worker: str) -> str:
-    """Worker bir kartÄ± Ã¼stlenir.
+    """Worker bir kartÄ± üstlenir.
 
     Args:
         card_id: Kart ID'si.
@@ -879,7 +879,7 @@ def kanban_list(
         status: Durum filtre (backlog/todo/ready/in_progress/blocked/review/done).
         assignee: Worker filtresi.
         tag: Etiket filtresi.
-        overdue: Sadece deadline geÃ§miÅŸ kartlar.
+        overdue: Sadece deadline geçmiÅŸ kartlar.
 
     Returns:
         Kart listesi metni.
@@ -920,7 +920,7 @@ def kanban_list(
 
 
 def kanban_summary() -> str:
-    """Pano Ã¶zetini gÃ¶ster.
+    """Pano özetini göster.
 
     Returns:
         Ã–zet metni.
@@ -977,7 +977,7 @@ def kanban_delete_card(card_id: str) -> str:
 
 
 def motor_kaydet(motor: Any) -> None:
-    """Motor'a Kanban araÃ§larÄ±nÄ± kaydet.
+    """Motor'a Kanban araçlarÄ±nÄ± kaydet.
 
     Args:
         motor: Motor instance'Ä±.
@@ -990,7 +990,7 @@ def motor_kaydet(motor: Any) -> None:
         "parents (list[str]): baÄŸÄ±mlÄ±lÄ±k listesi, tags (list[str]), deadline (str: ISO 8601)",
     )
     motor._plugin_arac_kaydet(
-        "KANBAN_SHOW", kanban_show, "Kart detayÄ±nÄ± gÃ¶ster. Parametre: card_id (str)"
+        "KANBAN_SHOW", kanban_show, "Kart detayÄ±nÄ± göster. Parametre: card_id (str)"
     )
     motor._plugin_arac_kaydet(
         "KANBAN_COMPLETE",
@@ -1002,7 +1002,7 @@ def motor_kaydet(motor: Any) -> None:
         "KANBAN_BLOCK",
         kanban_block,
         "KartÄ± bloke et. Parametreler: card_id (str), reason (str). "
-        "'review-required: ' Ã¶neki ile inceleme bekleme",
+        "'review-required: ' öneki ile inceleme bekleme",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_UNBLOCK",
@@ -1017,12 +1017,12 @@ def motor_kaydet(motor: Any) -> None:
     motor._plugin_arac_kaydet(
         "KANBAN_HEARTBEAT",
         kanban_heartbeat,
-        "Worker heartbeat gÃ¶nder. Parametreler: card_id (str), worker (str), message (str)",
+        "Worker heartbeat gönder. Parametreler: card_id (str), worker (str), message (str)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_CLAIM",
         kanban_claim,
-        "Worker kartÄ± Ã¼stlenir. Parametreler: card_id (str), worker (str)",
+        "Worker kartÄ± üstlenir. Parametreler: card_id (str), worker (str)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_LIST",
@@ -1031,7 +1031,7 @@ def motor_kaydet(motor: Any) -> None:
         "tag (str), overdue (bool)",
     )
     motor._plugin_arac_kaydet(
-        "KANBAN_SUMMARY", kanban_summary, "Pano Ã¶zetini gÃ¶ster. Parametre yok."
+        "KANBAN_SUMMARY", kanban_summary, "Pano özetini göster. Parametre yok."
     )
     motor._plugin_arac_kaydet(
         "KANBAN_DELETE", kanban_delete_card, "KartÄ± sil. Parametre: card_id (str)"

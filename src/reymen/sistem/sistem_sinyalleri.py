@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 sistem_sinyalleri.py â€” Sistem sinyalleri.
 

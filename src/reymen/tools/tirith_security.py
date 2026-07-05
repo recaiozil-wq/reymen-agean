@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.tirith_security shim â€” ReYMeN Tirith gÃ¼venlik kontrollerini yÃ¶nlendirir."""
+"""ReYMeN tools.tirith_security shim â€” ReYMeN Tirith güvenlik kontrollerini yönlendirir."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Sessiz except:pass temizleyici.
 except Exception: pass -> except Exception as _e: log.warning(...)
 """

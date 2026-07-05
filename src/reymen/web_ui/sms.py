@@ -1,7 +1,7 @@
-﻿# -*- coding: utf-8 -*-
-"""ğŸ“± ReYMeN SMS ModÃ¼lÃ¼ â€” Twilio REST API Ã¼zerinden SMS gÃ¶nderme.
+# -*- coding: utf-8 -*-
+"""ğŸ“± ReYMeN SMS Modülü â€” Twilio REST API üzerinden SMS gönderme.
 
-BaÄŸÄ±mlÄ±lÄ±k: twilio kÃ¼tÃ¼phanesi GEREKMEZ, urllib ile direkt REST API.
+BaÄŸÄ±mlÄ±lÄ±k: twilio kütüphanesi GEREKMEZ, urllib ile direkt REST API.
 
 .env'de:
   TWILIO_ACCOUNT_SID=ACxxxx
@@ -58,14 +58,14 @@ def sms_gonder(
     auth_token: Optional[str] = None,
     from_num: Optional[str] = None,
 ) -> dict:
-    """Twilio REST API ile SMS gÃ¶nder.
+    """Twilio REST API ile SMS gönder.
 
     Args:
         telefon: Hedef telefon numarasÄ± (+905551234567)
         mesaj: SMS metni
         account_sid: Twilio Account SID (None=.env'den al)
         auth_token: Twilio Auth Token (None=.env'den al)
-        from_num: GÃ¶nderen numara (None=.env'den al)
+        from_num: Gönderen numara (None=.env'den al)
 
     Returns:
         {"ok": bool, "mesaj_id": str|None, "hata": str|None}

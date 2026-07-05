@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 windows_entegrasyon.py â€” ReYMeN Windows Otomasyon Entegrasyonu
 

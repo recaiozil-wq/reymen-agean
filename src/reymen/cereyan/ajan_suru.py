@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 ajan_suru.py â€” FAZ 6: Coklu Alt-Ajan Orkestrasyonu (Swarm).
 
@@ -9,7 +9,7 @@ Roller:
   MimarAjan    â€” Problemi 3 farkli yaklasim stratejisine bol.
   GelistiriciAjan â€” En iyi stratejiyi somut eylem planina donustur.
   DenetciAjan  â€” Plani elestir, zayif noktalarÄ± bul. Maksimum 2 tur.
-  OrkestratÃ¶rAjan â€” Uc rolu koordine eder, sonucu tek string dondurur.
+  OrkestratörAjan â€” Uc rolu koordine eder, sonucu tek string dondurur.
 
 Aktivasyon (main.py):
     karmasiklik >= 4 ise su sekilde kullan:
@@ -118,7 +118,7 @@ class MimarAjan:
 
 
 class GelistiriciAjan:
-    """SeÃ§ilen stratejiyi somut eylem planina donusturur."""
+    """Seçilen stratejiyi somut eylem planina donusturur."""
 
     def __init__(self, provider):
         self._provider = provider

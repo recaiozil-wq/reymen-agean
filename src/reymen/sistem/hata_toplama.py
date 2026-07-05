@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hata_toplama.py â€” Merkezi Hata Toplama + Bildirim Sistemi
 
 Tum motor/plugin/tool hatalarini merkezi olarak toplar, kategorize eder,

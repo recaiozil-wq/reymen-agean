@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 tor_otomasyonu.py â€” ReYMeN icin Tor tabanli web otomasyon modulu.
 
@@ -518,7 +518,7 @@ if __name__ == "__main__":
 
         m = Motor(backend_mode="local")
 
-        # Motor'a TOR_ araÃ§larÄ±nÄ± ekle (motor_kaydet ile)
+        # Motor'a TOR_ araçlarÄ±nÄ± ekle (motor_kaydet ile)
         class MockMotor:
             calistir = m.calistir
 

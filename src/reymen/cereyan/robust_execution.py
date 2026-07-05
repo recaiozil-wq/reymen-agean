@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 robust_execution.py â€” Saglam calistirma modulu.
 

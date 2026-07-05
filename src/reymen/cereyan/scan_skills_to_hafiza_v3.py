@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 scan_skills_to_hafiza_v3.py â€” SADECE TARA VE RAPORLA, veritabanÄ±na dokunma.
 """
@@ -39,9 +39,9 @@ def kategori_ve_ad(dosya_yolu):
     return "/".join(parts[:-1]), parts[-1]
 
 
-# 1) Skills dizinindeki tÃ¼m .md dosyalarÄ±nÄ± bul
+# 1) Skills dizinindeki tüm .md dosyalarÄ±nÄ± bul
 md_dosyalari = sorted(SKILLS_DIR.rglob("*.md"))
-print(f"ğŸ“„ Skills klasÃ¶rÃ¼nde {len(md_dosyalari)} .md dosyasÄ± bulundu.", flush=True)
+print(f"ğŸ“„ Skills klasöründe {len(md_dosyalari)} .md dosyasÄ± bulundu.", flush=True)
 
 # 2) Skills DB meta tablosu
 con = sqlite3.connect(str(SKILLS_DB))
@@ -83,7 +83,7 @@ print(f"{'='*60}")
 print(f"  Toplam .md dosyasÄ±:           {len(md_dosyalari)}")
 print(f"  DB'de kayÄ±tlÄ±:                {len(meta_map)}")
 print(f"  ğŸ†• Yeni (eklenecek):          {len(yeni_liste)}")
-print(f"  ğŸ”„ GÃ¼ncellenecek:             {len(guncel_liste)}")
+print(f"  ğŸ”„ Güncellenecek:             {len(guncel_liste)}")
 print(f"  â­  Atlanan (deÄŸiÅŸmeyen):      {atlanan}")
 print(f"{'='*60}")
 
@@ -95,7 +95,7 @@ if yeni_liste:
         print(f"    ... ve {len(yeni_liste) - 15} daha")
 
 if guncel_liste:
-    print(f"\nğŸ”„ GÃ¼ncellenen dosyalar ({len(guncel_liste)}):")
+    print(f"\nğŸ”„ Güncellenen dosyalar ({len(guncel_liste)}):")
     for ad in guncel_liste[:15]:
         print(f"    ~ {ad}")
     if len(guncel_liste) > 15:

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """backup.py â€” Yedekleme sistemi.
 
 Proje dosyalarini ZIP ile yedekler.

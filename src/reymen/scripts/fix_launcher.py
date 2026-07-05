@@ -1,4 +1,4 @@
-﻿"""reymen_launcher.py'den _FINANS sozlugunu ve kullanimini kaldir."""
+"""reymen_launcher.py'den _FINANS sozlugunu ve kullanimini kaldir."""
 
 import re
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 dinamik_arac_uretici.py â€” FAZ 6: Dinamik Arac Uretimi (Code-As-A-Tool).
 
@@ -6,7 +6,7 @@ ReYMeN mevcut araclarla cozemedigi bir problemle karsilastiginda:
   1. LLM'den problemi cozen bir Python fonksiyonu uretmesini ister.
   2. guvenli_sandbox.py ile test eder.
   3. Basarili olursa araclar_dinamik/ klasorune kaydeder.
-  4. motor.py ToolRegistry'e aninda yÃ¼kler.
+  4. motor.py ToolRegistry'e aninda yükler.
   5. closed_learning_loop'a beceri olarak kristallestirir.
 
 Motor entegrasyonu:
@@ -51,7 +51,7 @@ def _fonksiyon_adi_bul(kod: str) -> Optional[str]:
 
 
 def _arac_kodu_olustur(fonk_adi: str, problem: str) -> str:
-    """Kaydedilecek araÃ§ Python dosyasÄ±nÄ±n iÃ§erigini olustur."""
+    """Kaydedilecek araç Python dosyasÄ±nÄ±n içerigini olustur."""
     return f'''# -*- coding: utf-8 -*-
 """
 araclar_dinamik â€” Otomatik uretilen arac.
@@ -105,8 +105,8 @@ def _llm_arac_uret(problem: str, provider) -> str:
         "KullanicÄ±nÄ±n verdiÄŸi problemi cozen SADECE bir Python fonksiyonu yaz. "
         "YanÄ±tÄ±nÄ± mutlaka ```python ... ``` blogu icerisinde ver. "
         "Fonksiyon parametresiz veya tek string parametreli olabilir. "
-        "os, subprocess, socket, requests gibi tehlikeli modÃ¼lleri KULLANMA. "
-        "Yalnizca standart kÃ¼tÃ¼phane (math, re, json, datetime, pathlib, csv vb.) kullan."
+        "os, subprocess, socket, requests gibi tehlikeli modülleri KULLANMA. "
+        "Yalnizca standart kütüphane (math, re, json, datetime, pathlib, csv vb.) kullan."
     )
     mesajlar = [
         {"role": "user", "content": f"Problem: {problem}\n\nPython fonksiyonu yaz:"}

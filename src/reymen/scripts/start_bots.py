@@ -1,4 +1,4 @@
-﻿"""start_bots.py â€” TÃ¼m Telegram botlarini temiz baslat."""
+"""start_bots.py â€” Tüm Telegram botlarini temiz baslat."""
 
 import json
 import os

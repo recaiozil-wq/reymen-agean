@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 kanban_orchestrator.py â€” ReYMeN Gelismis Kanban Gorev Tahtasi.
 
@@ -481,7 +481,7 @@ def _cli():
 
 
 def motor_kaydet(motor):
-    """Kanban araÃ§larÄ±nÄ± motora kaydet."""
+    """Kanban araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     _kb = KanbanDB()
@@ -492,29 +492,29 @@ def motor_kaydet(motor):
                 baslik, govde, int(oncelik) if str(oncelik).isdigit() else 2
             ).satir()
         ),
-        "Kanban tahtasÄ±na gÃ¶rev ekle (baslik, govde, oncelik:1-3)",
+        "Kanban tahtasÄ±na görev ekle (baslik, govde, oncelik:1-3)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_LISTE",
         lambda durum="": (
             "\n".join(g.satir() for g in _kb.listele(durum=durum))
-            or "[Kanban]: GÃ¶rev yok"
+            or "[Kanban]: Görev yok"
         ),
-        "Kanban gÃ¶revlerini listele (durum: todo/running/done/boÅŸ=hepsi)",
+        "Kanban görevlerini listele (durum: todo/running/done/boÅŸ=hepsi)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_GUNCELLE",
         lambda id="0", durum="done": (
             str(_kb.guncelle(int(id), durum=durum).satir())
             if str(id).isdigit()
-            else "[Kanban]: GeÃ§ersiz id"
+            else "[Kanban]: Geçersiz id"
         ),
-        "Kanban gÃ¶revi gÃ¼ncelle (id, durum: todo/ready/running/done/blocked)",
+        "Kanban görevi güncelle (id, durum: todo/ready/running/done/blocked)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_OZET",
         lambda: str(_kb.ozet()),
-        "Kanban tahta Ã¶zetini gÃ¶ster (kolon bazÄ±nda gÃ¶rev sayÄ±larÄ±)",
+        "Kanban tahta özetini göster (kolon bazÄ±nda görev sayÄ±larÄ±)",
     )
 
 

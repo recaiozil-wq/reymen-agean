@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-session_db.py â€” AdvancedSessionStorage. SQLite WAL + FTS5 ajan gÃ¼nlÃ¼ÄŸÃ¼
+session_db.py â€” AdvancedSessionStorage. SQLite WAL + FTS5 ajan günlüÄŸü
 + ReYMeN Agent seviyesi sessions tablosu (~30 sutun).
 
 Geriye uyumluluk: FTS5 ajan_gunlugu tablosu korunur.
@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 
 class AdvancedSessionStorage:
-    """SQLite tabanli session ve ajan gÃ¼nlÃ¼ÄŸÃ¼ deposu.
+    """SQLite tabanli session ve ajan günlüÄŸü deposu.
 
     Kullanim:
         storage = AdvancedSessionStorage("merkez_db/session.db")
@@ -106,7 +106,7 @@ class AdvancedSessionStorage:
                     "ON sessions(title) WHERE title IS NOT NULL"
                 )
 
-                # Mesaj geÃ§miÅŸi tablosu
+                # Mesaj geçmiÅŸi tablosu
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS session_messages (
                         id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,7 +118,7 @@ class AdvancedSessionStorage:
                     )
                 """)
 
-                # Tool call geÃ§miÅŸi tablosu
+                # Tool call geçmiÅŸi tablosu
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS session_tool_calls (
                         id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -365,7 +365,7 @@ class AdvancedSessionStorage:
         cache_write_tokens: int = 0,
         reasoning_tokens: int = 0,
     ):
-        """Token sayaÃ§larÄ±nÄ± artÄ±r (kÃ¼mÃ¼latif)."""
+        """Token sayaçlarÄ±nÄ± artÄ±r (kümülatif)."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -409,7 +409,7 @@ class AdvancedSessionStorage:
         cost_source: str = None,
         pricing_version: str = None,
     ):
-        """Maliyet bilgilerini gÃ¼ncelle."""
+        """Maliyet bilgilerini güncelle."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -446,7 +446,7 @@ class AdvancedSessionStorage:
     # â”€â”€ Sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def session_bul(self, session_id: str) -> dict:
-        """Session'Ä± id ile bul; bulunamazsa {} dÃ¶ner."""
+        """Session'Ä± id ile bul; bulunamazsa {} döner."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -708,7 +708,7 @@ class AdvancedSessionStorage:
                 conn.close()
 
     def istatistik(self) -> dict:
-        """Toplam session, token ve maliyet Ã¶zetini dÃ¶ndÃ¼r."""
+        """Toplam session, token ve maliyet özetini döndür."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -1104,7 +1104,7 @@ class AdvancedSessionStorage:
                 conn.close()
 
     def hata_ozeti_cek(self, son_n: int = 50) -> dict:
-        """Son N adÄ±mdaki hata Ã¶rÃ¼ntÃ¼lerini analiz et (FAZ 6 uyumlu)."""
+        """Son N adÄ±mdaki hata örüntülerini analiz et (FAZ 6 uyumlu)."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -1158,7 +1158,7 @@ class AdvancedSessionStorage:
         }
 
 
-# Geriye dÃ¶nÃ¼k uyumluluk aliasÄ±
+# Geriye dönük uyumluluk aliasÄ±
 SessionDB = AdvancedSessionStorage
 
 
@@ -1190,7 +1190,7 @@ if __name__ == "__main__":
 
     s = AdvancedSessionStorage(db_yolu=yol)
 
-    # Session yaÅŸam dÃ¶ngÃ¼sÃ¼
+    # Session yaÅŸam döngüsü
     sid = s.session_baslat(
         source="cli",
         model="deepseek-chat",

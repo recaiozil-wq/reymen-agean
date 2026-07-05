@@ -1,18 +1,18 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 steering_loop.py â€” ReYMeN 5 KatmanlÄ± Steering Loop (SQLite FTS5)
 
 ReYMeN Agent'in delegate_task/session_search/cron altyapÄ±sÄ±na eÅŸdeÄŸer,
-ReYMeN'in kendi 5 katmanlÄ± yÃ¶nlendirme dÃ¶ngÃ¼sÃ¼.
+ReYMeN'in kendi 5 katmanlÄ± yönlendirme döngüsü.
 
 Katmanlar:
-  1. HAFIZA   â€” SQLite+FTS5 kalÄ±cÄ± gÃ¶rev/konuÅŸma hafÄ±zasÄ±
-  2. SANDBOX  â€” Motor Ã¼zerinden gÃ¼venli araÃ§ Ã§alÄ±ÅŸtÄ±rma
-  3. TALIMAT  â€” Sistem prompt'u + araÃ§ rehberi
+  1. HAFIZA   â€” SQLite+FTS5 kalÄ±cÄ± görev/konuÅŸma hafÄ±zasÄ±
+  2. SANDBOX  â€” Motor üzerinden güvenli araç çalÄ±ÅŸtÄ±rma
+  3. TALIMAT  â€” Sistem prompt'u + araç rehberi
   4. KANCA    â€” Tekrar korumasÄ± + kural denetimi (SQLite persist)
-  5. GOZLEM   â€” LLM Ã§aÄŸrÄ± takibi + token/maliyet (SQLite persist)
+  5. GOZLEM   â€” LLM çaÄŸrÄ± takibi + token/maliyet (SQLite persist)
 
-TÃ¼m katmanlar SQLite (hafiza_genislet.py) Ã¼zerinde birleÅŸir.
+Tüm katmanlar SQLite (hafiza_genislet.py) üzerinde birleÅŸir.
 """
 
 import json
@@ -21,7 +21,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# â”€â”€ SQLite (standart kÃ¼tÃ¼phane) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ SQLite (standart kütüphane) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 import sqlite3
 import logging
 
@@ -48,9 +48,9 @@ _yazma_kilit = threading.Lock()
 
 
 class Katman1Hafiza:
-    """GÃ¶rev ve konuÅŸma hafÄ±zasÄ± â€” KalÄ±cÄ± SQLite+FTS5.
+    """Görev ve konuÅŸma hafÄ±zasÄ± â€” KalÄ±cÄ± SQLite+FTS5.
 
-    Her alt ajan adÄ±mÄ±, gÃ¶rev sonucu, kullanÄ±cÄ± mesajÄ±
+    Her alt ajan adÄ±mÄ±, görev sonucu, kullanÄ±cÄ± mesajÄ±
     FTS5 ile indexlenir. Tam metin arama.
     """
 
@@ -199,13 +199,13 @@ class Katman1Hafiza:
 
 
 class Katman4Kanca:
-    """Eylem Ã¶ncesi kural denetimi â€” SQLite persist + in-memory cache.
+    """Eylem öncesi kural denetimi â€” SQLite persist + in-memory cache.
 
     Kurallar:
     - AynÄ± eylem N kez art arda â†’ DUR
-    - YasaklÄ± araÃ§ â†’ BLOKE
+    - YasaklÄ± araç â†’ BLOKE
     - Toplam eylem limiti
-    - HÄ±zlÄ± dÃ¶ngÃ¼ korumasÄ±
+    - HÄ±zlÄ± döngü korumasÄ±
     """
 
     ENGELLENEN = frozenset({"ALT_AJAN_GOREVLENDIR", "SIL_DOSYA", "BICAKLA"})
@@ -293,7 +293,7 @@ class Katman4Kanca:
 
     def denetle(self, task_id: str, arac: str, derinlik: int = 1) -> Optional[str]:
         """Eylemi denetle. None = gecerli, str = hata."""
-        # Circuit Breaker kontrolÃ¼ â€” OPEN ise erken dÃ¶n
+        # Circuit Breaker kontrolü â€” OPEN ise erken dön
         if self._cb is not None:
             cb_mesaj = self._cb.denetle()
             if cb_mesaj:
@@ -302,7 +302,7 @@ class Katman4Kanca:
         if arac in self.ENGELLENEN:
             self._cache[task_id] = {"bloke": True, "bloke_nedeni": f"'{arac}' yasakli"}
             self._db_kaydet(task_id, self._cache[task_id])
-            return f"[KANCA] '{arac}' yasakli araÃ§ â€” task bloke."
+            return f"[KANCA] '{arac}' yasakli araç â€” task bloke."
 
         durum = self._cache.get(
             task_id,
@@ -410,9 +410,9 @@ class Katman4Kanca:
 
 
 class Katman5Gozlem:
-    """LLM Ã§aÄŸrÄ± takibi â€” SQLite + token/maliyet analizi.
+    """LLM çaÄŸrÄ± takibi â€” SQLite + token/maliyet analizi.
 
-    Her LLM Ã§aÄŸrÄ±sÄ±: task_id, sure, token, maliyet, basarili/basarisiz.
+    Her LLM çaÄŸrÄ±sÄ±: task_id, sure, token, maliyet, basarili/basarisiz.
     """
 
     TOKEN_BASINA_MALIYET = {
@@ -643,7 +643,7 @@ class SteeringLoop:
             return self.gozlem.task_ozet(task_id)
         return self.gozlem.genel_ozet()
 
-    # â”€â”€ TÃ¼m katman durumu â”€â”€
+    # â”€â”€ Tüm katman durumu â”€â”€
     def durum(self) -> dict:
         h = self.hafiza.durum()
         k = self.kanca.istatistik()

@@ -1,5 +1,5 @@
-﻿#!/usr/bin/env python3
-"""reymen_skills_to_skillmd.py â€” TÃ¼m ReYMeN skill'lerini SKILL.md formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r.
+#!/usr/bin/env python3
+"""reymen_skills_to_skillmd.py â€” Tüm ReYMeN skill'lerini SKILL.md formatÄ±na dönüÅŸtürür.
 
 YaptÄ±klarÄ±:
   1. Kategori etiketli (> **Kategori:**) dosyalara frontmatter ekler

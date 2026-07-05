@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """setup_wizard.py â€” ReYMeN first setup wizard (reymen setup).
 
 ReYMeN counterpart of ReYMeN' 'reymen setup' command.
@@ -103,7 +103,7 @@ def _kontrol_ad(ad: str, durum: bool, mesaj: str = "") -> None:
 # â”€â”€ 1. Python versiyon kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def python_kontrol() -> bool:
     """Python 3.11+ kontrolu."""
-    print(f"\n  {_c('â–¸ Python Versiyon KontrolÃ¼')}")
+    print(f"\n  {_c('â–¸ Python Versiyon Kontrolü')}")
     v = sys.version_info
     yeterli = v.major == 3 and v.minor >= 11
     if yeterli:
@@ -120,7 +120,7 @@ def python_kontrol() -> bool:
 # â”€â”€ 2. Git kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def git_kontrol() -> bool:
     """Git yuklu mu kontrol et."""
-    print(f"\n  {_c('â–¸ Git KontrolÃ¼')}")
+    print(f"\n  {_c('â–¸ Git Kontrolü')}")
     git_path = shutil.which("git")
     if git_path:
         try:
@@ -141,7 +141,7 @@ def git_kontrol() -> bool:
 # â”€â”€ 3. FFmpeg kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def ffmpeg_kontrol() -> bool:
     """FFmpeg yuklu mu."""
-    print(f"\n  {_c('â–¸ FFmpeg KontrolÃ¼')}")
+    print(f"\n  {_c('â–¸ FFmpeg Kontrolü')}")
     ffmpeg_path = shutil.which("ffmpeg")
     if ffmpeg_path:
         try:
@@ -162,7 +162,7 @@ def ffmpeg_kontrol() -> bool:
 # â”€â”€ 4. Playwright kontrolu + kurulum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def playwright_kontrol(oto_kur: bool = False) -> bool:
     """Playwright yuklu mu, gerekirse kur."""
-    print(f"\n  {_c('â–¸ Playwright KontrolÃ¼')}")
+    print(f"\n  {_c('â–¸ Playwright Kontrolü')}")
 
     # 1) Python paketi var mi?
     import importlib.util as _iu
@@ -347,7 +347,7 @@ VARSAYILAN_CONFIG = {
 
 def config_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
     """config.yaml kontrol et, yoksa olustur."""
-    print(f"\n  {_c('â–¸ config.yaml KontrolÃ¼')}")
+    print(f"\n  {_c('â–¸ config.yaml Kontrolü')}")
     config_yol = proje_kok / "config.yaml"
 
     if config_yol.exists():
@@ -478,7 +478,7 @@ def kurulum_tamamlandi_mi(proje_kok: Path) -> bool:
 # â”€â”€ 7. SOUL.md kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def soul_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
     """SOUL.md kontrol et, yoksa olustur."""
-    print(f"\n  {_c('â–¸ SOUL.md KontrolÃ¼')}")
+    print(f"\n  {_c('â–¸ SOUL.md Kontrolü')}")
     soul_yol = proje_kok / "SOUL.md"
 
     if soul_yol.exists():
@@ -529,7 +529,7 @@ def _soul_olustur(soul_yol: Path) -> None:
 # â”€â”€ 8. skills/ dizini kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def skills_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
     """skills/ dizinini kontrol et."""
-    print(f"\n  {_c('â–¸ Skills Dizini KontrolÃ¼')}")
+    print(f"\n  {_c('â–¸ Skills Dizini Kontrolü')}")
 
     skills_dizinleri = [
         proje_kok / "skills",

@@ -1,14 +1,14 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 kancalar.py â€” Katman 4: Eylem Ã–ncesi Kural Denetimi (Hook/Guard)
 
-Her eylem Ã§alÄ±ÅŸtÄ±rÄ±lmadan Ã¶nce belirlenen kurallara gÃ¶re denetlenir.
-Kural ihlali varsa eylem Ã§alÄ±ÅŸtÄ±rÄ±lmaz, hata mesajÄ± dÃ¶ner.
+Her eylem çalÄ±ÅŸtÄ±rÄ±lmadan önce belirlenen kurallara göre denetlenir.
+Kural ihlali varsa eylem çalÄ±ÅŸtÄ±rÄ±lmaz, hata mesajÄ± döner.
 
 Desteklenen kural tipleri:
     - AynÄ± eylem N kere art arda â†’ dur
-    - YasaklÄ± araÃ§ Ã§aÄŸrÄ±sÄ±
-    - AÅŸÄ±rÄ± hÄ±zlÄ± dÃ¶ngÃ¼ (rate limit)
+    - YasaklÄ± araç çaÄŸrÄ±sÄ±
+    - AÅŸÄ±rÄ± hÄ±zlÄ± döngü (rate limit)
     - Task baÅŸÄ±na maksimum eylem sayÄ±sÄ±
     - Derinlik sÄ±nÄ±rÄ± ihlali
 
@@ -16,9 +16,9 @@ KullanÄ±m:
     from kancalar import kanca_motoru
     hata = kanca_motoru.denetle(task_id, "KOMUT_CALISTIR")
     if hata:
-        # Eylem Ã§alÄ±ÅŸtÄ±rÄ±lmaz
+        # Eylem çalÄ±ÅŸtÄ±rÄ±lmaz
     else:
-        # Eylem Ã§alÄ±ÅŸtÄ±rÄ±lÄ±r
+        # Eylem çalÄ±ÅŸtÄ±rÄ±lÄ±r
 """
 
 import os
@@ -33,7 +33,7 @@ from typing import Optional
 
 # â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-VARSAYILAN_MAKS_ART_ARDA = 4  # AynÄ± eylem kaÃ§ kez Ã¼st Ã¼ste?
+VARSAYILAN_MAKS_ART_ARDA = 4  # AynÄ± eylem kaç kez üst üste?
 VARSAYILAN_MAKS_EYLEM = 30  # Task baÅŸÄ±na toplam eylem limiti
 VARSAYILAN_MIN_ARALIK = 0.5  # Ä°ki eylem arasÄ± minimum saniye
 DANGLING_DERINLIK_UYARISI = 3  # Derinlik > 3 ise 3'ten sonraki her adÄ±m uyarÄ±r
@@ -41,7 +41,7 @@ ENGELLENEN_ARACLAR = frozenset(
     {
         "ALT_AJAN_GOREVLENDIR",  # Zincir korumasÄ±
         "SIL_DOSYA",
-        "BICAKLA",  # Tehlikeli araÃ§lar
+        "BICAKLA",  # Tehlikeli araçlar
     }
 )
 
@@ -89,8 +89,8 @@ def audit_kaydet(
     """Bir eylemi audit log'a kaydeder.
 
     Args:
-        eylem: GerÃ§ekleÅŸtirilen eylem adÄ± (Ã¶rn. \"KOMUT_CALISTIR\").
-        kullanici: Eylemi baÅŸlatan kullanÄ±cÄ±/gÃ¶rev ID'si (varsayÄ±lan: 'system').
+        eylem: GerçekleÅŸtirilen eylem adÄ± (örn. \"KOMUT_CALISTIR\").
+        kullanici: Eylemi baÅŸlatan kullanÄ±cÄ±/görev ID'si (varsayÄ±lan: 'system').
         hedef: Eylemin hedefi (varsayÄ±lan: '').
         durum: Eylem durumu (varsayÄ±lan: 'pending').
 
@@ -129,7 +129,7 @@ class TaskKancaDurumu:
 
 
 class KancaMotoru:
-    """Eylem Ã¶ncesi kural denetimi yapar.
+    """Eylem öncesi kural denetimi yapar.
 
     Thread-safe: defaultdict + lock ile farklÄ± task'lar birbirini etkilemez.
     """
@@ -147,24 +147,24 @@ class KancaMotoru:
         maks_eylem: int = VARSAYILAN_MAKS_EYLEM,
         min_aralik: float = VARSAYILAN_MIN_ARALIK,
     ) -> Optional[str]:
-        """Bir eylemi kural denetiminden geÃ§irir.
+        """Bir eylemi kural denetiminden geçirir.
 
         Args:
             task_id: Alt ajan task ID'si
-            arac: Ã‡alÄ±ÅŸtÄ±rÄ±lacak araÃ§ adÄ± (Ã¶rn. "KOMUT_CALISTIR")
+            arac: Ã‡alÄ±ÅŸtÄ±rÄ±lacak araç adÄ± (örn. "KOMUT_CALISTIR")
             derinlik: Alt ajan derinliÄŸi (1 = ana ajan, 2+ = alt ajan)
-            maks_art_arda: Ãœst Ã¼ste aynÄ± eylem limiti
+            maks_art_arda: Ãœst üste aynÄ± eylem limiti
             maks_eylem: Task baÅŸÄ±na toplam eylem limiti
-            min_aralik: Ä°ki eylem arasÄ± minimum sÃ¼re (saniye)
+            min_aralik: Ä°ki eylem arasÄ± minimum süre (saniye)
 
         Returns:
-            None = kural ihlali yok (eylem Ã§alÄ±ÅŸtÄ±rÄ±labilir)
-            str = kural ihlali mesajÄ± (eylem Ã§alÄ±ÅŸtÄ±rÄ±lmaz)
+            None = kural ihlali yok (eylem çalÄ±ÅŸtÄ±rÄ±labilir)
+            str = kural ihlali mesajÄ± (eylem çalÄ±ÅŸtÄ±rÄ±lmaz)
         """
         with self._kilit:
             durum = self._durum[task_id]
 
-            # Audit log â€” her eylem Ã¶ncesi kayÄ±t
+            # Audit log â€” her eylem öncesi kayÄ±t
             audit_kaydet(
                 eylem=arac,
                 kullanici=task_id,
@@ -172,14 +172,14 @@ class KancaMotoru:
                 durum="denetleniyor",
             )
 
-            # Bloke kontrolÃ¼
+            # Bloke kontrolü
             if durum.bloke:
                 return f"[KANCA] Task {task_id} bloke: {durum.bloke_nedeni}"
 
-            # YasaklÄ± araÃ§ kontrolÃ¼
+            # YasaklÄ± araç kontrolü
             if arac in ENGELLENEN_ARACLAR:
                 durum.bloke = True
-                durum.bloke_nedeni = f"'{arac}' yasaklÄ± araÃ§"
+                durum.bloke_nedeni = f"'{arac}' yasaklÄ± araç"
                 return f"[KANCA] '{arac}' yasaklÄ±. Task bloke edildi."
 
             # Derinlik uyarÄ±sÄ±
@@ -189,15 +189,15 @@ class KancaMotoru:
                     f"Ã‡ok derin alt ajan zinciri â€” GOREV_BITTI ile sonlandÄ±r."
                 )
 
-            # AynÄ± eylem art arda kontrolÃ¼
+            # AynÄ± eylem art arda kontrolü
             if arac == durum.son_eylem:
                 durum.art_arda_sayac += 1
                 if durum.art_arda_sayac >= maks_art_arda:
                     durum.bloke = True
                     durum.bloke_nedeni = f"'{arac}' {maks_art_arda}kere art arda"
                     return (
-                        f"[KANCA] '{arac}' {maks_art_arda} kere art arda Ã§aÄŸrÄ±ldÄ±. "
-                        f"Muhtemel dÃ¶ngÃ¼ â€” task bloke edildi."
+                        f"[KANCA] '{arac}' {maks_art_arda} kere art arda çaÄŸrÄ±ldÄ±. "
+                        f"Muhtemel döngü â€” task bloke edildi."
                     )
             else:
                 durum.art_arda_sayac = 1
@@ -213,7 +213,7 @@ class KancaMotoru:
                     f"Task bloke edildi."
                 )
 
-            # HÄ±zlÄ± dÃ¶ngÃ¼ kontrolÃ¼
+            # HÄ±zlÄ± döngü kontrolü
             simdi = time.time()
             if durum.son_ts > 0 and (simdi - durum.son_ts) < min_aralik:
                 return (
@@ -233,7 +233,7 @@ class KancaMotoru:
             return False
 
     def task_durum(self, task_id: str) -> dict:
-        """Bir task'Ä±n kanca durumunu dÃ¶ndÃ¼rÃ¼r."""
+        """Bir task'Ä±n kanca durumunu döndürür."""
         with self._kilit:
             d = self._durum.get(task_id)
             if d:
@@ -252,7 +252,7 @@ class KancaMotoru:
             self._durum.pop(task_id, None)
 
     def istatistik(self) -> dict:
-        """TÃ¼m aktif task'larÄ±n kanca istatistikleri."""
+        """Tüm aktif task'larÄ±n kanca istatistikleri."""
         with self._kilit:
             toplam = len(self._durum)
             blokeli = sum(1 for d in self._durum.values() if d.bloke)
@@ -279,12 +279,12 @@ if __name__ == "__main__":
     assert "bloke" in hata.lower(), "Bloke mesaji icermeli"
     print(f"[OK] Art arda ayni eylem blokesi: {hata[:50]}...")
 
-    # Test 3: YasaklÄ± araÃ§
+    # Test 3: YasaklÄ± araç
     hata = kanca_motoru.denetle("test_003", "ALT_AJAN_GOREVLENDIR")
     assert hata is not None, "Yasakli arac bloke etmeli"
     print(f"[OK] Yasakli arac blokesi: {hata[:50]}...")
 
-    # Test 4: Bloke Ã§Ã¶zme
+    # Test 4: Bloke çözme
     assert kanca_motoru.bloke_coz("test_002"), "Bloke cozulebilmeli"
     durum = kanca_motoru.task_durum("test_002")
     assert not durum["bloke"], "Cozum sonrasi bloke=False olmali"

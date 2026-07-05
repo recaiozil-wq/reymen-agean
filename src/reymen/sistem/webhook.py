@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ReYMeN_cli/webhook.py â€” Webhook CLI.
 
 List, add, remove, test, log islemleri.

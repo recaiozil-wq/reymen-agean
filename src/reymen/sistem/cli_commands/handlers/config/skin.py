@@ -1,4 +1,4 @@
-﻿"""_handle_skin_command handler."""
+"""_handle_skin_command handler."""
 
 from reymen.sistem.ReYMeN_constants import display_reymen_home
 from reymen.sistem.cli_stream import save_config_value

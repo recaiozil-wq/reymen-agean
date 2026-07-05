@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.browser_tool shim â€” ReYMeN browser fonksiyonlarÄ±nÄ± ReYMeN browser_engine'e yÃ¶nlendirir."""
+"""ReYMeN tools.browser_tool shim â€” ReYMeN browser fonksiyonlarÄ±nÄ± ReYMeN browser_engine'e yönlendirir."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def _emergency_cleanup_all_sessions() -> None:
-    """ReYMeN browser acil kapatma â€” ReYMeN browser_engine'e yÃ¶nlendirir."""
+    """ReYMeN browser acil kapatma â€” ReYMeN browser_engine'e yönlendirir."""
     try:
         from reymen.arac.browser_engine import BrowserEngine
 
@@ -21,7 +21,7 @@ def _emergency_cleanup_all_sessions() -> None:
 
 
 def cleanup_all_browsers() -> None:
-    """TÃ¼m browser session'larÄ±nÄ± temizler."""
+    """Tüm browser session'larÄ±nÄ± temizler."""
     _emergency_cleanup_all_sessions()
 
 
@@ -41,7 +41,7 @@ def _ensure_cdp_supervisor(*args, **kwargs) -> None:
 
 
 def _get_browser_engine() -> Any:
-    """ReYMeN browser engine referansÄ± â€” ReYMeN BrowserEngine dÃ¶ndÃ¼rÃ¼r."""
+    """ReYMeN browser engine referansÄ± â€” ReYMeN BrowserEngine döndürür."""
     try:
         from reymen.arac.browser_engine import BrowserEngine
 
@@ -62,7 +62,7 @@ def _get_cloud_provider() -> Optional[str]:
 
 
 def browser_navigate(url: str) -> str:
-    """ReYMeN browser_navigate â€” ReYMeN browser_engine'e yÃ¶nlendirir."""
+    """ReYMeN browser_navigate â€” ReYMeN browser_engine'e yönlendirir."""
     import json
 
     try:

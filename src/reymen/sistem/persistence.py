@@ -1,12 +1,12 @@
-﻿# -*- coding: utf-8 -*-
-"""persistence.py â€” GÃ¼venlik KalÄ±cÄ±lÄ±k KatmanÄ±.
+# -*- coding: utf-8 -*-
+"""persistence.py â€” Güvenlik KalÄ±cÄ±lÄ±k KatmanÄ±.
 
-GÃ¼venlik olaylarÄ±nÄ±, tehdit loglarÄ±nÄ± ve denetim izlerini
-kalÄ±cÄ± olarak saklar. ÅÃ¼pheli etkinlik geÃ§miÅŸine dayalÄ±
+Güvenlik olaylarÄ±nÄ±, tehdit loglarÄ±nÄ± ve denetim izlerini
+kalÄ±cÄ± olarak saklar. Åüpheli etkinlik geçmiÅŸine dayalÄ±
 risk profili oluÅŸturur.
 
 BileÅŸenler:
-  - GÃ¼venlikOlayÄ±: Tek bir gÃ¼venlik kaydÄ±
+  - GüvenlikOlayÄ±: Tek bir güvenlik kaydÄ±
   - KalÄ±cÄ±lÄ±kDeposuu: JSON tabanlÄ± olay deposu
   - RiskProfili: Kaynak baÅŸÄ±na risk skoru
   - AuditTrail: DeÄŸiÅŸmez denetim izi (append-only)
@@ -33,7 +33,7 @@ DEPO_KOKU.mkdir(parents=True, exist_ok=True)
 
 
 class GuvenlikOlayi:
-    """Tek bir gÃ¼venlik olayÄ± kaydÄ±."""
+    """Tek bir güvenlik olayÄ± kaydÄ±."""
 
     SEVIYE_BILGI = "INFO"
     SEVIYE_UYARI = "WARN"
@@ -85,7 +85,7 @@ class GuvenlikOlayi:
 
 
 class KalicilikDeposu:
-    """JSONL tabanlÄ± gÃ¼venlik olayÄ± deposu."""
+    """JSONL tabanlÄ± güvenlik olayÄ± deposu."""
 
     def __init__(self, dosya: Path = OLAY_DOSYASI):
         self._dosya = dosya
@@ -134,7 +134,7 @@ class KalicilikDeposu:
         return olaylar[-son_n:]
 
     def temizle(self, gun: int = 30):
-        """30 gÃ¼nden eski olaylarÄ± sil."""
+        """30 günden eski olaylarÄ± sil."""
         esik = time.time() - (gun * 86400)
         if not self._dosya.exists():
             return 0
@@ -192,7 +192,7 @@ class RiskProfili:
         )
 
     def guncelle(self, kaynak: str, olay_seviyesi: str):
-        """KaynaÄŸÄ±n risk skorunu olay ÅŸiddetine gÃ¶re artÄ±r."""
+        """KaynaÄŸÄ±n risk skorunu olay ÅŸiddetine göre artÄ±r."""
         puan_map = {"INFO": 1, "WARN": 5, "THREAT": 20, "CRITICAL": 50}
         puan = puan_map.get(olay_seviyesi, 1)
 
@@ -280,11 +280,11 @@ class AuditTrail:
         return kayitlar[-son_n:]
 
 
-# â”€â”€ BirleÅŸik ArayÃ¼z â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ BirleÅŸik Arayüz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class GuvenlikKalicilik:
-    """TÃ¼m kalÄ±cÄ±lÄ±k bileÅŸenlerini yÃ¶neten tek sÄ±nÄ±f."""
+    """Tüm kalÄ±cÄ±lÄ±k bileÅŸenlerini yöneten tek sÄ±nÄ±f."""
 
     def __init__(self):
         self.depo = KalicilikDeposu()
@@ -299,7 +299,7 @@ class GuvenlikKalicilik:
         kaynak: str = "",
         detay: dict = None,
     ) -> GuvenlikOlayi:
-        """GÃ¼venlik olayÄ± kaydet, risk profilini gÃ¼ncelle, denetim izine yaz."""
+        """Güvenlik olayÄ± kaydet, risk profilini güncelle, denetim izine yaz."""
         olay = GuvenlikOlayi(kategori, aciklama, seviye, kaynak, detay)
         self.depo.kaydet(olay)
         if kaynak:
@@ -326,11 +326,11 @@ class GuvenlikKalicilik:
         ist = self.depo.istatistik()
         riskli = self.profil.yuksek_riskli(esik=50)
         satirlar = [
-            f"GÃ¼venlik Deposu: {ist['toplam']} olay",
+            f"Güvenlik Deposu: {ist['toplam']} olay",
             f"  Seviyeler: {ist['seviyeler']}",
         ]
         if riskli:
-            satirlar.append(f"YÃ¼ksek Riskli Kaynaklar ({len(riskli)}):")
+            satirlar.append(f"Yüksek Riskli Kaynaklar ({len(riskli)}):")
             for k, s in riskli[:5]:
                 satirlar.append(f"  {k}: {s}")
         return "\n".join(satirlar)
@@ -349,19 +349,19 @@ def guvenlik_kalicilik() -> GuvenlikKalicilik:
 
 
 def motor_kaydet(motor):
-    """GÃ¼venlik kalÄ±cÄ±lÄ±k araÃ§larÄ±nÄ± motora kaydet."""
+    """Güvenlik kalÄ±cÄ±lÄ±k araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     gk = guvenlik_kalicilik()
     motor._plugin_arac_kaydet(
         "GUVENLIK_OZET",
         lambda: gk.ozet(),
-        "GÃ¼venlik olay deposu Ã¶zetini gÃ¶ster",
+        "Güvenlik olay deposu özetini göster",
     )
     motor._plugin_arac_kaydet(
         "GUVENLIK_RISKLI",
         lambda esik=50: gk.profil.rapor(),
-        "YÃ¼ksek riskli kaynaklarÄ± listele",
+        "Yüksek riskli kaynaklarÄ± listele",
     )
 
 
@@ -369,7 +369,7 @@ if __name__ == "__main__":
     gk = GuvenlikKalicilik()
     gk.olay_kaydet("test", "BaÅŸlatma testi", "INFO", kaynak="persistence.py")
     gk.tehdit_kaydet(
-        "prompt_injection", "ÅÃ¼pheli girdi tespit edildi", kaynak="kullanici_1"
+        "prompt_injection", "Åüpheli girdi tespit edildi", kaynak="kullanici_1"
     )
     print(gk.ozet())
     print("\nDenetim Ä°zi (son 5):")

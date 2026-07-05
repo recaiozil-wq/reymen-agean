@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 oz_tutarlilik.py â€” Self-Consistency + LLM-as-Judge (Wang et al. 2022).
 

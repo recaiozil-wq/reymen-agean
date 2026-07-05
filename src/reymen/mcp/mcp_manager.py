@@ -1,13 +1,13 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-reymen/mcp/mcp_manager.py â€” MCP (Model Context Protocol) YÃ¶neticisi.
+reymen/mcp/mcp_manager.py â€” MCP (Model Context Protocol) Yöneticisi.
 
-ReYMeN iÃ§in built-in native MCP istemci.
-MCP sunucularÄ±na baÄŸlanÄ±r, tool'larÄ± keÅŸfeder ve Ã§aÄŸÄ±rÄ±r.
+ReYMeN için built-in native MCP istemci.
+MCP sunucularÄ±na baÄŸlanÄ±r, tool'larÄ± keÅŸfeder ve çaÄŸÄ±rÄ±r.
 Singleton: mcp_manager() ile eriÅŸilir.
 
 Desteklenen transportlar:
-  - stdio: alt sÃ¼reÃ§ (subprocess)
+  - stdio: alt süreç (subprocess)
   - http:  HTTP POST (JSON-RPC)
   - tcp:   TCP socket (JSON-RPC)
 """
@@ -56,7 +56,7 @@ class _StdioTransport:
 
     @staticmethod
     def _coz_komut(komut: list[str]) -> list[str]:
-        """Windows: npx gibi script'leri .cmd/.exe yoluna Ã§Ã¶z."""
+        """Windows: npx gibi script'leri .cmd/.exe yoluna çöz."""
         if os.name == "nt" and komut:
             ilk = komut[0]
             tam = shutil.which(ilk)
@@ -160,7 +160,7 @@ class MCPServerBaglantisi:
         return self._baglandi
 
     async def tools_kesfet(self) -> int:
-        """tools/list Ã§aÄŸÄ±r, tool'larÄ± keÅŸfet."""
+        """tools/list çaÄŸÄ±r, tool'larÄ± keÅŸfet."""
         istek = {"jsonrpc": "2.0", "id": 1, "method": "tools/list"}
         sonuc = await self._gonder(istek)
         if "error" in sonuc:
@@ -171,7 +171,7 @@ class MCPServerBaglantisi:
         return len(self._tools)
 
     async def tool_cagir(self, tool: str, args: Optional[dict] = None) -> dict:
-        """tools/call Ã§aÄŸÄ±r."""
+        """tools/call çaÄŸÄ±r."""
         istek = {
             "jsonrpc": "2.0",
             "id": 2,
@@ -193,7 +193,7 @@ class MCPServerBaglantisi:
         return {"durum": "basarili", "icerik": metin}
 
     def tool_listesi(self) -> list[dict]:
-        """KeÅŸfedilen tool'larÄ± dÃ¶ndÃ¼r."""
+        """KeÅŸfedilen tool'larÄ± döndür."""
         return [
             {
                 "sunucu": self.ad,
@@ -205,17 +205,17 @@ class MCPServerBaglantisi:
         ]
 
     async def _gonder(self, istek: dict) -> dict:
-        """Transport'a gÃ¶re isteÄŸi yÃ¶nlendir."""
+        """Transport'a göre isteÄŸi yönlendir."""
         t = self.transport
         if t == "stdio":
             komut = self.cfg.get("command")
             if not komut:
-                return {"error": {"message": "stdio iÃ§in 'command' gerekli"}}
+                return {"error": {"message": "stdio için 'command' gerekli"}}
             return await _StdioTransport.cagir(komut, istek)
         elif t == "http":
             url = self.cfg.get("url")
             if not url:
-                return {"error": {"message": "http iÃ§in 'url' gerekli"}}
+                return {"error": {"message": "http için 'url' gerekli"}}
             return await _HttpTransport.cagir(url, istek)
         else:  # tcp
             host = self.cfg.get("host", "127.0.0.1")
@@ -224,12 +224,12 @@ class MCPServerBaglantisi:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# MCP YÃ¶neticisi (Singleton)
+# MCP Yöneticisi (Singleton)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class MCPManager:
-    """TÃ¼m MCP sunucularÄ±nÄ± yÃ¶netir. Singleton."""
+    """Tüm MCP sunucularÄ±nÄ± yönetir. Singleton."""
 
     def __init__(self):
         self._sunucular: dict[str, MCPServerBaglantisi] = {}
@@ -247,18 +247,18 @@ class MCPManager:
                         return cfg.get("servers", {})
                     else:
                         if not YAML_OK:
-                            logger.warning("PyYAML yok, %s yÃ¼klenemedi", yol)
+                            logger.warning("PyYAML yok, %s yüklenemedi", yol)
                             continue
                         with open(yol) as f:
                             cfg = yaml.safe_load(f) or {}
                         return cfg.get("mcp_servers", {})
                 except Exception as e:
-                    logger.debug("Config yÃ¼kleme hatasÄ± %s: %s", yol, e)
+                    logger.debug("Config yükleme hatasÄ± %s: %s", yol, e)
         logger.info("MCP: config dosyasÄ± bulunamadÄ±")
         return {}
 
     async def baslat(self) -> int:
-        """TÃ¼m MCP sunucularÄ±nÄ± baÅŸlat, tool'larÄ± keÅŸfet.
+        """Tüm MCP sunucularÄ±nÄ± baÅŸlat, tool'larÄ± keÅŸfet.
 
         Returns:
             Toplam keÅŸfedilen tool sayÄ±sÄ±.
@@ -296,7 +296,7 @@ class MCPManager:
         return toplam
 
     async def cagir(self, sunucu: str, arac: str, args: Optional[dict] = None) -> dict:
-        """Bir MCP sunucusunda tool Ã§aÄŸÄ±r.
+        """Bir MCP sunucusunda tool çaÄŸÄ±r.
 
         Args:
             sunucu: Sunucu adÄ±
@@ -320,18 +320,18 @@ class MCPManager:
         return await baglanti.tool_cagir(arac, args)
 
     def tum_araclari_getir(self) -> list[dict]:
-        """TÃ¼m sunuculardaki tool'larÄ± dÃ¶ndÃ¼r."""
+        """Tüm sunuculardaki tool'larÄ± döndür."""
         tools = []
         for baglanti in self._sunucular.values():
             tools.extend(baglanti.tool_listesi())
         return tools
 
     def sunucu_listesi(self) -> list[str]:
-        """KayÄ±tlÄ± sunucu adlarÄ±nÄ± dÃ¶ndÃ¼r."""
+        """KayÄ±tlÄ± sunucu adlarÄ±nÄ± döndür."""
         return list(self._sunucular.keys())
 
     def ekle(self, ad: str, cfg: dict) -> MCPServerBaglantisi:
-        """Elle MCP sunucusu ekle (Ã§alÄ±ÅŸma zamanÄ±nda)."""
+        """Elle MCP sunucusu ekle (çalÄ±ÅŸma zamanÄ±nda)."""
         cfg.setdefault("transport", "stdio")
         baglanti = MCPServerBaglantisi(ad, cfg)
         self._sunucular[ad] = baglanti

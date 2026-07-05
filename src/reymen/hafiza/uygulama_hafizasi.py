@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-uygulama_hafizasi.py â€” Her uygulama iÃ§in ayrÄ± kalÄ±cÄ± hafÄ±za.
-"Photoshop'ta yeni proje ÅŸÃ¶yle aÃ§Ä±lÄ±r", "X uygulamasÄ±nda kaydet ÅŸurada"
-gibi uygulamaya Ã¶zel iÅŸlem bilgilerini saklar ve geri Ã§aÄŸÄ±rÄ±r.
+uygulama_hafizasi.py â€” Her uygulama için ayrÄ± kalÄ±cÄ± hafÄ±za.
+"Photoshop'ta yeni proje ÅŸöyle açÄ±lÄ±r", "X uygulamasÄ±nda kaydet ÅŸurada"
+gibi uygulamaya özel iÅŸlem bilgilerini saklar ve geri çaÄŸÄ±rÄ±r.
 
 YapÄ±: .ReYMeN/uygulama_hafizasi/<uygulama_adi>.json
 Her uygulamanÄ±n: islemler (ad -> adÄ±mlar), makrolar (ad -> makro dosyasÄ±), notlar.
@@ -38,7 +38,7 @@ class UygulamaHafizasi:
         veri = self._yukle(uygulama)
         veri["islemler"][islem_adi] = adimlar
         self._kaydet(uygulama, veri)
-        return f"[UygHafÄ±za]: '{uygulama}' iÃ§in '{islem_adi}' kaydedildi."
+        return f"[UygHafÄ±za]: '{uygulama}' için '{islem_adi}' kaydedildi."
 
     def islem_cagir(self, uygulama, islem_adi):
         """KayÄ±tlÄ± iÅŸlemin adÄ±mlarÄ±nÄ± geri getirir."""
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         h.islem_kaydet(
             "TinyTask",
             "yeni proje",
-            ["File menÃ¼sÃ¼ aÃ§", "Record'a bas", "iÅŸlemi yap", "Save"],
+            ["File menüsü aç", "Record'a bas", "iÅŸlemi yap", "Save"],
         )
     )
     print(h.islem_cagir("TinyTask", "yeni proje"))

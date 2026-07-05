@@ -1,4 +1,4 @@
-﻿"""config parser."""
+"""config parser."""
 
 from __future__ import annotations
 import argparse

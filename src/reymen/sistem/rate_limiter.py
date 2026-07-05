@@ -1,17 +1,17 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-rate_limiter.py â€” Provider basÄ±na rate limiting ve token bÃ¼tÃ§e yÃ¶netimi.
+rate_limiter.py â€” Provider basÄ±na rate limiting ve token bütçe yönetimi.
 
 Ã–zellikler:
   - Sliding-window rate limiter (istekler / dakika)
   - Token sayacÄ± (tahmini): kelime * 1.3
-  - GÃ¼nlÃ¼k / oturum token bÃ¼tÃ§esi (TOKEN_BUDGET_DAILY)
+  - Günlük / oturum token bütçesi (TOKEN_BUDGET_DAILY)
   - Otomatik bekleme + retry (RATE_LIMIT_RETRY=true)
   - provider_transport.py ile entegre olur (sarmalayÄ±cÄ±)
 
 .env:
   RATE_LIMIT_RPM=60          # istekler / dakika (varsayÄ±lan 60)
-  TOKEN_BUDGET_DAILY=500000  # gÃ¼nlÃ¼k token sÄ±nÄ±rÄ± (0 = sÄ±nÄ±rsÄ±z)
+  TOKEN_BUDGET_DAILY=500000  # günlük token sÄ±nÄ±rÄ± (0 = sÄ±nÄ±rsÄ±z)
   RATE_LIMIT_RETRY=true      # limit aÅŸÄ±lÄ±nca bekle
 """
 
@@ -112,8 +112,8 @@ class RateLimiter:
 
 class TokenBudget:
     """
-    GÃ¼nlÃ¼k token bÃ¼tÃ§esi. Tahmini sayÄ±m: kelime * 1.3.
-    GÃ¼n degisince otomatik sifirlanir.
+    Günlük token bütçesi. Tahmini sayÄ±m: kelime * 1.3.
+    Gün degisince otomatik sifirlanir.
     """
 
     def __init__(self, gunluk_sinir: int = None):
@@ -208,15 +208,15 @@ class RateLimitedProvider:
     def uret(self, sistem: str, mesajlar: list, **kwargs) -> str:
         provider_adi = getattr(self._provider, "_aktif_provider", "default")
 
-        # Token bÃ¼tÃ§e kontrolÃ¼
+        # Token bütçe kontrolü
         if self.token_budget.sinir_asildimi():
             kalan = self.token_budget.kalan()
             raise RuntimeError(
-                f"[TokenBudget] GÃ¼nlÃ¼k token limiti asildi "
+                f"[TokenBudget] Günlük token limiti asildi "
                 f"({self.token_budget.sinir:,}). Kalan: {kalan}"
             )
 
-        # Rate limit kontrolÃ¼ (bekleme dahil)
+        # Rate limit kontrolü (bekleme dahil)
         self.rate_limiter.bekle_ve_kaydet(provider_adi)
 
         # Asil cagri

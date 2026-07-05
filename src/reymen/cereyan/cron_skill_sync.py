@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 cron_skill_sync.py â€” Skills â†’ OnceHafiza DB senkronizasyonu.
 Her 6 saatte bir calisir (cron job).

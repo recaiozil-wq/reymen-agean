@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module."""
+"""ReYMeNCLI mixin module."""
 
 import logging
 import os
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinDisplay:
-    """ReYMeNCLI UI/ekran/Ã§Ä±ktÄ± formatlama metotlarÄ±."""
+    """ReYMeNCLI UI/ekran/çÄ±ktÄ± formatlama metotlarÄ±."""
 
     def _invalidate(self, min_interval: float = 0.25) -> None:
         """Throttled UI repaint â€” prevents terminal blinking on slow/SSH connections."""

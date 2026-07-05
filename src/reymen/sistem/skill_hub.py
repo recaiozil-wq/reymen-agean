@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 skill_hub.py â€” ReYMeN Skill Hub. Ice/disa aktarma, yedekleme.
 """

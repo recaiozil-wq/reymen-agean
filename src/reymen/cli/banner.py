@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Stub: banner.py â€” CLI karsilama mesaji. Henuz tam tasinmadi."""
 
 

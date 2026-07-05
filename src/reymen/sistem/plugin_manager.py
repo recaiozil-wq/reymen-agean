@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 plugin_manager.py â€” ReYMeN Plugin Yonetim Sistemi (ReYMeN-seviyesi).
 
@@ -748,7 +748,7 @@ class PluginYoneticisi:
         """Plugin'i .reyplugin paketine dÄ±ÅŸa aktar.
 
         Args:
-            ad: Plugin klasÃ¶r adÄ±.
+            ad: Plugin klasör adÄ±.
             cikti_yol: Ã‡Ä±ktÄ± dosya yolu (None = {ad}.reyplugin).
 
         Returns:
@@ -786,7 +786,7 @@ class PluginYoneticisi:
         return f"[OK] '{ad}' -> {cikti_yol} ({len(metadata['dosyalar'])} dosya)"
 
     def import_plugin(self, kaynak: str) -> str:
-        """.reyplugin paketini iÃ§e aktar.
+        """.reyplugin paketini içe aktar.
 
         Args:
             kaynak: .reyplugin dosya yolu.
@@ -812,7 +812,7 @@ class PluginYoneticisi:
                 metadata = json.loads(zf.read("metadata.json"))
                 plugin_adi = metadata.get("plugin_adi", dosya.stem)
 
-                # Hedef klasÃ¶r
+                # Hedef klasör
                 hedef = self._dizin / plugin_adi
                 if hedef.exists():
                     return f"[HATA] '{plugin_adi}' zaten mevcut. Once silin veya farkli bir isim verin."
@@ -824,7 +824,7 @@ class PluginYoneticisi:
                         continue
                     zf.extract(uye, self._dizin)
 
-            # Cache'i temizle (yeniden yÃ¼kleme iÃ§in)
+            # Cache'i temizle (yeniden yükleme için)
             yl = self.yukleyici
             if yl and plugin_adi in yl._yaml_bilgisi:
                 del yl._yaml_bilgisi[plugin_adi]

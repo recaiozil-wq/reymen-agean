@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.kanban_tools shim â€” ReYMeN Kanban araÃ§larÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.kanban_tools shim â€” ReYMeN Kanban araçlarÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

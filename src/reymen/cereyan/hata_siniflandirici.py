@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
-"""API hata sÄ±nÄ±flandÄ±rmasÄ± â€” akÄ±llÄ± failover ve recovery iÃ§in.
+# -*- coding: utf-8 -*-
+"""API hata sÄ±nÄ±flandÄ±rmasÄ± â€” akÄ±llÄ± failover ve recovery için.
 
-ReYMeN agent'Ä±n error_classifier.py'sinden ReYMeN iÃ§in adapte edilmiÅŸtir.
-TÃ¼m API hatalarÄ±nÄ± yapÄ±sal FailoverReason enum deÄŸerleriyle sÄ±nÄ±flandÄ±rÄ±r;
-retry loop doÄŸrudan bu deÄŸerlere gÃ¶re karar verir.
+ReYMeN agent'Ä±n error_classifier.py'sinden ReYMeN için adapte edilmiÅŸtir.
+Tüm API hatalarÄ±nÄ± yapÄ±sal FailoverReason enum deÄŸerleriyle sÄ±nÄ±flandÄ±rÄ±r;
+retry loop doÄŸrudan bu deÄŸerlere göre karar verir.
 """
 
 from __future__ import annotations
@@ -24,15 +24,15 @@ log = logging.getLogger("conversation_loop")
 
 
 class FailoverNedeni(enum.Enum):
-    """API Ã§aÄŸrÄ±sÄ±nÄ±n neden baÅŸarÄ±sÄ±z olduÄŸu â€” recovery stratejisini belirler."""
+    """API çaÄŸrÄ±sÄ±nÄ±n neden baÅŸarÄ±sÄ±z olduÄŸu â€” recovery stratejisini belirler."""
 
     # Kimlik doÄŸrulama / yetkilendirme
-    auth = "auth"  # GeÃ§ici auth (401/403) â€” yenile/dÃ¶ndÃ¼r
+    auth = "auth"  # Geçici auth (401/403) â€” yenile/döndür
     auth_kalici = "auth_kalici"  # Yenileme sonrasÄ± da auth hatasÄ± â€” durdur
 
     # Faturalama / kota
-    faturalama = "faturalama"  # 402 veya kredi bitti â€” hemen dÃ¶ndÃ¼r
-    rate_limit = "rate_limit"  # 429 veya kota aÅŸÄ±mÄ± â€” bekle + dÃ¶ndÃ¼r
+    faturalama = "faturalama"  # 402 veya kredi bitti â€” hemen döndür
+    rate_limit = "rate_limit"  # 429 veya kota aÅŸÄ±mÄ± â€” bekle + döndür
 
     # Sunucu tarafÄ±
     asiri_yuklu = "asiri_yuklu"  # 503/529 â€” backoff
@@ -42,24 +42,24 @@ class FailoverNedeni(enum.Enum):
     zaman_asimi = "zaman_asimi"  # BaÄŸlantÄ±/okuma timeout â€” istemci yeniden kur
 
     # Context / payload
-    context_tasma = "context_tasma"  # Context Ã§ok bÃ¼yÃ¼k â€” sÄ±kÄ±ÅŸtÄ±r, failover deÄŸil
+    context_tasma = "context_tasma"  # Context çok büyük â€” sÄ±kÄ±ÅŸtÄ±r, failover deÄŸil
     payload_cok_buyuk = "payload_cok_buyuk"  # 413 â€” sÄ±kÄ±ÅŸtÄ±r
     gorsel_cok_buyuk = (
-        "gorsel_cok_buyuk"  # GÃ¶rselin sÄ±nÄ±rÄ± aÅŸtÄ± â€” kÃ¼Ã§Ã¼lt + yeniden dene
+        "gorsel_cok_buyuk"  # Görselin sÄ±nÄ±rÄ± aÅŸtÄ± â€” küçült + yeniden dene
     )
 
     # Model / provider politikasÄ±
-    model_bulunamadi = "model_bulunamadi"  # 404 veya geÃ§ersiz model â€” fallback
-    provider_politika_blok = "provider_politika_blok"  # AggregatÃ¶r bloklarÄ±
+    model_bulunamadi = "model_bulunamadi"  # 404 veya geçersiz model â€” fallback
+    provider_politika_blok = "provider_politika_blok"  # Aggregatör bloklarÄ±
     icerik_politika_blok = (
-        "icerik_politika_blok"  # GÃ¼venlik filtresi â€” tekrar deneme yok
+        "icerik_politika_blok"  # Güvenlik filtresi â€” tekrar deneme yok
     )
 
     # Ä°stek formatÄ±
-    format_hatasi = "format_hatasi"  # 400 bad request â€” durdur veya dÃ¼zelt + dene
+    format_hatasi = "format_hatasi"  # 400 bad request â€” durdur veya düzelt + dene
     sifreli_icerik_gecersiz = "sifreli_icerik_gecersiz"  # Replay blobu reddedildi
     multimodal_arac_desteklenmiyor = (
-        "multimodal_arac_desteklenmiyor"  # Tool content liste tÃ¼rÃ¼ reddedildi
+        "multimodal_arac_desteklenmiyor"  # Tool content liste türü reddedildi
     )
 
     # Provider-specific
@@ -105,7 +105,7 @@ class FailoverReason(enum.Enum):
 
 @dataclass
 class SiniflandirilmisHata:
-    """API hatasÄ±nÄ±n yapÄ±sal sÄ±nÄ±flandÄ±rmasÄ± ve recovery Ã¶nerileri."""
+    """API hatasÄ±nÄ±n yapÄ±sal sÄ±nÄ±flandÄ±rmasÄ± ve recovery önerileri."""
 
     neden: FailoverReason
     durum_kodu: Optional[int] = None
@@ -114,7 +114,7 @@ class SiniflandirilmisHata:
     mesaj: str = ""
     hata_baglami: Dict[str, Any] = field(default_factory=dict)
 
-    # Recovery eylemi ipuÃ§larÄ±
+    # Recovery eylemi ipuçlarÄ±
     yeniden_denenebilir: bool = True
     sikistirilmali: bool = False
     kimlik_dondurmeli: bool = False
@@ -124,7 +124,7 @@ class SiniflandirilmisHata:
     def is_auth(self) -> bool:
         return self.neden in {FailoverReason.auth, FailoverReason.auth_permanent}
 
-    # ReYMeN API uyumluluÄŸu iÃ§in property'ler
+    # ReYMeN API uyumluluÄŸu için property'ler
     @property
     def reason(self) -> FailoverReason:
         return self.neden
@@ -146,11 +146,11 @@ class SiniflandirilmisHata:
         return self.fallback_olmali
 
 
-# ReYMeN uyumluluÄŸu iÃ§in alias
+# ReYMeN uyumluluÄŸu için alias
 ClassifiedError = SiniflandirilmisHata
 
 
-# â”€â”€ Provider-specific Ã¶rÃ¼ntÃ¼ler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Provider-specific örüntüler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _FATURALAMA_ORNEKLERI = [
     "insufficient credits",
@@ -384,15 +384,15 @@ def api_hatasini_siniflandir(
     context_uzunlugu: int = 200_000,
     mesaj_sayisi: int = 0,
 ) -> SiniflandirilmisHata:
-    """Bir API hatasÄ±nÄ± yapÄ±sal recovery Ã¶nerisiyle sÄ±nÄ±flandÄ±r.
+    """Bir API hatasÄ±nÄ± yapÄ±sal recovery önerisiyle sÄ±nÄ±flandÄ±r.
 
     Ã–ncelik sÄ±rasÄ±:
-      1. Provider-specific Ã¶zel durumlar (thinking imzalarÄ±, tier kapÄ±larÄ±)
-      2. HTTP durum kodu + mesaj bilinÃ§li iyileÅŸtirme
+      1. Provider-specific özel durumlar (thinking imzalarÄ±, tier kapÄ±larÄ±)
+      2. HTTP durum kodu + mesaj bilinçli iyileÅŸtirme
       3. Hata kodu sÄ±nÄ±flandÄ±rmasÄ± (body'den)
-      4. Mesaj Ã¶rÃ¼ntÃ¼sÃ¼ eÅŸleÅŸmesi (faturalama vs rate_limit vs context vs auth)
-      5. SSL/TLS geÃ§ici alert Ã¶rÃ¼ntÃ¼leri â†’ timeout olarak yeniden dene
-      6. Sunucu baÄŸlantÄ± kesilmesi + bÃ¼yÃ¼k oturum â†’ context overflow
+      4. Mesaj örüntüsü eÅŸleÅŸmesi (faturalama vs rate_limit vs context vs auth)
+      5. SSL/TLS geçici alert örüntüleri â†’ timeout olarak yeniden dene
+      6. Sunucu baÄŸlantÄ± kesilmesi + büyük oturum â†’ context overflow
       7. Transport hata sezgiselleri
       8. Fallback: bilinmiyor (backoff ile yeniden dene)
     """
@@ -453,7 +453,7 @@ def api_hatasini_siniflandir(
         varsayilanlar.update(gecisgeler)
         return SiniflandirilmisHata(**varsayilanlar)
 
-    # â”€â”€ 1. Provider-specific Ã¶zel durumlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ 1. Provider-specific özel durumlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if any(p in hata_mesaj for p in _ICERIK_POLITIKA_ORNEKLERI):
         return _sonuc(
             FailoverReason.content_policy_blocked,
@@ -533,7 +533,7 @@ def api_hatasini_siniflandir(
         if siniflandirilmis is not None:
             return siniflandirilmis
 
-    # â”€â”€ 4. Mesaj Ã¶rÃ¼ntÃ¼sÃ¼ eÅŸleÅŸmesi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ 4. Mesaj örüntüsü eÅŸleÅŸmesi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     siniflandirilmis = _mesaja_gore_siniflandir(
         hata_mesaj,
         hata_tipi,
@@ -544,11 +544,11 @@ def api_hatasini_siniflandir(
     if siniflandirilmis is not None:
         return siniflandirilmis
 
-    # â”€â”€ 5. SSL/TLS geÃ§ici hatalar â†’ timeout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ 5. SSL/TLS geçici hatalar â†’ timeout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if any(p in hata_mesaj for p in _SSL_GECICI_ORNEKLERI):
         return _sonuc(FailoverReason.timeout, yeniden_denenebilir=True)
 
-    # â”€â”€ 6. Sunucu baÄŸlantÄ± kesilmesi + bÃ¼yÃ¼k oturum â†’ context overflow â”€â”€
+    # â”€â”€ 6. Sunucu baÄŸlantÄ± kesilmesi + büyük oturum â†’ context overflow â”€â”€
     baglanti_kesildi = any(p in hata_mesaj for p in _SUNUCU_BAGLANTI_KESILDI_ORNEKLERI)
     if baglanti_kesildi and not durum_kodu:
         buyuk_oturum = yaklasik_token > context_uzunlugu * 0.6 or (
@@ -573,11 +573,11 @@ def api_hatasini_siniflandir(
     return _sonuc(FailoverReason.unknown, yeniden_denenebilir=True)
 
 
-# ReYMeN uyumluluÄŸu iÃ§in Ä°ngilizce alias
+# ReYMeN uyumluluÄŸu için Ä°ngilizce alias
 classify_api_error = api_hatasini_siniflandir
 
 
-# â”€â”€ Durum koduna gÃ¶re sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Durum koduna göre sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _duruma_gore_siniflandir(
@@ -694,7 +694,7 @@ def _duruma_gore_siniflandir(
 
 
 def _402_siniflandir(hata_mesaj: str, sonuc_fn) -> SiniflandirilmisHata:
-    """402: faturalama bitiÅŸi vs geÃ§ici kullanÄ±m limiti."""
+    """402: faturalama bitiÅŸi vs geçici kullanÄ±m limiti."""
     kullanim_limiti_var = any(p in hata_mesaj for p in _KULLANIM_LIMITI_ORNEKLERI)
     gecici_sinyal_var = any(p in hata_mesaj for p in _KULLANIM_LIMITI_GECICI_SINYALLER)
     if kullanim_limiti_var and gecici_sinyal_var:
@@ -789,7 +789,7 @@ def _400_siniflandir(
             fallback_olmali=True,
         )
 
-    # Genel 400 + bÃ¼yÃ¼k oturum â†’ muhtemel context overflow
+    # Genel 400 + büyük oturum â†’ muhtemel context overflow
     govde_mesaj = ""
     if isinstance(govde, dict):
         _hata_obj = govde.get("error", {})
@@ -814,7 +814,7 @@ def _400_siniflandir(
     )
 
 
-# â”€â”€ Hata koduna gÃ¶re sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Hata koduna göre sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _koda_gore_siniflandir(
@@ -865,7 +865,7 @@ def _koda_gore_siniflandir(
     return None
 
 
-# â”€â”€ Mesaja gÃ¶re sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Mesaja göre sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _mesaja_gore_siniflandir(
@@ -980,7 +980,7 @@ def _durum_kodu_cikart(hata: Exception) -> Optional[int]:
 
 
 def _hata_govdesi_cikart(hata: Exception) -> dict:
-    """SDK exception'dan yapÄ±sal hata gÃ¶vdesi Ã§Ä±kart."""
+    """SDK exception'dan yapÄ±sal hata gövdesi çÄ±kart."""
     govde = getattr(hata, "body", None)
     if isinstance(govde, dict):
         return govde
@@ -999,7 +999,7 @@ def _hata_govdesi_cikart(hata: Exception) -> dict:
 
 
 def _hata_kodunu_cikart(govde: dict) -> str:
-    """YanÄ±t gÃ¶vdesinden hata kodu string'i Ã§Ä±kart."""
+    """YanÄ±t gövdesinden hata kodu string'i çÄ±kart."""
     if not govde:
         return ""
 
@@ -1045,7 +1045,7 @@ def _hata_kodunu_cikart(govde: dict) -> str:
 
 
 def _mesaj_cikart(hata: Exception, govde: dict) -> str:
-    """En bilgilendirici hata mesajÄ±nÄ± Ã§Ä±kart."""
+    """En bilgilendirici hata mesajÄ±nÄ± çÄ±kart."""
     if govde:
         hata_obj = govde.get("error", {})
         if isinstance(hata_obj, dict):

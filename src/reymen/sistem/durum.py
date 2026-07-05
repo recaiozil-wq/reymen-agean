@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 durum.py â€” ReYMeN merkezi durum dosyasi (durum.json) okuyucu.
 

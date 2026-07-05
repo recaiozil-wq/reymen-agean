@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.voice_mode shim â€” ReYMeN voice mode fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.voice_mode shim â€” ReYMeN voice mode fonksiyonlarÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

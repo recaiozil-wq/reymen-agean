@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from reymen.arac.image_gen_engine import (
     FALEngine,

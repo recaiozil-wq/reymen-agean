@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """dispatcher.py â€” Tool dispatch orkestratoru.
 
 Uc bileseni birlestirir:

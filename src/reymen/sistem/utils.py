@@ -1,4 +1,4 @@
-﻿"""Shared utility functions for ReYMeN-agent."""
+"""Shared utility functions for ReYMeN-agent."""
 
 import json
 import logging

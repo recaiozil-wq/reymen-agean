@@ -1,4 +1,4 @@
-﻿"""Handle /handoff command â€” transfer CLI session to a gateway platform."""
+"""Handle /handoff command â€” transfer CLI session to a gateway platform."""
 
 import logging
 

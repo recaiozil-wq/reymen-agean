@@ -1,4 +1,4 @@
-﻿"""ReYMeN Desktop â€” Sistem tepsisi + web sunucu yoneticisi."""
+"""ReYMeN Desktop â€” Sistem tepsisi + web sunucu yoneticisi."""
 
 from reymen.desktop.app import DesktopApp
 from reymen.desktop.server import WebServerManager, web_server

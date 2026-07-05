@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-"""yuanbao_tools.py â€” Tencent Yuanbao (å…ƒå®) AraÃ§larÄ±.
+# -*- coding: utf-8 -*-
+"""yuanbao_tools.py â€” Tencent Yuanbao (å…ƒå®) AraçlarÄ±.
 
 Tencent Yuanbao AI asistanÄ± API entegrasyonu.
-Hunyuan modelini destekler; Ã‡ince NLP gÃ¶revleri iÃ§in idealdir.
+Hunyuan modelini destekler; Ã‡ince NLP görevleri için idealdir.
 ENV: YUANBAO_APP_ID, YUANBAO_SECRET_KEY
 """
 
@@ -34,7 +34,7 @@ def _imza_uret(yuk: str, zaman_damgasi: int, nonce: str) -> str:
 
 
 def _hunyuan_istek(eylem: str, govde: dict) -> dict:
-    """Hunyuan API'ye istek gÃ¶nder."""
+    """Hunyuan API'ye istek gönder."""
     if not YUANBAO_APP_ID or not YUANBAO_SECRET_KEY:
         return {"error": "YUANBAO_APP_ID veya YUANBAO_SECRET_KEY ayarlanmamÄ±ÅŸ."}
 
@@ -104,39 +104,39 @@ def hunyuan_sohbet(
 
 
 def metin_gonullu(metin: str) -> str:
-    """Metin duygu analizi (Ã‡ince NLP iÅŸ akÄ±ÅŸlarÄ± iÃ§in).
+    """Metin duygu analizi (Ã‡ince NLP iÅŸ akÄ±ÅŸlarÄ± için).
 
     Args:
         metin: Analiz edilecek metin
 
     Returns:
-        Duygu etiketi ve gÃ¼ven skoru
+        Duygu etiketi ve güven skoru
     """
     yanit = hunyuan_sohbet(
-        f"Bu metnin duygusunu tek kelimeyle belirt (olumlu/olumsuz/nÃ¶tr) ve aÃ§Ä±kla:\n{metin}",
+        f"Bu metnin duygusunu tek kelimeyle belirt (olumlu/olumsuz/nötr) ve açÄ±kla:\n{metin}",
         sistem="Sen metin analizi uzmanÄ±sÄ±n. KÄ±sa ve net cevap ver.",
     )
     return yanit
 
 
-def ceviri(metin: str, hedef_dil: str = "TÃ¼rkÃ§e") -> str:
-    """Hunyuan ile metin Ã§eviri.
+def ceviri(metin: str, hedef_dil: str = "Türkçe") -> str:
+    """Hunyuan ile metin çeviri.
 
     Args:
         metin:     Ã‡evrilecek metin
-        hedef_dil: Hedef dil adÄ± (TÃ¼rkÃ§e, Ä°ngilizce, Ã‡ince, vb.)
+        hedef_dil: Hedef dil adÄ± (Türkçe, Ä°ngilizce, Ã‡ince, vb.)
 
     Returns:
         Ã‡eviri metni
     """
     return hunyuan_sohbet(
-        f"Åunu {hedef_dil}'ye Ã§evir, sadece Ã§eviriyi ver:\n{metin}",
-        sistem="Sen profesyonel bir Ã§evirmensin.",
+        f"Åunu {hedef_dil}'ye çevir, sadece çeviriyi ver:\n{metin}",
+        sistem="Sen profesyonel bir çevirmensin.",
     )
 
 
 def motor_kaydet(motor):
-    """Yuanbao araÃ§larÄ±nÄ± motora kaydet."""
+    """Yuanbao araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
@@ -147,8 +147,8 @@ def motor_kaydet(motor):
     )
     motor._plugin_arac_kaydet(
         "YUANBAO_CEVIRI",
-        lambda metin, hedef_dil="TÃ¼rkÃ§e": ceviri(metin, hedef_dil),
-        "Tencent Hunyuan ile metin Ã§evir",
+        lambda metin, hedef_dil="Türkçe": ceviri(metin, hedef_dil),
+        "Tencent Hunyuan ile metin çevir",
     )
     motor._plugin_arac_kaydet(
         "YUANBAO_DUYGU",

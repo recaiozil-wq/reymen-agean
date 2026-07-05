@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 self_update.py - ReYMeN Autonomous Self-Update System.
 

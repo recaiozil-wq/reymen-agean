@@ -1,7 +1,7 @@
-﻿# -*- coding: utf-8 -*-
-"""gemini_cloudcode_adapter.py â€” Gemini Cloud Code AdaptÃ¶rÃ¼.
+# -*- coding: utf-8 -*-
+"""gemini_cloudcode_adapter.py â€” Gemini Cloud Code Adaptörü.
 
-Google Cloud Vertex AI Ã¼zerinden Gemini modellerine eriÅŸim.
+Google Cloud Vertex AI üzerinden Gemini modellerine eriÅŸim.
 Standart Gemini API'den farkÄ±: proje+lokasyon kimlik doÄŸrulamasÄ± kullanÄ±r.
 ENV: GCP_PROJECT_ID, GCP_LOCATION, GOOGLE_APPLICATION_CREDENTIALS
 """
@@ -85,7 +85,7 @@ def _gcp_token() -> str:
 
 
 class GeminiCloudCodeAdapter:
-    """Vertex AI Ã¼zerinden Gemini modeli."""
+    """Vertex AI üzerinden Gemini modeli."""
 
     DEFAULT_MODEL = "gemini-1.5-pro"
 
@@ -107,7 +107,7 @@ class GeminiCloudCodeAdapter:
         )
 
     def _openai_to_vertex(self, sistem: str, mesajlar: list[dict]) -> dict:
-        """OpenAI formatÄ±nÄ± Vertex AI Gemini formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼r."""
+        """OpenAI formatÄ±nÄ± Vertex AI Gemini formatÄ±na dönüÅŸtür."""
         icerikler = []
         if sistem:
             icerikler.append(

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """subcommand_fix.py â€” 29 subcommand run_* stub'larini doldur."""
 
 import os

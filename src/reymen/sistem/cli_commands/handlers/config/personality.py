@@ -1,4 +1,4 @@
-﻿"""_handle_personality_command handler."""
+"""_handle_personality_command handler."""
 
 from reymen.sistem.cli_stream import save_config_value
 

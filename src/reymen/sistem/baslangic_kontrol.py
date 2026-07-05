@@ -1,12 +1,12 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-baslangic_kontrol.py â€” ReYMeN BaÅŸlangÄ±Ã§ ve Ortam KontrolÃ¼.
+baslangic_kontrol.py â€” ReYMeN BaÅŸlangÄ±ç ve Ortam Kontrolü.
 
-Program aÃ§Ä±lÄ±ÅŸÄ±nda Ã§alÄ±ÅŸÄ±r:
+Program açÄ±lÄ±ÅŸÄ±nda çalÄ±ÅŸÄ±r:
   1. Harici API anahtarÄ± var mÄ±? â†’ varsa o provider ile baÅŸlat
-  2. Yoksa Ollama Ã§alÄ±ÅŸÄ±yor mu?  â†’ Ã§alÄ±ÅŸmÄ±yorsa uyarÄ± ver
-  3. llava modeli yÃ¼klÃ¼ mÃ¼?      â†’ yoksa indir seÃ§eneÄŸi sun
-  4. /model komutu               â†’ Ã§alÄ±ÅŸma sÄ±rasÄ±nda model deÄŸiÅŸtir
+  2. Yoksa Ollama çalÄ±ÅŸÄ±yor mu?  â†’ çalÄ±ÅŸmÄ±yorsa uyarÄ± ver
+  3. llava modeli yüklü mü?      â†’ yoksa indir seçeneÄŸi sun
+  4. /model komutu               â†’ çalÄ±ÅŸma sÄ±rasÄ±nda model deÄŸiÅŸtir
 """
 
 import json
@@ -32,9 +32,9 @@ HARICI_API_ENV = {
     "MOONSHOT_API_KEY": "Moonshot",
 }
 
-# Ollama'dan indirilecek modeller (hafif genel + gÃ¶rsel)
-ONERILIR_MODEL = "llama3.2:3b"  # kÃ¼Ã§Ã¼k ama yetenekli
-GORUNTUSEL_MODEL = "llava:7b"  # gÃ¶rsel/OCR iÃ§in
+# Ollama'dan indirilecek modeller (hafif genel + görsel)
+ONERILIR_MODEL = "llama3.2:3b"  # küçük ama yetenekli
+GORUNTUSEL_MODEL = "llava:7b"  # görsel/OCR için
 
 
 # â”€â”€ YardÄ±mcÄ± fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -69,7 +69,7 @@ def _env_deger(anahtar: str) -> str:
 
 
 def api_anahtari_var_mi() -> dict:
-    """TanÄ±mlÄ± harici API anahtarlarÄ±nÄ± dÃ¶ndÃ¼r. {provider_adi: anahtar}"""
+    """TanÄ±mlÄ± harici API anahtarlarÄ±nÄ± döndür. {provider_adi: anahtar}"""
     bulunanlar = {}
     for env_adi, provider_adi in HARICI_API_ENV.items():
         val = _env_deger(env_adi)
@@ -79,7 +79,7 @@ def api_anahtari_var_mi() -> dict:
 
 
 def lmstudio_modeller(base_url: str = LMSTUDIO_BASE) -> list:
-    """LM Studio'da yuklÃ¼ modellerin isim listesini donDur."""
+    """LM Studio'da yuklü modellerin isim listesini donDur."""
     try:
         import urllib.request
 
@@ -107,7 +107,7 @@ def ollama_calisiyor_mu() -> bool:
 
 
 def ollama_modeller() -> list:
-    """Ollama'da yÃ¼klÃ¼ modellerin isim listesini dÃ¶ndÃ¼r."""
+    """Ollama'da yüklü modellerin isim listesini döndür."""
     try:
         import urllib.request
 
@@ -119,12 +119,12 @@ def ollama_modeller() -> list:
 
 
 def llava_yuklu_mu() -> bool:
-    """llava modeli yÃ¼klÃ¼ mÃ¼?"""
+    """llava modeli yüklü mü?"""
     return any("llava" in m.lower() for m in ollama_modeller())
 
 
 def model_indir(model_adi: str) -> bool:
-    """Ollama API Ã¼zerinden model indir, ilerlemeyi konsola yaz."""
+    """Ollama API üzerinden model indir, ilerlemeyi konsola yaz."""
     print(f"\n  Ä°ndiriliyor: {model_adi} ...")
     try:
         import urllib.request
@@ -165,16 +165,16 @@ def model_indir(model_adi: str) -> bool:
         return False
 
 
-# â”€â”€ Ana baÅŸlangÄ±Ã§ kontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Ana baÅŸlangÄ±ç kontrolü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def baslangic_kontrolu(config: dict) -> dict:
     """
-    Program baÅŸlangÄ±cÄ±nda Ã§alÄ±ÅŸÄ±r. Config'i doÄŸrular/gÃ¼nceller.
-    - Harici API varsa kullan â†’ Ollama kontrolÃ¼ atla
+    Program baÅŸlangÄ±cÄ±nda çalÄ±ÅŸÄ±r. Config'i doÄŸrular/günceller.
+    - Harici API varsa kullan â†’ Ollama kontrolü atla
     - Yoksa Ollama + llava zorunlu
     """
-    # (baslangiÃ§ banner startup_ekrani.py tarafindan gosterilir)
+    # (baslangiç banner startup_ekrani.py tarafindan gosterilir)
 
     # 0. Kaydedilmis bulut tercihi var mi? â†’ LM Studio'yu gecersiz kilma
     _BULUT_ENV_MAP = {
@@ -203,7 +203,7 @@ def baslangic_kontrolu(config: dict) -> dict:
     except Exception as _baslangi_e186:
         print(f"[UYARI] baslangic_kontrol.py:187 - {_baslangi_e186}")
 
-    # 1. LM Studio kontrolÃ¼ (API anahtarÄ±na gerek yok)
+    # 1. LM Studio kontrolü (API anahtarÄ±na gerek yok)
     ls_url = (
         config.get("providers", {}).get("lmstudio", {}).get("base_url", LMSTUDIO_BASE)
     )
@@ -221,7 +221,7 @@ def baslangic_kontrolu(config: dict) -> dict:
         config["default_provider"] = "lmstudio"
         return config
 
-    # 2. Harici API anahtarÄ± kontrolÃ¼
+    # 2. Harici API anahtarÄ± kontrolü
     aktif_api = api_anahtari_var_mi()
     if aktif_api:
         provider_listesi = ", ".join(aktif_api.keys())
@@ -251,23 +251,23 @@ def baslangic_kontrolu(config: dict) -> dict:
             print("  Devam ediliyor â€” LLM erismeden calÄ±sacak (sÄ±nÄ±rlÄ± mod).")
             return config
 
-    # 3. Ollama Ã§alÄ±ÅŸÄ±yor â€” model listesini gÃ¶ster
+    # 3. Ollama çalÄ±ÅŸÄ±yor â€” model listesini göster
     mevcut_modeller = ollama_modeller()
-    print(f"  Ollama Ã§alÄ±ÅŸÄ±yor â€” {len(mevcut_modeller)} model yÃ¼klÃ¼:")
+    print(f"  Ollama çalÄ±ÅŸÄ±yor â€” {len(mevcut_modeller)} model yüklü:")
     for m in mevcut_modeller:
         isaretci = "  â†’" if "llava" in m.lower() else "   "
         print(f"  {isaretci} {m}")
 
-    # 4. llava kontrolÃ¼
+    # 4. llava kontrolü
     if not llava_yuklu_mu():
         print()
-        print("  [BÄ°LGÄ°] GÃ¶rsel/OCR iÅŸlevleri iÃ§in 'llava' modeli gereklidir.")
+        print("  [BÄ°LGÄ°] Görsel/OCR iÅŸlevleri için 'llava' modeli gereklidir.")
         print(f"  Ä°ndirilecek modeller:")
-        print(f"    â€¢ {ONERILIR_MODEL}  (genel amaÃ§lÄ±, hafif)")
-        print(f"    â€¢ {GORUNTUSEL_MODEL} (gÃ¶rsel analiz)")
+        print(f"    â€¢ {ONERILIR_MODEL}  (genel amaçlÄ±, hafif)")
+        print(f"    â€¢ {GORUNTUSEL_MODEL} (görsel analiz)")
         print()
-        print("  [Ä°] Ä°ndir    [G] GeÃ§    [Ã‡] Ã‡Ä±kÄ±ÅŸ")
-        yanit = input("  SeÃ§iminiz: ").strip().upper()
+        print("  [Ä°] Ä°ndir    [G] Geç    [Ã‡] Ã‡Ä±kÄ±ÅŸ")
+        yanit = input("  Seçiminiz: ").strip().upper()
 
         if yanit == "Ä°" or yanit == "I":
             # Genel model â€” sadece listede yoksa indir
@@ -279,7 +279,7 @@ def baslangic_kontrolu(config: dict) -> dict:
             else:
                 print(f"  {ONERILIR_MODEL} zaten mevcut, atlanÄ±yor.")
             model_indir(GORUNTUSEL_MODEL)
-            # Config'i llava'ya gÃ¼ncelle
+            # Config'i llava'ya güncelle
             if "auxiliary" in config:
                 config["auxiliary"]["vision"]["model"] = GORUNTUSEL_MODEL
 
@@ -287,13 +287,13 @@ def baslangic_kontrolu(config: dict) -> dict:
             print("  Ã‡Ä±kÄ±lÄ±yor.")
             sys.exit(0)
         else:
-            print("  GeÃ§iliyor â€” llava olmadan devam ediliyor.")
+            print("  Geçiliyor â€” llava olmadan devam ediliyor.")
     else:
         # llava var, modeli config'e yaz
         llava_adi = next(m for m in mevcut_modeller if "llava" in m.lower())
         if "auxiliary" in config:
             config["auxiliary"]["vision"]["model"] = llava_adi
-        print(f"\n  GÃ¶rsel model hazÄ±r: {llava_adi}")
+        print(f"\n  Görsel model hazÄ±r: {llava_adi}")
 
     # 5. VarsayÄ±lan provider'Ä± Ollama'ya ayarla
     if not config.get("default_provider") or config["default_provider"] in (
@@ -309,7 +309,7 @@ def baslangic_kontrolu(config: dict) -> dict:
             }
             print(f"  Aktif model: {mevcut_modeller[0]}")
 
-    # 6. Arka planda gÃ¼ncelleme kontrolÃ¼ baÅŸlat (kullanÄ±cÄ±yÄ± bekletmez)
+    # 6. Arka planda güncelleme kontrolü baÅŸlat (kullanÄ±cÄ±yÄ± bekletmez)
     try:
         from reymen.sistem.guncelle import arka_plan_baslat
 
@@ -421,7 +421,7 @@ def model_degistir(agent) -> bool:
         print("  Iptal edildi.")
         return False
 
-    # Numara ile seÃ§im
+    # Numara ile seçim
     if yanit.isdigit():
         num = int(yanit) - 1
         if 0 <= num < len(secenekler):
@@ -511,8 +511,8 @@ def model_degistir(agent) -> bool:
 
 
 if __name__ == "__main__":
-    print("=== BaÅŸlangÄ±Ã§ Kontrol Testi ===")
+    print("=== BaÅŸlangÄ±ç Kontrol Testi ===")
     print(f"API anahtarlarÄ±: {api_anahtari_var_mi()}")
-    print(f"Ollama Ã§alÄ±ÅŸÄ±yor: {ollama_calisiyor_mu()}")
-    print(f"YÃ¼klÃ¼ modeller: {ollama_modeller()}")
-    print(f"llava yÃ¼klÃ¼: {llava_yuklu_mu()}")
+    print(f"Ollama çalÄ±ÅŸÄ±yor: {ollama_calisiyor_mu()}")
+    print(f"Yüklü modeller: {ollama_modeller()}")
+    print(f"llava yüklü: {llava_yuklu_mu()}")

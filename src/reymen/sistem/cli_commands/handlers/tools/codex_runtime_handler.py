@@ -1,4 +1,4 @@
-﻿"""_handle_codex_runtime handler."""
+"""_handle_codex_runtime handler."""
 
 
 def _handle_codex_runtime(cli, cmd_original: str) -> None:

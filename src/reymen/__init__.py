@@ -1,18 +1,18 @@
-﻿"""ReYMeN â€” Otonom gÃ¶rev Ã§Ã¶zÃ¼cÃ¼ Ã§ekirdeÄŸi.
+"""ReYMeN â€” Otonom görev çözücü çekirdeÄŸi.
 
-Bu paket, gÃ¶rev 7 kapsamÄ±ndaki 7 dÃ¼ÅŸÃ¼k Ã¶ncelikli Ã¶zelliÄŸi barÄ±ndÄ±rÄ±r:
+Bu paket, görev 7 kapsamÄ±ndaki 7 düÅŸük öncelikli özelliÄŸi barÄ±ndÄ±rÄ±r:
 
 - ``cost_tracker``      : API harcama takibi + log
-- ``platform_adapter``  : WSL/Kali adapter + path Ã§evirici
+- ``platform_adapter``  : WSL/Kali adapter + path çevirici
 - ``tui``               : Rich ile status bar, spinner, progress
 - ``self_improve``      : Kalite metrikleri + otomatik iyileÅŸtirme
-- ``kanban``            : Kart, kolon, Ã¶ncelik, deadline
+- ``kanban``            : Kart, kolon, öncelik, deadline
 - ``video_tools``       : yt-dlp + ffmpeg wrapper
 - ``a2a``               : Basit agent mesajlaÅŸma (A2A prototip)
-- ``problem_solver``    : AjanÄ±n sorun Ã§Ã¶zme doÄŸasÄ± (retry, fallback, Ã¶ÄŸrenme)
-- ``learning_loop``     : Kendi kendine Ã¶ÄŸrenen Ã§Ã¶zÃ¼m bulma dÃ¶ngÃ¼sÃ¼
+- ``problem_solver``    : AjanÄ±n sorun çözme doÄŸasÄ± (retry, fallback, öÄŸrenme)
+- ``learning_loop``     : Kendi kendine öÄŸrenen çözüm bulma döngüsü
 
-Her modÃ¼l kendi baÅŸÄ±na Ã§alÄ±ÅŸabilir ve opsiyonel baÄŸÄ±mlÄ±lÄ±klarÄ±n yokluÄŸunda
+Her modül kendi baÅŸÄ±na çalÄ±ÅŸabilir ve opsiyonel baÄŸÄ±mlÄ±lÄ±klarÄ±n yokluÄŸunda
 graceful fallback yapar.
 """
 

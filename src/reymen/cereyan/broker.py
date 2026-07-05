@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 broker.py â€” MessageBroker: queue.Queue tabanlÄ±, thread-safe mesajlaÅŸma katmanÄ±.
 
@@ -35,29 +35,29 @@ logger = logging.getLogger(__name__)
 
 
 class MesajTipi(Enum):
-    """Sistemdeki tÃ¼m mesaj tipleri. Her tip bir consumer queue'suna karÅŸÄ±lÄ±k gelir."""
+    """Sistemdeki tüm mesaj tipleri. Her tip bir consumer queue'suna karÅŸÄ±lÄ±k gelir."""
 
-    # Ã‡Ã¶zÃ¼m dÃ¶ngÃ¼sÃ¼
-    HATA = auto()  # hata_cozucu'ya: hata yakalandÄ±, Ã§Ã¶zÃ¼m Ã¼ret
-    COZUM_ARA = auto()  # ogrenme'ye: Ã§Ã¶zÃ¼m hafÄ±zasÄ±nda ara
-    COZUM_BULUNDU = auto()  # orchestrator'a: Ã§Ã¶zÃ¼m bulundu, uygula
-    COZUM_KAYDET = auto()  # ogrenme'ye: baÅŸarÄ±lÄ± Ã§Ã¶zÃ¼mÃ¼ kaydet
+    # Ã‡özüm döngüsü
+    HATA = auto()  # hata_cozucu'ya: hata yakalandÄ±, çözüm üret
+    COZUM_ARA = auto()  # ogrenme'ye: çözüm hafÄ±zasÄ±nda ara
+    COZUM_BULUNDU = auto()  # orchestrator'a: çözüm bulundu, uygula
+    COZUM_KAYDET = auto()  # ogrenme'ye: baÅŸarÄ±lÄ± çözümü kaydet
     BECERI_KRISTAL = auto()  # closed_learning_loop'a: skill kartÄ± oluÅŸtur
 
     # Workflow pipeline
-    GOREV_BASLAT = auto()  # motor'a: yeni gÃ¶rev baÅŸlat
-    GOREV_PLANLA = auto()  # planlayÄ±cÄ±ya: gÃ¶revi alt adÄ±mlara bÃ¶l
-    GOREV_DOGRULA = auto()  # doÄŸrulayÄ±cÄ±ya: Ã¶n koÅŸullarÄ± kontrol et
-    GOREV_KOD = auto()  # kodlayÄ±cÄ±ya: Python script'i Ã¼ret
-    GOREV_TEST = auto()  # testÃ§iye: script'i Ã§alÄ±ÅŸtÄ±r/doÄŸrula
-    GOREV_INCELE = auto()  # inceleyiciye: kodu gÃ¶zden geÃ§ir
+    GOREV_BASLAT = auto()  # motor'a: yeni görev baÅŸlat
+    GOREV_PLANLA = auto()  # planlayÄ±cÄ±ya: görevi alt adÄ±mlara böl
+    GOREV_DOGRULA = auto()  # doÄŸrulayÄ±cÄ±ya: ön koÅŸullarÄ± kontrol et
+    GOREV_KOD = auto()  # kodlayÄ±cÄ±ya: Python script'i üret
+    GOREV_TEST = auto()  # testçiye: script'i çalÄ±ÅŸtÄ±r/doÄŸrula
+    GOREV_INCELE = auto()  # inceleyiciye: kodu gözden geçir
     GOREV_KAYDET = auto()  # kaydediciye: .py dosyasÄ±na yaz
-    GOREV_BASARILI = auto()  # orchestrator'a: gÃ¶rev tamam
-    GOREV_HATA = auto()  # orchestrator'a: gÃ¶rev baÅŸarÄ±sÄ±z
+    GOREV_BASARILI = auto()  # orchestrator'a: görev tamam
+    GOREV_HATA = auto()  # orchestrator'a: görev baÅŸarÄ±sÄ±z
 
-    # Tool Ã§aÄŸrÄ±larÄ±
-    TOOL_CALL = auto()  # conversation_loop'a: tool Ã§aÄŸrÄ±sÄ± hazÄ±r
-    TOOL_SONUC = auto()  # conversation_loop'a: tool sonucu dÃ¶ndÃ¼
+    # Tool çaÄŸrÄ±larÄ±
+    TOOL_CALL = auto()  # conversation_loop'a: tool çaÄŸrÄ±sÄ± hazÄ±r
+    TOOL_SONUC = auto()  # conversation_loop'a: tool sonucu döndü
 
     # Kontrol
     DURDUR = auto()  # broker'Ä± kapat
@@ -81,7 +81,7 @@ class Mesaj:
 
 
 class MesajKuyrugu:
-    """Her consumer iÃ§in ayrÄ± queue + abone yÃ¶netimi."""
+    """Her consumer için ayrÄ± queue + abone yönetimi."""
 
     def __init__(self, tip: MesajTipi):
         self.tip = tip
@@ -111,7 +111,7 @@ class MessageBroker:
     """
     Merkezi mesajlaÅŸma katmanÄ±.
 
-    - Her MesajTipi iÃ§in ayrÄ± queue
+    - Her MesajTipi için ayrÄ± queue
     - ThreadPoolExecutor consumer pool
     - Abonelik bazlÄ± routing
     - Otomatik correlation ID
@@ -125,14 +125,14 @@ class MessageBroker:
         self._executor: Optional[threading.Thread] = None
         self._lock = threading.Lock()
 
-        # TÃ¼m mesaj tipleri iÃ§in queue oluÅŸtur
+        # Tüm mesaj tipleri için queue oluÅŸtur
         for tip in MesajTipi:
             self._kuyruklar[tip] = MesajKuyrugu(tip)
 
-    # â”€â”€ Abone YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Abone Yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def abone_ol(self, tip: MesajTipi, callback: Callable[[Mesaj], None]) -> None:
-        """Bir mesaj tipine abone ol. Callback consumer thread'de Ã§alÄ±ÅŸÄ±r."""
+        """Bir mesaj tipine abone ol. Callback consumer thread'de çalÄ±ÅŸÄ±r."""
         kuyruk = self._kuyruklar.get(tip)
         if kuyruk:
             kuyruk.abone_ekle(callback)
@@ -142,10 +142,10 @@ class MessageBroker:
         for tip, cb in abonelikler:
             self.abone_ol(tip, cb)
 
-    # â”€â”€ Mesaj GÃ¶nderme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Mesaj Gönderme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def yayinla(self, mesaj: Mesaj) -> None:
-        """Bir mesajÄ± ilgili queue'suna gÃ¶nder."""
+        """Bir mesajÄ± ilgili queue'suna gönder."""
         if not self._running:
             logger.warning("[Broker] Ã‡alÄ±ÅŸmÄ±yor, mesaj atÄ±ldÄ±: %s", mesaj)
             return
@@ -155,14 +155,14 @@ class MessageBroker:
             kuyruk.mesaj_at(mesaj)
 
     def yayinla_basit(self, tip: MesajTipi, veri: dict, kaynak: str = "") -> None:
-        """HÄ±zlÄ± mesaj gÃ¶nderme (Mesaj nesnesi oluÅŸturmadan)."""
+        """HÄ±zlÄ± mesaj gönderme (Mesaj nesnesi oluÅŸturmadan)."""
         mesaj = Mesaj(tip=tip, veri=veri, kaynak=kaynak)
         self.yayinla(mesaj)
 
     # â”€â”€ Consumer Thread â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _consumer_loop(self, kuyruk: MesajKuyrugu) -> None:
-        """Tek bir queue iÃ§in consumer thread dÃ¶ngÃ¼sÃ¼."""
+        """Tek bir queue için consumer thread döngüsü."""
         thread_name = threading.current_thread().name
         logger.debug(
             "[Broker] Consumer baÅŸladÄ±: %s <- %s", thread_name, kuyruk.tip.name
@@ -188,8 +188,8 @@ class MessageBroker:
 
     def baslat(self) -> None:
         """
-        Her mesaj tipi iÃ§in bir consumer thread baÅŸlatÄ±r.
-        Thread'ler daemon=True olduÄŸu iÃ§in ana thread bitince otomatik kapanÄ±r.
+        Her mesaj tipi için bir consumer thread baÅŸlatÄ±r.
+        Thread'ler daemon=True olduÄŸu için ana thread bitince otomatik kapanÄ±r.
         """
         if self._running:
             return
@@ -209,9 +209,9 @@ class MessageBroker:
         logger.info("[Broker] %d consumer thread baÅŸlatÄ±ldÄ±", len(self._threads))
 
     def durdur(self) -> None:
-        """TÃ¼m consumer thread'leri durdur."""
+        """Tüm consumer thread'leri durdur."""
         self._running = False
-        # DURDUR mesajÄ± gÃ¶ndererek bekleyen thread'leri uyandÄ±r
+        # DURDUR mesajÄ± göndererek bekleyen thread'leri uyandÄ±r
         for kuyruk in self._kuyruklar.values():
             kuyruk.mesaj_at(Mesaj(MesajTipi.DURDUR, kaynak="broker"))
         logger.info("[Broker] Durduruldu")
@@ -240,7 +240,7 @@ class MessageBroker:
 def mesaj_gonder(
     broker: Optional[MessageBroker], tip: MesajTipi, veri: dict, kaynak: str = ""
 ) -> None:
-    """Broker varsa mesaj gÃ¶nder, yoksa sessiz geÃ§."""
+    """Broker varsa mesaj gönder, yoksa sessiz geç."""
     if broker:
         broker.yayinla(Mesaj(tip=tip, veri=veri, kaynak=kaynak or __name__))
 

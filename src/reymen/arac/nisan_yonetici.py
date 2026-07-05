@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 nisan_yonetici.py â€” Nisan sablonu cikarma yoneticisi.
 

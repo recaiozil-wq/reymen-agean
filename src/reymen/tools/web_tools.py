@@ -1,9 +1,9 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 ReYMeN Web Tools â€” BaÄŸÄ±msÄ±z web_search_tool ve web_extract_tool.
 
 ReYMeN Agent'tan baÄŸÄ±msÄ±zlaÅŸtÄ±rÄ±lmÄ±ÅŸtÄ±r. Provider'larÄ± reymen.web_search_registry
-Ã¼zerinden Ã§Ã¶zÃ¼mler, SSRF korumasÄ± iÃ§in reymen.tools.url_safety kullanÄ±r.
+üzerinden çözümler, SSRF korumasÄ± için reymen.tools.url_safety kullanÄ±r.
 
 Env vars:
   REYMEN_SEARCH_BACKEND / REYMEN_EXTRACT_BACKEND / REYMEN_WEB_BACKEND
@@ -42,7 +42,7 @@ def _has_env(name: str) -> bool:
 
 
 def _get_backend() -> str:
-    """Backend seÃ§imi: REYMEN_WEB_BACKEND env var veya env var'dan otomatik."""
+    """Backend seçimi: REYMEN_WEB_BACKEND env var veya env var'dan otomatik."""
     configured = (os.getenv("REYMEN_WEB_BACKEND") or "").lower().strip()
     if configured in (
         "parallel",
@@ -121,7 +121,7 @@ async def _try_summarize(
     title: str = "",
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> Optional[str]:
-    """LLM ile Ã¶zetleme dene. auxiliary client yoksa None dÃ¶ner."""
+    """LLM ile özetleme dene. auxiliary client yoksa None döner."""
     if len(content) < min_length:
         return None
     if len(content) > 2_000_000:
@@ -133,7 +133,7 @@ async def _try_summarize(
 
         return await async_web_extract_summarize(content, url, title)
     except ImportError:
-        logger.debug("reymen.auxiliary mevcut deÄŸil, LLM Ã¶zetleme atlanÄ±yor")
+        logger.debug("reymen.auxiliary mevcut deÄŸil, LLM özetleme atlanÄ±yor")
         return None
     except Exception as exc:
         logger.warning("LLM summarization failed: %s", exc)
@@ -165,12 +165,12 @@ _debug = DebugSession("web_tools", env_var="WEB_TOOLS_DEBUG")
 
 
 # ---------------------------------------------------------------------------
-# Provider'larÄ± yÃ¼kle (ensure_web_plugins_loaded)
+# Provider'larÄ± yükle (ensure_web_plugins_loaded)
 # ---------------------------------------------------------------------------
 
 
 def _ensure_web_plugins_loaded() -> None:
-    """Plugin'leri yÃ¼kle â€” providers register olur. Idempotent."""
+    """Plugin'leri yükle â€” providers register olur. Idempotent."""
     try:
         from reymen.web_search_registry import get_provider
 
@@ -185,7 +185,7 @@ def _ensure_web_plugins_loaded() -> None:
 
 
 def _import_all_providers() -> None:
-    """TÃ¼m built-in web provider'larÄ±nÄ± ReYMeN registry'ye kaydet."""
+    """Tüm built-in web provider'larÄ±nÄ± ReYMeN registry'ye kaydet."""
     from reymen.web_search_registry import register_provider
 
     # Her provider'Ä±n class'Ä±nÄ± import et ve register et
@@ -206,7 +206,7 @@ def _import_all_providers() -> None:
             if cls is not None:
                 register_provider(cls())
         except Exception as exc:
-            logger.debug("Provider %s.%s yÃ¼klenemedi: %s", mod_name, class_name, exc)
+            logger.debug("Provider %s.%s yüklenemedi: %s", mod_name, class_name, exc)
 
 
 # ---------------------------------------------------------------------------
@@ -215,11 +215,11 @@ def _import_all_providers() -> None:
 
 
 def web_search_tool(query: str, limit: int = 5) -> str:
-    """Web'de arama yap. Provider registry Ã¼zerinden dispatch eder.
+    """Web'de arama yap. Provider registry üzerinden dispatch eder.
 
     Args:
         query: Arama sorgusu
-        limit: SonuÃ§ sayÄ±sÄ± (1-100)
+        limit: Sonuç sayÄ±sÄ± (1-100)
 
     Returns:
         JSON: {"success": bool, "data": {"web": [...]} veya "error": str}
@@ -283,14 +283,14 @@ async def web_extract_tool(
     model: Optional[str] = None,
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> str:
-    """Web sayfalarÄ±ndan iÃ§erik Ã§ek. Provider registry Ã¼zerinden dispatch.
+    """Web sayfalarÄ±ndan içerik çek. Provider registry üzerinden dispatch.
 
     Args:
         urls: Ã‡ekilecek URL listesi
         format: Ã‡Ä±ktÄ± formatÄ± ("markdown" veya "html")
-        use_llm_processing: LLM Ã¶zetleme kullanÄ±lsÄ±n mÄ±
+        use_llm_processing: LLM özetleme kullanÄ±lsÄ±n mÄ±
         model: KullanÄ±lacak model (opsiyonel)
-        min_length: LLM Ã¶zetleme iÃ§in minimum karakter (default: 5000)
+        min_length: LLM özetleme için minimum karakter (default: 5000)
 
     Returns:
         JSON: {"results": [...]} veya {"success": False, "error": str}
@@ -303,7 +303,7 @@ async def web_extract_tool(
     for _url in urls:
         if not isinstance(_url, str):
             continue
-        # Basit secret pattern kontrolÃ¼ (api key vs)
+        # Basit secret pattern kontrolü (api key vs)
         _secret_pattern = re.compile(
             r"(?i)(sk-[a-z0-9]{20,}|ghp_[a-zA-Z0-9]{36,}|"
             r"AIza[0-9A-Za-z_-]{35}|xox[bpras]-[0-9a-zA-Z-]{10,})"

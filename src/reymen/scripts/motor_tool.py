@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-motor_tool.py â€” Bot'lar icin motor arayÃ¼zÃ¼.
+motor_tool.py â€” Bot'lar icin motor arayüzü.
 
-Bu modÃ¼l, Telegram/Discord bot'lari ve diger platform gateway'leri icin
+Bu modül, Telegram/Discord bot'lari ve diger platform gateway'leri icin
 ReYMeN motor'una erisim saglar. Dogrudan motor.py'yi import etmek yerine
 buradan erisilir (bagimliliklari soyutlar).
 

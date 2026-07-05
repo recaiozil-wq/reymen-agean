@@ -1,4 +1,4 @@
-﻿"""ğŸ”‘ OAuth 2.0 Sistemi â€” Google + Discord Login.
+"""ğŸ”‘ OAuth 2.0 Sistemi â€” Google + Discord Login.
 
 Provider pattern:
     OAuth2Provider (ABC) â†’ GoogleOAuth2Provider, DiscordOAuth2Provider
@@ -56,9 +56,9 @@ class OAuth2Token:
 
 @dataclass
 class OAuth2UserInfo:
-    """Provider'dan dÃ¶nen kullanÄ±cÄ± bilgisi (normalleÅŸtirilmiÅŸ)."""
+    """Provider'dan dönen kullanÄ±cÄ± bilgisi (normalleÅŸtirilmiÅŸ)."""
 
-    provider_id: str  # provider iÃ§indeki unique ID
+    provider_id: str  # provider içindeki unique ID
     email: str = ""
     display_name: str = ""
     avatar_url: str = ""
@@ -74,7 +74,7 @@ class OAuth2Provider(ABC):
     """OAuth2 saÄŸlayÄ±cÄ± temel sÄ±nÄ±fÄ±.
 
     Alt sÄ±nÄ±flar ÅŸu alanlarÄ± tanÄ±mlamalÄ±:
-      - provider_id: str  (Ã¶rn: "google", "discord")
+      - provider_id: str  (örn: "google", "discord")
       - client_id, client_secret (genelde env var'dan okunur)
       - auth_url, token_url, userinfo_url
       - scopes: list[str]
@@ -90,7 +90,7 @@ class OAuth2Provider(ABC):
     redirect_uri: str = ""
 
     def get_auth_url(self, state: str = "", redirect_uri: str = "") -> str:
-        """KullanÄ±cÄ±yÄ± OAuth2 onay sayfasÄ±na yÃ¶nlendirecek URL."""
+        """KullanÄ±cÄ±yÄ± OAuth2 onay sayfasÄ±na yönlendirecek URL."""
         if not redirect_uri:
             redirect_uri = self.redirect_uri
         if not state:
@@ -156,7 +156,7 @@ class OAuth2Provider(ABC):
 
     @abstractmethod
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuth2UserInfo:
-        """Provider'a Ã¶zel raw yanÄ±tÄ± OAuth2UserInfo'ya dÃ¶nÃ¼ÅŸtÃ¼r."""
+        """Provider'a özel raw yanÄ±tÄ± OAuth2UserInfo'ya dönüÅŸtür."""
         ...
 
     def _http_post(self, url: str, data: dict[str, Any]) -> dict[str, Any]:
@@ -223,7 +223,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
         if not self.client_id or not self.client_secret:
             logger.warning(
                 "[OAuth2:Google] GOOGLE_CLIENT_ID veya GOOGLE_CLIENT_SECRET "
-                "ortam deÄŸiÅŸkeni bulunamadÄ±. Google giriÅŸi Ã§alÄ±ÅŸmayacak."
+                "ortam deÄŸiÅŸkeni bulunamadÄ±. Google giriÅŸi çalÄ±ÅŸmayacak."
             )
         self.redirect_uri = redirect_uri or os.getenv(
             "GOOGLE_REDIRECT_URI",
@@ -266,7 +266,7 @@ class DiscordOAuth2Provider(OAuth2Provider):
         if not self.client_id or not self.client_secret:
             logger.warning(
                 "[OAuth2:Discord] DISCORD_CLIENT_ID veya DISCORD_CLIENT_SECRET "
-                "ortam deÄŸiÅŸkeni bulunamadÄ±. Discord giriÅŸi Ã§alÄ±ÅŸmayacak."
+                "ortam deÄŸiÅŸkeni bulunamadÄ±. Discord giriÅŸi çalÄ±ÅŸmayacak."
             )
         self.redirect_uri = redirect_uri or os.getenv(
             "DISCORD_REDIRECT_URI",
@@ -345,7 +345,7 @@ class OAuth2TokenStorage:
             try:
                 return json.loads(self._dosya.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, OSError) as e:
-                logger.warning("[OAuth2TokenStorage] YÃ¼kleme hatasÄ±: %s", e)
+                logger.warning("[OAuth2TokenStorage] Yükleme hatasÄ±: %s", e)
                 return {}
         return {}
 
@@ -383,7 +383,7 @@ class OAuth2TokenStorage:
             self._save(data)
 
     def list_tokens(self) -> list[dict[str, str]]:
-        """TÃ¼m kayÄ±tlÄ± token'larÄ± listele (provider, user_id bazÄ±nda)."""
+        """Tüm kayÄ±tlÄ± token'larÄ± listele (provider, user_id bazÄ±nda)."""
         data = self._load()
         result = []
         for provider_id, users in data.items():
@@ -403,7 +403,7 @@ class OAuth2TokenStorage:
 
 
 class OAuth2Manager:
-    """OAuth2 akÄ±ÅŸ yÃ¶neticisi.
+    """OAuth2 akÄ±ÅŸ yöneticisi.
 
     KullanÄ±m:
         manager = OAuth2Manager()
@@ -424,7 +424,7 @@ class OAuth2Manager:
     def get_auth_url(
         self, provider_id: str, state: str = "", redirect_uri: str = ""
     ) -> str:
-        """KullanÄ±cÄ±yÄ± OAuth2 onay sayfasÄ±na yÃ¶nlendirecek URL."""
+        """KullanÄ±cÄ±yÄ± OAuth2 onay sayfasÄ±na yönlendirecek URL."""
         provider = self.registry.get(provider_id)
         if not provider:
             raise OAuth2ProviderError(
@@ -512,7 +512,7 @@ def init_oauth2_providers(redirect_base: str = "") -> None:
     """VarsayÄ±lan OAuth2 provider'larÄ±nÄ± kaydet.
 
     Args:
-        redirect_base: Callback URL base (Ã¶rn: "http://localhost:5000")
+        redirect_base: Callback URL base (örn: "http://localhost:5000")
                        BoÅŸsa env var'daki redirect_uri'ler kullanÄ±lÄ±r.
     """
     google_redirect = ""

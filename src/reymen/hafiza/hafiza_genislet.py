@@ -1,13 +1,13 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 hafiza_genislet.py â€” ReYMeN GeliÅŸmiÅŸ HafÄ±za Sistemi.
 
 ReYMeN Agent'in SQLite FTS5 tabanlÄ± session hafÄ±zasÄ±na benzer bir sistem.
 Ã–zellikler:
   - SQLite + FTS5 tam metin arama
-  - Oturum (session) bazlÄ± konuÅŸma geÃ§miÅŸi
+  - Oturum (session) bazlÄ± konuÅŸma geçmiÅŸi
   - KullanÄ±cÄ± tercihleri kalÄ±cÄ± kaydÄ±
-  - Cross-session arama (geÃ§miÅŸ oturumlarda ara)
+  - Cross-session arama (geçmiÅŸ oturumlarda ara)
   - Otomatik kayÄ±t (her N mesajda bir checkpoint)
 
 Kullanim:
@@ -15,7 +15,7 @@ Kullanim:
     hafiza.initialize("oturum_123")
     hafiza.kaydet("Python decorator nedir?", "kullanici_sorusu")
     sonuc = hafiza.ara("decorator")
-    tercih = hafiza.tercih_al("dil", default="TÃ¼rkÃ§e")
+    tercih = hafiza.tercih_al("dil", default="Türkçe")
 """
 
 import json
@@ -27,7 +27,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# SQLite (standart kÃ¼tÃ¼phane)
+# SQLite (standart kütüphane)
 try:
     import sqlite3
 
@@ -71,7 +71,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "bir",
         "biraz",
         "biri",
-        "birkaÃ§",
+        "birkaç",
         "birsey",
         "birÅŸey",
         "biz",
@@ -91,7 +91,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "bunu",
         "bunun",
         "burada",
-        "bÃ¶yle",
+        "böyle",
         "bu",
         "buna",
         "da",
@@ -116,7 +116,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "filan",
         "gene",
         "gibi",
-        "gÃ¶re",
+        "göre",
         "gore",
         "halen",
         "hangi",
@@ -124,7 +124,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "hatta",
         "hem",
         "henuz",
-        "henÃ¼z",
+        "henüz",
         "hep",
         "hepsi",
         "her",
@@ -134,8 +134,8 @@ _TURKCE_STOP_WORDS = frozenset(
         "hic",
         "hicbir",
         "hÃ¢lÃ¢",
-        "hiÃ§",
-        "hiÃ§bir",
+        "hiç",
+        "hiçbir",
         "icin",
         "ile",
         "ilgili",
@@ -143,8 +143,8 @@ _TURKCE_STOP_WORDS = frozenset(
         "ister",
         "itibaren",
         "itibariyle",
-        "iÃ§in",
-        "iÃ§inde",
+        "için",
+        "içinde",
         "iÅŸte",
         "kadar",
         "karsi",
@@ -166,7 +166,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "mi",
         "milyon",
         "mu",
-        "mÃ¼",
+        "mü",
         "mÄ±",
         "nasil",
         "nasÄ±l",
@@ -179,7 +179,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "neyse",
         "nice",
         "niye",
-        "niÃ§in",
+        "niçin",
         "nu",
         "nun",
         "o",
@@ -213,7 +213,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "siz",
         "sizin",
         "soyle",
-        "sÃ¶yle",
+        "söyle",
         "su",
         "suna",
         "sunda",
@@ -234,10 +234,10 @@ _TURKCE_STOP_WORDS = frozenset(
         "tarafindan",
         "tarafÄ±ndan",
         "tum",
-        "tÃ¼m",
+        "tüm",
         "uzere",
-        "Ã¼zerinde",
-        "Ã¼zere",
+        "üzerinde",
+        "üzere",
         "var",
         "ve",
         "veya",
@@ -1027,7 +1027,7 @@ class GelismisHafiza:
             import re
 
             tum_metin = " ".join(row["icerik"] or "" for row in satirlar)
-            kelimeler = re.findall(r"[a-zA-ZÄŸÃ¼ÅŸÄ±Ã¶Ã§ÄÃœÅÄ°Ã–Ã‡0-9]+", tum_metin.lower())
+            kelimeler = re.findall(r"[a-zA-ZÄŸüÅŸÄ±öçÄÃœÅÄ°Ã–Ã‡0-9]+", tum_metin.lower())
 
             # 2. Stop words + kisa kelimeleri filtrele
             filtrelenmis = [
@@ -1384,12 +1384,12 @@ def auto_consolidation_durdur() -> None:
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# MOTOR ENTEGRASYONU â€” araÃ§larÄ± motor.py'ye kaydet
+# MOTOR ENTEGRASYONU â€” araçlarÄ± motor.py'ye kaydet
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor: Any) -> None:
-    """hafiza_genislet.py araÃ§larÄ±nÄ± Motor'a kaydet.
+    """hafiza_genislet.py araçlarÄ±nÄ± Motor'a kaydet.
 
     Motor._plugin_moduller_yukle() tarafÄ±ndan otomatik keÅŸfedilir.
     """
@@ -1433,7 +1433,7 @@ def motor_kaydet(motor: Any) -> None:
         "Hafizaya kayit ekler. Kullanim: HAFIZA_KAYDET(icerik='...', koleksiyon='konusmalar', anahtar='...', ttl_saat='0')",
     )
 
-    # HAFIZA_SESSION_ARA â€” geÃ§miÅŸ session'larda FTS5 arama (ReYMeN session_search benzeri)
+    # HAFIZA_SESSION_ARA â€” geçmiÅŸ session'larda FTS5 arama (ReYMeN session_search benzeri)
     motor._plugin_arac_kaydet(
         "HAFIZA_SESSION_ARA",
         lambda sorgu="", limit="5": json.dumps(

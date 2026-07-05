@@ -1,4 +1,4 @@
-﻿"""disk_izleme.py â€” GÃ¼nlÃ¼k disk + DB boyut kontrolÃ¼."""
+"""disk_izleme.py â€” Günlük disk + DB boyut kontrolü."""
 
 import shutil, json
 from pathlib import Path
@@ -25,13 +25,13 @@ if si_db.exists():
     else:
         rapor.append(f"âœ… skills_index.db: {mb:.0f}MB")
 
-# .old yaÅŸ kontrolÃ¼
+# .old yaÅŸ kontrolü
 for f in sorted(PROJE.rglob("*.old")):
     yas = (
         __import__("datetime").datetime.now()
         - __import__("datetime").datetime.fromtimestamp(f.stat().st_mtime)
     ).days
     if yas > 7:
-        rapor.append(f"âš ï¸ {f.name}: {yas} gÃ¼nlÃ¼k .old â€” silinebilir")
+        rapor.append(f"âš ï¸ {f.name}: {yas} günlük .old â€” silinebilir")
 
 print(" | ".join(rapor) if rapor else "âœ… Her ÅŸey normal")

@@ -1,20 +1,20 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 browser_agent.py â€” ReYMeN Otonom Browser Agent Loop Tool.
 
-Tek hedef ver, ReYMeN tarayÄ±cÄ±yÄ± otomatik yÃ¶netsin:
-  Hedef â†’ Plan â†’ DÃ¶ngÃ¼ (navigate â†’ vision â†’ decide â†’ act â†’ verify) â†’ Rapor
+Tek hedef ver, ReYMeN tarayÄ±cÄ±yÄ± otomatik yönetsin:
+  Hedef â†’ Plan â†’ Döngü (navigate â†’ vision â†’ decide â†’ act â†’ verify) â†’ Rapor
 
 Resilience desenleri (skill: browser-hata-desenleri):
   - retry + exponential backoff
   - timeout + screenshot + log
-  - sekme state yÃ¶netimi (invisible dÃ¶ngÃ¼ tespiti)
+  - sekme state yönetimi (invisible döngü tespiti)
   - finally ile kaynak temizleme
 
 Tool Registry'e otomatik kaydolur (tools/ dizininde run() fonksiyonu).
 
 KullanÄ±m (LLM'den):
-    Eylem: BROWSER_AGENT(goal="GitHub'da ReYMeN reposunu bul ve yÄ±ldÄ±z sayÄ±sÄ±nÄ± sÃ¶yle")
+    Eylem: BROWSER_AGENT(goal="GitHub'da ReYMeN reposunu bul ve yÄ±ldÄ±z sayÄ±sÄ±nÄ± söyle")
 """
 
 import json
@@ -27,14 +27,14 @@ logger = logging.getLogger(__name__)
 
 # â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _DENEME_SAYISI = 3
-_MAX_DENEME = 3  # invisible dÃ¶ngÃ¼ kesme sÄ±nÄ±rÄ±
+_MAX_DENEME = 3  # invisible döngü kesme sÄ±nÄ±rÄ±
 _TIMEOUT_KISA = 5000
 _TIMEOUT_UZUN = 15000
 _BEKLEME_CARPAN = 1.0  # exponential backoff baÅŸlangÄ±cÄ±
 
-# â”€â”€ Tool Meta (Registry iÃ§in) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Tool Meta (Registry için) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 TOOL_META = {
-    "aciklama": "Otonom Browser Agent â€” tek hedefle tarayÄ±cÄ±yÄ± otomatik yÃ¶netir",
+    "aciklama": "Otonom Browser Agent â€” tek hedefle tarayÄ±cÄ±yÄ± otomatik yönetir",
     "kategori": "browser",
     "risk": 2,
     "parametreler": [
@@ -42,45 +42,45 @@ TOOL_META = {
             "ad": "goal",
             "tip": "string",
             "zorunlu": True,
-            "aciklama": "TarayÄ±cÄ±da yapÄ±lacak iÅŸ (Ã¶rn: 'Google'da X ara, ilk sonucu aÃ§')",
+            "aciklama": "TarayÄ±cÄ±da yapÄ±lacak iÅŸ (örn: 'Google'da X ara, ilk sonucu aç')",
         },
         {
             "ad": "url",
             "tip": "string",
             "zorunlu": False,
-            "aciklama": "BaÅŸlangÄ±Ã§ URL'si (opsiyonel)",
+            "aciklama": "BaÅŸlangÄ±ç URL'si (opsiyonel)",
         },
         {
             "ad": "max_tur",
             "tip": "int",
             "zorunlu": False,
-            "aciklama": "Maksimum dÃ¶ngÃ¼ turu (varsayÄ±lan: 15)",
+            "aciklama": "Maksimum döngü turu (varsayÄ±lan: 15)",
         },
     ],
 }
 
 # â”€â”€ LLM Sistemi Talimati â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _SISTEM_TALIMATI = """Sen ReYMeN'in tarayÄ±cÄ± otomasyon ajanÄ±sÄ±n.
-GÃ¶revin: Verilen hedefe ulaÅŸmak iÃ§in tarayÄ±cÄ±yÄ± adÄ±m adÄ±m yÃ¶netmek.
+Görevin: Verilen hedefe ulaÅŸmak için tarayÄ±cÄ±yÄ± adÄ±m adÄ±m yönetmek.
 
 TARAYICI KOMUTLARIN:
   navigate: URL'ye git (param: url)
   click:    elementi tÄ±kla (param: selector - CSS selector)
   type:     input alanÄ±na yazÄ± yaz (param: selector, text)
   scroll:   sayfayÄ± kaydÄ±r (param: direction - up/down)
-  back:     bir Ã¶nceki sayfaya dÃ¶n
-  screenshot: ekran gÃ¶rÃ¼ntÃ¼sÃ¼ al
-  tamam:   hedefe ulaÅŸÄ±ldÄ±, dÃ¶ngÃ¼yÃ¼ bitir
-  basarisiz: hedefe ulaÅŸÄ±lamadÄ±, dÃ¶ngÃ¼yÃ¼ bitir
+  back:     bir önceki sayfaya dön
+  screenshot: ekran görüntüsü al
+  tamam:   hedefe ulaÅŸÄ±ldÄ±, döngüyü bitir
+  basarisiz: hedefe ulaÅŸÄ±lamadÄ±, döngüyü bitir
 
 ADIM ADIM DÃ–NGÃœ:
 1. Mevcut sayfayÄ± analiz et (sana snapshot verildi)
 2. Bir sonraki eylemi belirle
 3. Eylemi yap
 4. Hedefe ulaÅŸÄ±ldÄ± mÄ± kontrol et
-5. UlaÅŸÄ±lmadÄ±ysa dÃ¶ngÃ¼ye devam et
+5. UlaÅŸÄ±lmadÄ±ysa döngüye devam et
 
-CEVAP FORMATI (sadece geÃ§erli JSON):
+CEVAP FORMATI (sadece geçerli JSON):
 {"degerlendirme": "mevcut durum analizi", "hedefe_ulasti": false, "eylem": {"tur": "navigate", "parametreler": {"url": "https://..."}, "aciklama": "google'a git"}}
 
 Kurallar:
@@ -91,12 +91,12 @@ Kurallar:
 
 
 class BrowserAgentLoop:
-    """Browser Agent Loop â€” hedefe kadar otonom dÃ¶ngÃ¼.
+    """Browser Agent Loop â€” hedefe kadar otonom döngü.
 
     Resilience desenleri:
     - guvenli_tikla: retry + exponential backoff + screenshot
-    - sekme state: her adÄ±mda sayfa kontrolÃ¼
-    - invisible dÃ¶ngÃ¼ tespiti: MAX_DENEME sayacÄ±
+    - sekme state: her adÄ±mda sayfa kontrolü
+    - invisible döngü tespiti: MAX_DENEME sayacÄ±
     - finally: kaynak temizleme
     """
 
@@ -144,10 +144,10 @@ class BrowserAgentLoop:
 
     # â”€â”€ Resilience: guvenli_tikla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _guvenli_tikla(self, selector: str) -> tuple[bool, str]:
-        """Retry + exponential backoff + screenshot ile gÃ¼venli tÄ±klama.
+        """Retry + exponential backoff + screenshot ile güvenli tÄ±klama.
 
         Returns:
-            (baÅŸarÄ±lÄ±_mÄ±, sonuÃ§_mesajÄ±)
+            (baÅŸarÄ±lÄ±_mÄ±, sonuç_mesajÄ±)
         """
         for i in range(_DENEME_SAYISI):
             try:
@@ -171,7 +171,7 @@ class BrowserAgentLoop:
             logger.info("[BrowserAgent] %d sn bekleniyor...", bekle)
             time.sleep(bekle)
 
-        # TÃ¼m denemeler baÅŸarÄ±sÄ±z â†’ screenshot al
+        # Tüm denemeler baÅŸarÄ±sÄ±z â†’ screenshot al
         try:
             engine = self._engine_al()
             ss = engine.ekran_goruntusu()
@@ -184,12 +184,12 @@ class BrowserAgentLoop:
         return False, f"[HATA] Tik basarisiz ({_DENEME_SAYISI} deneme): {selector}"
 
     def _guvenli_sayfa_ac(self, url: str) -> tuple[bool, str]:
-        """Timeout + retry ile gÃ¼venli sayfa aÃ§ma."""
-        # Invisible dÃ¶ngÃ¼ tespiti
+        """Timeout + retry ile güvenli sayfa açma."""
+        # Invisible döngü tespiti
         if self._sekme_acma_sayaci >= _MAX_DENEME:
             return (
                 False,
-                "[HATA] Sekme aÃ§ma/kapama dÃ¶ngÃ¼sÃ¼ tespit edildi â€” iÅŸlem durduruldu",
+                "[HATA] Sekme açma/kapama döngüsü tespit edildi â€” iÅŸlem durduruldu",
             )
 
         for i in range(_DENEME_SAYISI):
@@ -214,7 +214,7 @@ class BrowserAgentLoop:
         return False, f"[HATA] Sayfa acilamadi ({_DENEME_SAYISI} deneme): {url}"
 
     def _guvenli_ekran_goruntusu(self) -> str:
-        """Screenshot al, baÅŸarÄ±sÄ±zsa boÅŸ dÃ¶n."""
+        """Screenshot al, baÅŸarÄ±sÄ±zsa boÅŸ dön."""
         for i in range(2):
             try:
                 engine = self._engine_al()
@@ -253,7 +253,7 @@ class BrowserAgentLoop:
             return self._basit_strateji()
 
     def _json_ayikla(self, yanit: str) -> dict:
-        """LLM yanÄ±tÄ±ndan JSON Ã§Ä±kar."""
+        """LLM yanÄ±tÄ±ndan JSON çÄ±kar."""
         try:
             if "```" in yanit:
                 parcalar = yanit.split("```")
@@ -316,16 +316,16 @@ class BrowserAgentLoop:
             self._engine = BrowserEngine()
         return self._engine
 
-    # â”€â”€ Ana DÃ¶ngÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Ana Döngü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def calistir(self) -> str:
-        """Ana dÃ¶ngÃ¼yÃ¼ Ã§alÄ±ÅŸtÄ±r.
+        """Ana döngüyü çalÄ±ÅŸtÄ±r.
 
         Resilience:
         - Her adÄ±mda retry + exponential backoff
         - Screenshot ile hata kanÄ±tÄ±
-        - Sekme state yÃ¶netimi
+        - Sekme state yönetimi
         - finally ile kaynak temizleme
-        - Invisible dÃ¶ngÃ¼ tespiti
+        - Invisible döngü tespiti
         """
         logger.info("[BrowserAgent] Baslatiliyor: %s", self.goal)
 
@@ -341,7 +341,7 @@ class BrowserAgentLoop:
                 if not basarili:
                     return f"âŒ BASLANGIC HATASI\n\nHedef: {self.goal}\n{msg}"
 
-            # Ana dÃ¶ngÃ¼
+            # Ana döngü
             while self.tur < self.max_tur:
                 self.tur += 1
                 logger.info("[BrowserAgent] Tur %d/%d", self.tur, self.max_tur)
@@ -364,7 +364,7 @@ class BrowserAgentLoop:
                         f"âœ… BROWSER AGENT TAMAMLANDI\n\n"
                         f"Hedef: {self.goal}\n"
                         f"Tur: {self.tur}/{self.max_tur}\n"
-                        f"SonuÃ§: {sonuc}"
+                        f"Sonuç: {sonuc}"
                     )
 
                 # Eylemi uygula (resilience desenleri ile)
@@ -400,7 +400,7 @@ class BrowserAgentLoop:
                         f"{'âœ…' if eylem_tur == 'tamam' else 'âŒ'} BROWSER AGENT SONLANDI\n\n"
                         f"Hedef: {self.goal}\n"
                         f"Tur: {self.tur}/{self.max_tur}\n"
-                        f"SonuÃ§: {eylem.get('aciklama', '')}"
+                        f"Sonuç: {eylem.get('aciklama', '')}"
                     )
 
                 time.sleep(0.5)
@@ -430,16 +430,16 @@ class BrowserAgentLoop:
                     logger.warning("[BrowserAgent] Kapatma hatasi: %s", e)
 
 
-# â”€â”€ Tool Entry Point (tools/ discovery iÃ§in) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Tool Entry Point (tools/ discovery için) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def run(goal: str = "", url: str = "", max_tur: int = 15) -> str:
     """BROWSER_AGENT tool entry point.
 
     Args:
-        goal: YapÄ±lacak iÅŸ (Ã¶rn: "GitHub'da ReYMeN reposunu bul")
-        url: BaÅŸlangÄ±Ã§ URL'si (opsiyonel)
-        max_tur: Maksimum dÃ¶ngÃ¼ turu
+        goal: YapÄ±lacak iÅŸ (örn: "GitHub'da ReYMeN reposunu bul")
+        url: BaÅŸlangÄ±ç URL'si (opsiyonel)
+        max_tur: Maksimum döngü turu
 
     Returns:
         Ä°ÅŸlem sonucu metni

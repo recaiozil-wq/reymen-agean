@@ -1,4 +1,4 @@
-﻿"""ReYMeN console CLI â€” ReYMeN'teki ``reymen_cli/`` paketinin ReYMeN karÅŸÄ±lÄ±ÄŸÄ±.
+"""ReYMeN console CLI â€” ReYMeN'teki ``reymen_cli/`` paketinin ReYMeN karÅŸÄ±lÄ±ÄŸÄ±.
 
 ReYMeN'te komutlar::
 
@@ -6,7 +6,7 @@ ReYMeN'te komutlar::
     reymen model          â†’ hermes_cli/model_cmd.py
     reymen cron list      â†’ hermes_cli/cron_cmd.py
 
-Bu modÃ¼l, ``reymen_launcher.py``'deki argparse Ã¼zerinden Ã§aÄŸrÄ±lÄ±r.
+Bu modül, ``reymen_launcher.py``'deki argparse üzerinden çaÄŸrÄ±lÄ±r.
 KullanÄ±m::
 
     reymen status
@@ -67,7 +67,7 @@ def cmd_status(args: argparse.Namespace) -> int:
 
 
 def cmd_model(args: argparse.Namespace) -> int:
-    """Model/Provider seÃ§im ekranÄ± (ReYMeN'teki ``reymen model`` gibi)."""
+    """Model/Provider seçim ekranÄ± (ReYMeN'teki ``reymen model`` gibi)."""
     from reymen_launcher import _api_kontrol_bekle, _model_sec
 
     api_sonuc = _api_kontrol_bekle(timeout=3)
@@ -80,7 +80,7 @@ def cmd_cost(args: argparse.Namespace) -> int:
     try:
         from reymen import cost_tracker
     except ImportError:
-        print("[HATA] cost_tracker modÃ¼lÃ¼ bulunamadÄ±.")
+        print("[HATA] cost_tracker modülü bulunamadÄ±.")
         return 1
 
     sub = getattr(args, "sub", None)
@@ -97,13 +97,13 @@ def cmd_cost(args: argparse.Namespace) -> int:
 
 
 def cmd_skill_shrink(args: argparse.Namespace) -> int:
-    """Skill kÃ¼Ã§Ã¼ltme CLI komutu."""
+    """Skill küçültme CLI komutu."""
     try:
         from reymen.scripts.skill_shrink import cmd_skill_shrink as _shrink_impl
 
         return _shrink_impl(args)
     except ImportError as e:
-        print(f"[HATA] skill_shrink modÃ¼lÃ¼ bulunamadÄ±: {e}")
+        print(f"[HATA] skill_shrink modülü bulunamadÄ±: {e}")
         return 1
     except Exception as e:
         print(f"[HATA] {e}")
@@ -111,7 +111,7 @@ def cmd_skill_shrink(args: argparse.Namespace) -> int:
 
 
 def cmd_auth(args: argparse.Namespace) -> int:
-    """ğŸ” Auth yÃ¶netimi CLI komutu.
+    """ğŸ” Auth yönetimi CLI komutu.
 
     KullanÄ±m:
         reymen auth status          â†’ Auth sistemi durumu
@@ -127,7 +127,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
     try:
         from reymen.guvenlik.reymen_auth import auth_manager as _auth
     except ImportError as e:
-        print(f"[HATA] auth modÃ¼lÃ¼ bulunamadÄ±: {e}")
+        print(f"[HATA] auth modülü bulunamadÄ±: {e}")
         return 1
 
     sub = getattr(args, "auth_sub", None)
@@ -140,7 +140,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
     elif sub == "list":
         tokens = _auth.list_tokens()
         if not tokens:
-            print("HenÃ¼z token bulunmuyor.")
+            print("Henüz token bulunmuyor.")
             return 0
         print(f"{'KULLANICI':<20} {'ROL':<10} {'OLUÅTURULMA':<25} {'DURUM':<10}")
         print("-" * 65)
@@ -157,7 +157,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
     elif sub == "users":
         users = _auth.list_users()
         if not users:
-            print("HenÃ¼z kullanÄ±cÄ± bulunmuyor.")
+            print("Henüz kullanÄ±cÄ± bulunmuyor.")
             return 0
         print(f"{'KULLANICI':<20} {'ROL':<10} {'AKTÄ°F':<8} {'EMAIL':<25}")
         print("-" * 63)
@@ -177,7 +177,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
             if token:
                 print(f"   Token     : {token.access_token[:50]}...")
                 print(f"   Refresh   : {token.refresh_token[:50]}...")
-                print(f"   SÃ¼re      : {token.expires_in}s")
+                print(f"   Süre      : {token.expires_in}s")
         else:
             print(f"âŒ KullanÄ±cÄ± oluÅŸturulamadÄ±: {username}")
         return 0
@@ -192,7 +192,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
             print(f"   Rol       : {token.role}")
             print(f"   Token     : {token.access_token}")
             print(f"   Refresh   : {token.refresh_token}")
-            print(f"   SÃ¼re      : {token.expires_in}s")
+            print(f"   Süre      : {token.expires_in}s")
         else:
             print(f"âŒ Token oluÅŸturulamadÄ±: {username}")
         return 0
@@ -226,10 +226,10 @@ def cmd_auth(args: argparse.Namespace) -> int:
             print("âŒ KullanÄ±cÄ± adÄ± ve rol gerekli (admin/user/guest)")
             return 1
         if role not in ("admin", "user", "guest"):
-            print(f"âŒ GeÃ§ersiz rol: {role} (admin/user/guest)")
+            print(f"âŒ Geçersiz rol: {role} (admin/user/guest)")
             return 1
         if _auth.update_user_role(username, role):
-            print(f"âœ… {username} rolÃ¼ â†’ {role}")
+            print(f"âœ… {username} rolü â†’ {role}")
         else:
             print(f"âŒ KullanÄ±cÄ± bulunamadÄ±: {username}")
         return 0
@@ -250,13 +250,13 @@ def cmd_auth(args: argparse.Namespace) -> int:
 
     elif sub == "cleanup":
         count = _auth.cleanup()
-        print(f"ğŸ§¹ {count} sÃ¼resi dolmuÅŸ token temizlendi")
+        print(f"ğŸ§¹ {count} süresi dolmuÅŸ token temizlendi")
         return 0
 
     else:
         print("ğŸ” ReYMeN Auth Sistemi")
         print()
-        print("KullanÄ±m: reymen auth <komut> [argÃ¼manlar]")
+        print("KullanÄ±m: reymen auth <komut> [argümanlar]")
         print()
         print("Komutlar:")
         print("  status              Auth sistemi durumu")
@@ -268,13 +268,13 @@ def cmd_auth(args: argparse.Namespace) -> int:
         print("  delete <user>       KullanÄ±cÄ± sil")
         print("  role <user> <role>  Rol deÄŸiÅŸtir (admin/user/guest)")
         print("  key <api_key>       API key doÄŸrula")
-        print("  cleanup             SÃ¼resi dolmuÅŸ token'larÄ± temizle")
+        print("  cleanup             Süresi dolmuÅŸ token'larÄ± temizle")
         return 0
 
 
 # â”€â”€ A2A/ACP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_a2a(args: argparse.Namespace) -> int:
-    """A2A/ACP protokol yÃ¶netimi.
+    """A2A/ACP protokol yönetimi.
 
     KullanÄ±m:
         reymen a2a status         â†’ A2A/ACP durumu
@@ -282,14 +282,14 @@ def cmd_a2a(args: argparse.Namespace) -> int:
         reymen a2a stop           â†’ ACP sunucusunu durdur
         reymen a2a card list      â†’ Agent Card'larÄ± listele
         reymen a2a card register  â†’ Agent Card kaydet
-        reymen a2a task list      â†’ Devredilen gÃ¶revleri listele
-        reymen a2a task delegate  â†’ GÃ¶rev devret
+        reymen a2a task list      â†’ Devredilen görevleri listele
+        reymen a2a task delegate  â†’ Görev devret
         reymen a2a skill transfer â†’ Beceri aktar
         reymen a2a stats          â†’ Ä°statistikler
     """
     alt = getattr(args, "a2a_sub", None) or "status"
 
-    # Ã–nce ACP modÃ¼lÃ¼nÃ¼ yÃ¼kle
+    # Ã–nce ACP modülünü yükle
     try:
         from reymen.a2a_acp import (
             ACPServer,
@@ -455,23 +455,23 @@ def build_parser() -> argparse.ArgumentParser:
     p_st.set_defaults(func=cmd_status)
 
     # model
-    p_mdl = sub.add_parser("model", help="Model/Provider seÃ§imi")
+    p_mdl = sub.add_parser("model", help="Model/Provider seçimi")
     p_mdl.set_defaults(func=cmd_model)
 
     # cost
     p_cost = sub.add_parser("cost", help="API maliyet takibi")
     p_cost_sub = p_cost.add_subparsers(dest="sub")
-    p_cost_sub.add_parser("summary", help="Maliyet Ã¶zeti")
+    p_cost_sub.add_parser("summary", help="Maliyet özeti")
     p_log = p_cost_sub.add_parser("log", help="Ham kayÄ±tlar")
     p_log.add_argument("--limit", type=int, default=20)
     p_cost_sub.add_parser("reset", help="KayÄ±tlarÄ± temizle")
     p_cost.set_defaults(func=cmd_cost, sub="summary")
 
     # skill
-    p_skill = sub.add_parser("skill", help="Skill yÃ¶netimi")
+    p_skill = sub.add_parser("skill", help="Skill yönetimi")
     p_skill_sub = p_skill.add_subparsers(dest="skill_sub")
     p_shrink = p_skill_sub.add_parser(
-        "shrink", help="ÅiÅŸkin skill'leri tespit et/kÃ¼Ã§Ã¼lt"
+        "shrink", help="ÅiÅŸkin skill'leri tespit et/küçült"
     )
     p_shrink.add_argument(
         "--dry-run",
@@ -494,7 +494,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_shrink.set_defaults(func=cmd_skill_shrink)
 
     # auth ğŸ”
-    p_auth = sub.add_parser("auth", help="ğŸ” Auth yÃ¶netimi (token, kullanÄ±cÄ±, API key)")
+    p_auth = sub.add_parser("auth", help="ğŸ” Auth yönetimi (token, kullanÄ±cÄ±, API key)")
     p_auth_sub = p_auth.add_subparsers(dest="auth_sub")
     p_auth_sub.add_parser("status", help="Auth sistemi durumu")
     p_auth_sub.add_parser("list", help="Token'larÄ± listele")
@@ -513,22 +513,22 @@ def build_parser() -> argparse.ArgumentParser:
     p_auth_revoke.add_argument("token_value", help="Ä°ptal edilecek token")
     p_auth_delete = p_auth_sub.add_parser("delete", help="KullanÄ±cÄ± sil")
     p_auth_delete.add_argument("username", help="Silinecek kullanÄ±cÄ±")
-    p_auth_role = p_auth_sub.add_parser("role", help="KullanÄ±cÄ± rolÃ¼ deÄŸiÅŸtir")
+    p_auth_role = p_auth_sub.add_parser("role", help="KullanÄ±cÄ± rolü deÄŸiÅŸtir")
     p_auth_role.add_argument("username", help="KullanÄ±cÄ± adÄ±")
     p_auth_role.add_argument("role", choices=["admin", "user", "guest"])
     p_auth_key = p_auth_sub.add_parser("key", help="API key doÄŸrula")
     p_auth_key.add_argument("key_value", help="DoÄŸrulanacak API anahtarÄ±")
-    p_auth_sub.add_parser("cleanup", help="SÃ¼resi dolmuÅŸ token'larÄ± temizle")
+    p_auth_sub.add_parser("cleanup", help="Süresi dolmuÅŸ token'larÄ± temizle")
     p_auth.set_defaults(func=cmd_auth)
 
     # a2a/ACP
     p_a2a = sub.add_parser(
         "a2a",
-        help="ğŸ“¡ A2A/ACP protokol yÃ¶netimi (Agent Card, gÃ¶rev devretme, beceri aktarÄ±mÄ±)",
+        help="ğŸ“¡ A2A/ACP protokol yönetimi (Agent Card, görev devretme, beceri aktarÄ±mÄ±)",
     )
 
     # kural (Rules Engine)
-    p_kural = sub.add_parser("kural", help="ğŸ“‹ Kural/izin yÃ¶netimi (Rules Engine)")
+    p_kural = sub.add_parser("kural", help="ğŸ“‹ Kural/izin yönetimi (Rules Engine)")
     p_kural_sub = p_kural.add_subparsers(dest="kural_sub")
     p_kural_list = p_kural_sub.add_parser("list", help="KurallarÄ± listele")
     p_kural_list.add_argument(
@@ -554,12 +554,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_kural_ekle.add_argument(
         "desen", help="EÅŸleÅŸme deseni (wildcard veya re: ile regex)"
     )
-    p_kural_ekle.add_argument("--sebep", "-s", default="", help="Kural aÃ§Ä±klamasÄ±")
+    p_kural_ekle.add_argument("--sebep", "-s", default="", help="Kural açÄ±klamasÄ±")
     p_kural_ekle.add_argument("--id", default=None, help="Kural ID'si (opsiyonel)")
     p_kural_sil = p_kural_sub.add_parser("sil", help="Kural sil")
     p_kural_sil.add_argument("kural_id", help="Silinecek kural ID'si")
     p_kural_kontrol = p_kural_sub.add_parser(
-        "kontrol", help="Bir hedefi kurallara gÃ¶re kontrol et"
+        "kontrol", help="Bir hedefi kurallara göre kontrol et"
     )
     p_kural_kontrol.add_argument(
         "kategori",
@@ -577,7 +577,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--transport",
         default="stdio",
         choices=["stdio", "socket"],
-        help="TaÅŸÄ±ma protokolÃ¼ (varsayÄ±lan: stdio)",
+        help="TaÅŸÄ±ma protokolü (varsayÄ±lan: stdio)",
     )
     p_a2a_start.add_argument(
         "--port",
@@ -588,39 +588,39 @@ def build_parser() -> argparse.ArgumentParser:
     p_a2a_sub.add_parser("stop", help="ACP sunucusunu durdur")
 
     # card alt komutlarÄ±
-    p_card = p_a2a_sub.add_parser("card", help="Agent Card yÃ¶netimi")
+    p_card = p_a2a_sub.add_parser("card", help="Agent Card yönetimi")
     p_card_sub = p_card.add_subparsers(dest="card_sub")
     p_card_sub.add_parser("list", help="Agent Card'larÄ± listele")
     p_card_reg = p_card_sub.add_parser("register", help="Agent Card kaydet")
     p_card_reg.add_argument("agent_id", help="Benzersiz agent ID")
-    p_card_reg.add_argument("--name", default="", help="GÃ¶sterim adÄ±")
+    p_card_reg.add_argument("--name", default="", help="Gösterim adÄ±")
     p_card_reg.add_argument(
         "--capabilities",
         default="messaging",
-        help="Yetenek listesi (virgÃ¼lle ayrÄ±lmÄ±ÅŸ)",
+        help="Yetenek listesi (virgülle ayrÄ±lmÄ±ÅŸ)",
     )
     p_card_reg.add_argument(
-        "--skills", default="", help="Beceri listesi (virgÃ¼lle ayrÄ±lmÄ±ÅŸ)"
+        "--skills", default="", help="Beceri listesi (virgülle ayrÄ±lmÄ±ÅŸ)"
     )
     p_card.set_defaults(card_sub="list")
 
     # task alt komutlarÄ±
-    p_task = p_a2a_sub.add_parser("task", help="GÃ¶rev devretme yÃ¶netimi")
+    p_task = p_a2a_sub.add_parser("task", help="Görev devretme yönetimi")
     p_task_sub = p_task.add_subparsers(dest="task_sub")
-    p_task_list = p_task_sub.add_parser("list", help="Devredilen gÃ¶revleri listele")
+    p_task_list = p_task_sub.add_parser("list", help="Devredilen görevleri listele")
     p_task_list.add_argument("--agent-id", help="Agent ID filtresi")
     p_task_list.add_argument(
         "--status",
         dest="task_status",
         help="Durum filtresi (pending/accepted/completed/failed)",
     )
-    p_task_del = p_task_sub.add_parser("delegate", help="Yeni gÃ¶rev devret")
+    p_task_del = p_task_sub.add_parser("delegate", help="Yeni görev devret")
     p_task_del.add_argument("target", help="Hedef agent ID")
-    p_task_del.add_argument("title", help="GÃ¶rev baÅŸlÄ±ÄŸÄ±")
+    p_task_del.add_argument("title", help="Görev baÅŸlÄ±ÄŸÄ±")
     p_task_del.add_argument(
         "--source", default="reymen", help="Kaynak agent ID (varsayÄ±lan: reymen)"
     )
-    p_task_del.add_argument("--description", default="", help="GÃ¶rev aÃ§Ä±klamasÄ±")
+    p_task_del.add_argument("--description", default="", help="Görev açÄ±klamasÄ±")
     p_task.set_defaults(task_sub="list")
 
     p_a2a_sub.add_parser("stats", help="ACP istatistikleri")

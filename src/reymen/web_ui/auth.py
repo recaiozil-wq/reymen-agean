@@ -1,4 +1,4 @@
-﻿"""ğŸ” ReYMeN Auth â€” Provider pattern + JWT cookie + roller.
+"""ğŸ” ReYMeN Auth â€” Provider pattern + JWT cookie + roller.
 
 ReYMeN dashboard_auth pattern'inin birebir kopyasÄ±:
   - AuthProvider ABC (ReYMeN'teki DashboardAuthProvider)
@@ -14,7 +14,7 @@ Kullanim:
         user_manager, token_manager, Session,
     )
 
-    # Kullanici yÃ¶netimi
+    # Kullanici yönetimi
     user_manager.kullanici_ekle("operator", "sifre", role="operator")
 
     # Provider registry
@@ -47,8 +47,8 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 
 class Role(str, Enum):
     ADMIN = "admin"  # Tam yetki
-    OPERATOR = "operator"  # AraÃ§ kullanabilir, yapÄ±landÄ±ramaz
-    VIEWER = "viewer"  # Sadece gÃ¶rÃ¼ntÃ¼leme
+    OPERATOR = "operator"  # Araç kullanabilir, yapÄ±landÄ±ramaz
+    VIEWER = "viewer"  # Sadece görüntüleme
 
 
 ROLE_PERMISSIONS = {

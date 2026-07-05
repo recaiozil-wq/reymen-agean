@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """prompt_assembly.py â€” Sistem prompt'u tek noktadan topla.
 
 Hedef yapi:
@@ -210,3 +210,198 @@ def _kaynak_dosyalari() -> dict:
         "soul": str(_profil_soul_yolu()),
         "user": str(_VARSAYILAN_USER_MD),
     }
+
+
+# ── Harici dosya cache (mtime kontrollü) ─────────────────────────────
+_prompt_dosya_cache: dict[str, tuple[float, str]] = {}
+
+
+def cache_dosya_oku(dosya_yolu: str | Path, max_len: int = 0) -> str | None:
+    """Dosyayi mtime kontroluyle cache'le. Degismemisse cache'den don."""
+    p = Path(dosya_yolu) if not isinstance(dosya_yolu, Path) else dosya_yolu
+    if not p.exists():
+        return None
+    try:
+        mtime = p.stat().st_mtime
+        cache_key = f"{str(p.resolve())}_max{max_len}"
+        if cache_key in _prompt_dosya_cache:
+            cached_mtime, cached_content = _prompt_dosya_cache[cache_key]
+            if cached_mtime == mtime:
+                return cached_content
+        icerik = p.read_text(encoding="utf-8", errors="replace")
+        if max_len and len(icerik) > max_len:
+            icerik = icerik[:max_len]
+        _prompt_dosya_cache[cache_key] = (mtime, icerik)
+        return icerik
+    except (OSError, PermissionError):
+        return None
+
+
+# ── Profil bilgisi (MEMORY.md + USER.md) ───────────────────────────
+
+def profil_bilgisi_al() -> str:
+    """MEMORY.md + USER.md icerigini oku, profil bilgisi olarak don."""
+    try:
+        proje_kok = _PROJE_KOKU
+        localappdata = Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~/.hermes")))
+        hermes_profiles = localappdata / "hermes" / "profiles"
+        aday_yollar = [
+            proje_kok / ".ReYMeN" / "memories",
+            proje_kok / ".ReYMeN",
+            proje_kok / "reymen" / "hafiza",
+            hermes_profiles / "default" / "memories",
+            hermes_profiles / "reymen" / "memories",
+            hermes_profiles / "kiral38" / "memories",
+            Path(sys.path[0]) / ".ReYMeN" / "memories" if sys.path[0] else None,
+            Path.cwd() / ".ReYMeN" / "memories",
+        ]
+        parcalar = []
+        for dosya_adi, etiket in [("MEMORY.md", "Hafiza Notlari"), ("USER.md", "Kullanici Profili")]:
+            for aday in aday_yollar:
+                if aday is None:
+                    continue
+                yol = aday / dosya_adi
+                if yol.exists():
+                    icerik = cache_dosya_oku(yol, max_len=2000)
+                    if icerik:
+                        parcalar.append(f"[{etiket}]\n{icerik}")
+                    break
+        return "\n" + "\n\n".join(parcalar) if parcalar else ""
+    except Exception:
+        return ""
+
+
+def soul_bilgisi_al() -> str:
+    """SOUL.md icerigini oku, kimlik + kural + platform bilgisi olarak don."""
+    try:
+        proje_kok = _PROJE_KOKU
+        localappdata = Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~/.hermes")))
+        hermes_profiles = localappdata / "hermes" / "profiles"
+        aday_yollar = [
+            proje_kok / "SOUL.md",
+            proje_kok / "SOUL" / "SOUL.md",
+            proje_kok / ".ReYMeN" / "SOUL.md",
+            hermes_profiles / "default" / "SOUL.md",
+            hermes_profiles / "reymen" / "SOUL.md",
+            hermes_profiles / "kiral38" / "SOUL.md",
+            Path(sys.path[0]) / "SOUL.md" if sys.path[0] else None,
+        ]
+        for aday in aday_yollar:
+            if aday is None:
+                continue
+            yol = aday if isinstance(aday, Path) else Path(aday)
+            if yol.exists():
+                icerik = cache_dosya_oku(yol, max_len=4000)
+                if icerik:
+                    return f"\n[SOUL.md — Kimlik & Kurallar]\n{icerik}\n"
+        return ""
+    except Exception:
+        return ""
+
+
+def agents_bilgisi_al() -> str:
+    """AGENTS.md icerigini oku, entry point + yapi bilgisi olarak don."""
+    try:
+        proje_kok = _PROJE_KOKU
+        aday_yollar = [
+            proje_kok / "AGENTS.md",
+            proje_kok / ".ReYMeN" / "AGENTS.md",
+            Path(os.path.expanduser("~")) / "AppData" / "Local" / "reymen" / "profiles" / "reymen" / "AGENTS.md",
+            Path(sys.path[0]) / "AGENTS.md" if sys.path[0] else None,
+        ]
+        for aday in aday_yollar:
+            if aday is None:
+                continue
+            yol = aday if isinstance(aday, Path) else Path(aday)
+            if yol.exists():
+                icerik = cache_dosya_oku(yol, max_len=2000)
+                if icerik:
+                    return f"\n[AGENTS.md — Entry Points & Mimari]\n{icerik}\n"
+        return ""
+    except Exception:
+        return ""
+
+
+def sistem_promptu_olustur(hedef: str, baglam: dict = None, motor=None) -> str:
+    """PromptBuilder ile sistem promptu insa et."""
+    try:
+        from reymen.arac.prompt_builder import PromptBuilder
+        import json as _json
+        import logging as _log
+        _logg = _log.getLogger("conversation_loop")
+        pb = PromptBuilder()
+        if motor and hasattr(motor, "arac_listesi"):
+            try:
+                pb.araclar_kaydet(motor.arac_listesi())
+            except Exception:
+                pass
+        ek_bilgi = _json.dumps(baglam, ensure_ascii=False) if baglam else ""
+
+        try:
+            from reymen.cereyan.continuous_learning import ogrenme_baglani_al as _cl_baglam
+            cl_ctx = _cl_baglam()
+            if cl_ctx:
+                ek_bilgi += "\\n\\n" + cl_ctx
+        except Exception:
+            pass
+        try:
+            from reymen.cereyan.active_skill_tracker import aktif_skill_context_ekle
+            skill_ctx = aktif_skill_context_ekle()
+            if skill_ctx:
+                ek_bilgi += "\\n\\n" + skill_ctx
+        except Exception:
+            pass
+        try:
+            from reymen.sistem.ortak_komut import guncelle as _ortak_guncelle
+            _ortak_guncelle()
+        except Exception:
+            pass
+        try:
+            from reymen.sistem.durum import _yukle
+            _ham_veri = _yukle()
+            _ham_json = _json.dumps(_ham_veri, indent=2, ensure_ascii=False)
+            ek_bilgi += "\\n\\n" + "=" * 50 + "\\n[ZORUNLU KURAL - ASAGIDAKI JSON TEK KAYNAKTIR]\\n"
+            ek_bilgi += "ReYMeN durumu hakkinda soru gelince kendi training bilgini KULLANMA.\\n"
+            ek_bilgi += "Bu JSON TEK KAYNAK.\\n" + "=" * 50 + "\\n"
+            ek_bilgi += _ham_json[:8000]
+            if len(_ham_json) > 8000:
+                ek_bilgi += "\\n... (JSON kesildi)"
+            ek_bilgi += "\\n" + "=" * 50 + "\\n"
+        except Exception:
+            pass
+
+        try:
+            p = profil_bilgisi_al()
+            if p: ek_bilgi += p
+        except Exception:
+            pass
+        try:
+            s = soul_bilgisi_al()
+            if s: ek_bilgi += "\\n" + s
+        except Exception:
+            pass
+        try:
+            a = agents_bilgisi_al()
+            if a: ek_bilgi += "\\n" + a
+        except Exception:
+            pass
+
+        return pb.sistem_prompt(hedef=hedef, ek_bilgi=ek_bilgi)
+    except Exception as e:
+        _logg = _log.getLogger("conversation_loop")
+        _logg.warning("PromptBuilder yok: %s", e)
+
+    skill_context = ""
+    try:
+        from reymen.cereyan.active_skill_tracker import aktif_skill_context_ekle
+        skill_context = aktif_skill_context_ekle() or ""
+    except Exception:
+        pass
+    return (
+        "Sen ReYMeN, otonom bir yazilim ajanisin. "
+        "Hedefe odaklan, araclari kullan, Turkce yaz. "
+        f"{profil_bilgisi_al()}"
+        f"{soul_bilgisi_al()}"
+        f"{agents_bilgisi_al()}"
+        f"{skill_context}"
+    )

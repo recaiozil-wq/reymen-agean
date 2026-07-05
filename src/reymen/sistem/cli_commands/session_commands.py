@@ -1,7 +1,7 @@
-﻿"""Oturum yÃ¶netim komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
+"""Oturum yönetim komutlarÄ± â€” MixinCommands alt modülü.
 
 Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
-MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± içerir.
 """
 
 import logging
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """Oturum yÃ¶netim komutlarÄ±."""
+    """Oturum yönetim komutlarÄ±."""
 
     def new_session(self, silent=False, title=None):
         """Start a fresh session with a new session ID and cleared agent state."""

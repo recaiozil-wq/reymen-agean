@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """workflow_recorder.py â€” Ä°ÅŸ akÄ±ÅŸÄ± kaydetme ve tekrarlama.
 
 Browser iÅŸlemlerini kaydeder, JSON dosyasÄ±na yazar,
@@ -52,7 +52,7 @@ class WorkflowRecorder:
         """Her browser iÅŸlemini kaydet (aktif kayÄ±t varsa).
 
         Args:
-            adim_turu: Ä°ÅŸlem tÃ¼rÃ¼ (ac, tikla, fill, scroll, bekle, ...)
+            adim_turu: Ä°ÅŸlem türü (ac, tikla, fill, scroll, bekle, ...)
             **kwargs: Ä°ÅŸlem parametreleri
         """
         if not self._kayit_yapiliyor:
@@ -152,7 +152,7 @@ class WorkflowRecorder:
                     browser_tool.forward()
                     satirlar.append(f"  [{i+1}] âœ… forward")
                 elif tur == "geribildirim":
-                    # KullanÄ±cÄ±ya mesaj gÃ¶ster (sadece log)
+                    # KullanÄ±cÄ±ya mesaj göster (sadece log)
                     satirlar.append(f"  [{i+1}] ğŸ’¬ {adim.get('mesaj','')}")
                 else:
                     satirlar.append(f"  [{i+1}] âš ï¸ Bilinmeyen adim: {tur}")
@@ -166,7 +166,7 @@ class WorkflowRecorder:
         return "\n".join(satirlar)
 
     def listele(self) -> str:
-        """KayÄ±tlÄ± tÃ¼m workflow'larÄ± listele.
+        """KayÄ±tlÄ± tüm workflow'larÄ± listele.
 
         Returns:
             str: Workflow listesi

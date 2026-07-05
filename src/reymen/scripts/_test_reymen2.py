@@ -1,11 +1,11 @@
-﻿"""ReYMeN modÃ¼l import testi"""
+"""ReYMeN modül import testi"""
 
 import sys, os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 print("CWD:", os.getcwd())
 print("SCRIPT DIR:", os.path.dirname(os.path.abspath(__file__)))
-print("ReYMeN klasÃ¶rÃ¼:", os.path.isdir("ReYMeN"))
+print("ReYMeN klasörü:", os.path.isdir("ReYMeN"))
 print("init:", os.path.isfile("ReYMeN/__init__.py"))
 try:
     import ReYMeN.cost_tracker

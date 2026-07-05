@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.checkpoint_manager shim â€” ReYMeN checkpoint yÃ¶netimini yÃ¶nlendirir."""
+"""ReYMeN tools.checkpoint_manager shim â€” ReYMeN checkpoint yönetimini yönlendirir."""
 
 from __future__ import annotations
 

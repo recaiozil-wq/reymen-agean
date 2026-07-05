@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 git_watchdog.py â€” Her 10dk'da bir git status --short calistirir.
 

@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-insan_arayuzu.py â€” KullanÄ±cÄ± arayÃ¼zÃ¼.
+insan_arayuzu.py â€” KullanÄ±cÄ± arayüzü.
 
 HumanInterface sinifi ile konsol tabanli kullanici arayuzu
 bilesenleri sunar. Progress bar, kullanici girdisi, onay
@@ -178,7 +178,7 @@ class HumanInterface:
         """
         Kullanicidan onay alir.
 
-        REYMEN_OTOMATIK_ONAY=true ise direkt True dÃ¶ner (kullanÄ±cÄ±ya sormaz).
+        REYMEN_OTOMATIK_ONAY=true ise direkt True döner (kullanÄ±cÄ±ya sormaz).
         ReYMeN Agent'Ä±n approvals.mode=off / Allow Once pattern'i ile aynÄ±.
 
         Args:

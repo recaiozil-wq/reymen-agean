@@ -9,6 +9,8 @@ set PYTHON=%PROJE_KOK%\venv\Scripts\python.exe
 if "%1"=="--status" goto status
 if "%1"=="--stop" goto stop
 if "%1"=="--once" goto once
+if "%1"=="--web" goto web
+if "%1"=="web" goto web
 goto start
 
 :start
@@ -30,6 +32,12 @@ goto end
 echo [ReYMeN] Bot durumu:
 tasklist /fi "imagename eq python.exe" /v 2>nul | findstr /i "telegram_bot bot_supervisor"
 if %errorlevel% neq 0 echo Hicbir bot process'i calismiyor.
+goto end
+
+:web
+echo [ReYMeN] Hermes Studio baslatiliyor...
+start "" http://localhost:8648
+"%PYTHON%" "%PROJE_KOK%\reymen_launcher.py" web
 goto end
 
 :end

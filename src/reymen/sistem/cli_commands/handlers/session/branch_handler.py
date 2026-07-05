@@ -1,4 +1,4 @@
-﻿"""Handle /branch command â€” fork the current session into a new independent copy."""
+"""Handle /branch command â€” fork the current session into a new independent copy."""
 
 import logging
 import os

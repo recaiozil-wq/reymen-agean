@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """kiral38-watchdog: Sadece 409 conflict + gateway kontrolu (her 5 dk)."""
 

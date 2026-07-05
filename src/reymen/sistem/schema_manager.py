@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """schema_manager.py â€” ReYMeN Schema Versionlama Yoneticisi.
 
 Alembic + SQLite PRAGMA user_version ile tum veritabanlarinin
@@ -174,7 +174,7 @@ def _uygula_migrasyon(con, db_adi: str, versiyon: int) -> None:
     logger.info("[Schema] %s migrate edildi: v%s", db_adi, versiyon)
 
 
-# TÃ¼m public API'yi re-export et
+# Tüm public API'yi re-export et
 __all__ = [
     "Migration",
     "SchemaManager",

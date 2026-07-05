@@ -1,4 +1,4 @@
-﻿"""cli_agent.py - ReYMeNCLI Agent lifecycle metotlari."""
+"""cli_agent.py - ReYMeNCLI Agent lifecycle metotlari."""
 
 import logging, os, re, sys, time, json, threading
 from datetime import datetime

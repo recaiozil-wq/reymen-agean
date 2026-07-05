@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 nudge_model.py â€” Stealth User Modelling System (ReYMeN Honcho-like)
 
@@ -16,7 +16,7 @@ Basic flow:
 Usage:
     from nudge_model import NudgeModel
     nm = NudgeModel()
-    nm.gozlemle("merhaba, nasÄ±lsÄ±n?", "iyiyim teÅŸekkÃ¼rler!")
+    nm.gozlemle("merhaba, nasÄ±lsÄ±n?", "iyiyim teÅŸekkürler!")
     model = nm.kullanici_modeli_al()
     prompt_ek = nm.sistem_prompu_ekle()
     hatirlatma = nm.nudge()

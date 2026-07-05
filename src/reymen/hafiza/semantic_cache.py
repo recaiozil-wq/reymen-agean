@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 semantic_cache.py â€” Anlamsal LLM Onbellek.
 
 Ayni veya cok benzer promptlara verilen LLM yanitlarini saklar.
-ChromaDB varsa vektÃ¶rel benzerlik, yoksa SHA-256 karma ile eslesme yapar.
+ChromaDB varsa vektörel benzerlik, yoksa SHA-256 karma ile eslesme yapar.
 
 Kullanim::
 
@@ -25,7 +25,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ChromaDB varsa vektÃ¶rel, yoksa hash tabanlÄ± Ã§alÄ±ÅŸÄ±r
+# ChromaDB varsa vektörel, yoksa hash tabanlÄ± çalÄ±ÅŸÄ±r
 try:
     import chromadb
 
@@ -33,7 +33,7 @@ try:
 except ImportError:
     _CHROMA_VAR = False
 
-# GÃ¶mme (embedding) iÃ§in SentenceTransformers opsiyonel
+# Gömme (embedding) için SentenceTransformers opsiyonel
 try:
     from sentence_transformers import SentenceTransformer
 
@@ -241,7 +241,7 @@ class SemanticCache:
         }
 
     def temizle(self):
-        """TÃ¼m onbellek kayitlarini sil."""
+        """Tüm onbellek kayitlarini sil."""
         self._hash_cache.clear()
         try:
             for dosya in self._cache_dizin.glob("*.json"):

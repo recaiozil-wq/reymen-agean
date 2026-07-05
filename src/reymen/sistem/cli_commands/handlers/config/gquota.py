@@ -1,4 +1,4 @@
-﻿"""_handle_gquota_command handler."""
+"""_handle_gquota_command handler."""
 
 
 def _handle_gquota_command(cli, cmd_original: str) -> None:

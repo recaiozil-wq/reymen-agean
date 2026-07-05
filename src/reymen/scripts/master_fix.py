@@ -1,6 +1,6 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
-MASTER â€” ReYMeN TÃ¼m Fix'leri Ã‡alÄ±ÅŸtÄ±r
+MASTER â€” ReYMeN Tüm Fix'leri Ã‡alÄ±ÅŸtÄ±r
 SÄ±rasÄ±yla: Fix01 â†’ Fix02 â†’ Fix03 â†’ Fix04 â†’ Fix05
 Her aÅŸama sonrasÄ± rapor yazar, hata olursa durur.
 
@@ -47,8 +47,8 @@ FIXLER = [
     (1, "fix_01_sessiz_except.py", "Sessiz Except Temizleme (1,127 nokta)"),
     (2, "fix_02_all_ekle.py", "__all__ Ekleme (121 init)"),
     (3, "fix_03_coverage.py", "Coverage Kurulum & Test"),
-    (4, "fix_04_guvenlik.py", "GÃ¼venlik TaramasÄ±"),
-    (5, "fix_05_cli_bolme.py", "cli.py BÃ¶lme PlanÄ±"),
+    (4, "fix_04_guvenlik.py", "Güvenlik TaramasÄ±"),
+    (5, "fix_05_cli_bolme.py", "cli.py Bölme PlanÄ±"),
 ]
 
 
@@ -132,7 +132,7 @@ def main():
             atla = {int(x) for x in sys.argv[i + 1].split(",")}
 
     hdr(
-        f"MASTER â€” ReYMeN Fix KoÅŸucusu\nKÃ¶k: {kok}\nTarih: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        f"MASTER â€” ReYMeN Fix KoÅŸucusu\nKök: {kok}\nTarih: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
     )
     if sadece:
         print(f"  Sadece fix'ler: {sadece}")
@@ -158,7 +158,7 @@ def main():
 
     toplam_sure = round(time.time() - t0, 1)
     hdr("MASTER RAPOR")
-    print(f"\n  {'Fix':<6} {'Durum':<12} {'SÃ¼re':<10} AÃ§Ä±klama\n  {'â”€'*60}")
+    print(f"\n  {'Fix':<6} {'Durum':<12} {'Süre':<10} AçÄ±klama\n  {'â”€'*60}")
     for s in sonuclar:
         renk = (
             C.GRN
@@ -168,7 +168,7 @@ def main():
         print(
             f"  {renk}FIX {s['no']:02d}  {s['durum']:<12} {str(s.get('sure','?'))+'s':<10} {s.get('aciklama','')}{C.RESET}"
         )
-    print(f"\n  Toplam sÃ¼re: {toplam_sure}s")
+    print(f"\n  Toplam süre: {toplam_sure}s")
 
     basarili = sum(1 for s in sonuclar if s["durum"] == "BASARILI")
     hata = sum(1 for s in sonuclar if s["durum"] == "HATA")
@@ -183,7 +183,7 @@ def main():
             print(f"\n  {C.BOLD}FIX {s['no']:02d} Ã–zet:{C.RESET}")
             if s["no"] == 1:
                 print(
-                    f"    DÃ¼zeltme: {rapor.get('toplam_duzeltme','?')} sessiz except\n    Test geÃ§en: {len(rapor.get('test_gecen',[]))}"
+                    f"    Düzeltme: {rapor.get('toplam_duzeltme','?')} sessiz except\n    Test geçen: {len(rapor.get('test_gecen',[]))}"
                 )
             elif s["no"] == 2:
                 print(
@@ -206,7 +206,7 @@ def main():
         json.dump(master_rapor, fp, ensure_ascii=False, indent=2, default=str)
     print(f"\n  {C.GRN}âœ… Master rapor: {rapor_yolu}{C.RESET}")
     if hata == 0 and timeout == 0:
-        print(f"\n  {C.BOLD}{C.GRN}ğŸ‰ TÃ¼m fix'ler baÅŸarÄ±yla tamamlandÄ±!{C.RESET}")
+        print(f"\n  {C.BOLD}{C.GRN}ğŸ‰ Tüm fix'ler baÅŸarÄ±yla tamamlandÄ±!{C.RESET}")
     else:
         print(f"\n  {C.YEL}âš ï¸  BazÄ± fix'lerde sorun var â€” raporlarÄ± kontrol et{C.RESET}")
 

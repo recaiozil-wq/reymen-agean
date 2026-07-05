@@ -1,4 +1,4 @@
-﻿"""ReYMeN website access policy â€” BaÄŸÄ±msÄ±z ReYMeN sÃ¼rÃ¼mÃ¼.
+"""ReYMeN website access policy â€” BaÄŸÄ±msÄ±z ReYMeN sürümü.
 
 Website blocklist politikasÄ±nÄ± REYMEN_HOME/config.yaml'dan okur.
 """

@@ -1,10 +1,10 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 context_manager.py â€” TrajectoryCompressor (ReYMeN Konusma Sikistirici).
 
 Ozellikler:
   - LLM ile yapisal ozet (Cozumlendi / Devam Ediyor / Bekleyen)
-  - AraÃ§ Ã§Ä±ktÄ±sÄ± budama (token tasarrufu)
+  - Araç çÄ±ktÄ±sÄ± budama (token tasarrufu)
   - Kuyruk koruma: son N mesaj dokunulmaz
   - Iteratif guncelleme: onceki ozet varsa birlestir
   - Provider verilmezse rule-based fallback
@@ -155,7 +155,7 @@ class TrajectoryCompressor:
 
     def compress(self, mesajlar: list, context_length: int = 8192) -> list:
         """
-        Token bÃ¼tÃ§esi esigi asilinca sikistir.
+        Token bütçesi esigi asilinca sikistir.
         Son `korunan_son` mesaj her zaman korunur.
         """
         if len(mesajlar) <= self.korunan_son:

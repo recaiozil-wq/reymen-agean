@@ -1,13 +1,13 @@
-﻿"""
-Agent Gatekeeper â€” Ã§aÄŸrÄ± akÄ±ÅŸÄ± doÄŸrulama katmanÄ±.
+"""
+Agent Gatekeeper â€” çaÄŸrÄ± akÄ±ÅŸÄ± doÄŸrulama katmanÄ±.
 
-Bu bir araÃ§ DEÄÄ°LDÄ°R. Modelin haberi olmadan Ã§alÄ±ÅŸÄ±r.
-Main loop'unda call_model() yerine run_gatekept_turn() Ã§aÄŸrÄ±lÄ±r.
+Bu bir araç DEÄÄ°LDÄ°R. Modelin haberi olmadan çalÄ±ÅŸÄ±r.
+Main loop'unda call_model() yerine run_gatekept_turn() çaÄŸrÄ±lÄ±r.
 
 AkÄ±ÅŸ:
-  1. KullanÄ±cÄ± mesajÄ± gelir (sayÄ±sal/DB iÃ§erikli olabilir)
-  2. run_gatekept_turn() modeli Ã§aÄŸÄ±rÄ±r
-  3. Model ```python bloÄŸu Ã¼retirse â†’ otomatik Ã§alÄ±ÅŸtÄ±r â†’ ham Ã§Ä±ktÄ±yÄ± modele geri ver
+  1. KullanÄ±cÄ± mesajÄ± gelir (sayÄ±sal/DB içerikli olabilir)
+  2. run_gatekept_turn() modeli çaÄŸÄ±rÄ±r
+  3. Model ```python bloÄŸu üretirse â†’ otomatik çalÄ±ÅŸtÄ±r â†’ ham çÄ±ktÄ±yÄ± modele geri ver
   4. Model sayÄ±sal/DB iddiasÄ± yaparsa ama execution kaydÄ± yoksa â†’ REDDET
   5. KayÄ±t varsa veya iddia yoksa â†’ cevabÄ± kabul et
 
@@ -28,15 +28,15 @@ LOG_DB = Path(__file__).parent / "execution_log.sqlite"
 FORMAT_SYSTEM_MSG = {
     "role": "system",
     "content": (
-        "Kod Ã¼retirken mutlaka ```python bloÄŸu kullan. "
-        "Sistem bu bloÄŸu otomatik Ã§alÄ±ÅŸtÄ±rÄ±p sana gerÃ§ek Ã§Ä±ktÄ±yÄ± geri verecek. "
-        "Kod bloklarÄ±nÄ±n dÄ±ÅŸÄ±nda kalan metinler doÄŸrudan kullanÄ±cÄ±ya gÃ¶nderilir."
+        "Kod üretirken mutlaka ```python bloÄŸu kullan. "
+        "Sistem bu bloÄŸu otomatik çalÄ±ÅŸtÄ±rÄ±p sana gerçek çÄ±ktÄ±yÄ± geri verecek. "
+        "Kod bloklarÄ±nÄ±n dÄ±ÅŸÄ±nda kalan metinler doÄŸrudan kullanÄ±cÄ±ya gönderilir."
     )
 }
 
 
 # ---------------------------------------------------------------------
-# 1) Ã‡alÄ±ÅŸtÄ±rma logu â€” gerÃ§ek kanÄ±t burada tutulur
+# 1) Ã‡alÄ±ÅŸtÄ±rma logu â€” gerçek kanÄ±t burada tutulur
 # ---------------------------------------------------------------------
 def init_log():
     conn = sqlite3.connect(LOG_DB)
@@ -56,7 +56,7 @@ def init_log():
 
 
 def run_and_log(session_id: str, code: str, timeout: int = 15) -> dict:
-    """Kodu gerÃ§ekten Ã§alÄ±ÅŸtÄ±rÄ±r, ham Ã§Ä±ktÄ±yÄ± yakalar ve DB'ye yazar."""
+    """Kodu gerçekten çalÄ±ÅŸtÄ±rÄ±r, ham çÄ±ktÄ±yÄ± yakalar ve DB'ye yazar."""
     try:
         result = subprocess.run(
             ["python3", "-c", code],
@@ -79,7 +79,7 @@ def run_and_log(session_id: str, code: str, timeout: int = 15) -> dict:
 
 
 def has_real_execution(session_id: str, since_ts: float) -> bool:
-    """Gatekeeper: bu oturumda, since_ts'ten sonra gerÃ§ek bir Ã§alÄ±ÅŸtÄ±rma var mÄ±?"""
+    """Gatekeeper: bu oturumda, since_ts'ten sonra gerçek bir çalÄ±ÅŸtÄ±rma var mÄ±?"""
     conn = sqlite3.connect(LOG_DB)
     row = conn.execute(
         "SELECT COUNT(*) FROM executions WHERE session_id=? AND ts>?",
@@ -93,7 +93,7 @@ def has_real_execution(session_id: str, since_ts: float) -> bool:
 # 2) SayÄ±sal / DB iddiasÄ± tespiti
 # ---------------------------------------------------------------------
 NUMERIC_CLAIM_PATTERN = re.compile(
-    r"(\bSELECT\b|\bsonuÃ§\b.*\d|\btoplam\b.*\d|=\s*\d|%\d)", re.IGNORECASE
+    r"(\bSELECT\b|\bsonuç\b.*\d|\btoplam\b.*\d|=\s*\d|%\d)", re.IGNORECASE
 )
 
 def response_makes_numeric_claim(text: str) -> bool:
@@ -101,14 +101,14 @@ def response_makes_numeric_claim(text: str) -> bool:
 
 
 # ---------------------------------------------------------------------
-# 3) Model Ã§aÄŸrÄ±sÄ± â€” DeepSeek-V4-Flash endpoint
+# 3) Model çaÄŸrÄ±sÄ± â€” DeepSeek-V4-Flash endpoint
 # ---------------------------------------------------------------------
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 def call_model(messages: list, model: str = "deepseek-v4-flash") -> str:
     """
-    DeepSeek-V4-Flash API'sine istek gÃ¶nderir.
-    Ä°lk Ã§aÄŸrÄ±da system prompt'a format talimatÄ±nÄ± enjekte eder.
+    DeepSeek-V4-Flash API'sine istek gönderir.
+    Ä°lk çaÄŸrÄ±da system prompt'a format talimatÄ±nÄ± enjekte eder.
     """
     # Format talimatÄ±nÄ± system message'a ekle (yoksa)
     has_system = any(m.get("role") == "system" for m in messages)
@@ -156,19 +156,19 @@ def call_model(messages: list, model: str = "deepseek-v4-flash") -> str:
 
 
 def extract_code_blocks(text: str) -> list:
-    """```python ... ``` iÃ§indeki kod bloklarÄ±nÄ± ayÄ±klar."""
+    """```python ... ``` içindeki kod bloklarÄ±nÄ± ayÄ±klar."""
     return [b.strip() for b in re.findall(r"```python\s*(.*?)```", text, re.DOTALL)]
 
 
 # ---------------------------------------------------------------------
-# 4) Gatekeeper dÃ¶ngÃ¼sÃ¼ â€” main loop'unda call_model yerine bunu Ã§aÄŸÄ±r
+# 4) Gatekeeper döngüsü â€” main loop'unda call_model yerine bunu çaÄŸÄ±r
 # ---------------------------------------------------------------------
 def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> str:
     """
     call_model() yerine bunu kullan.
     Modelin haberi olmadan:
-    - Kod bloklarÄ±nÄ± yakala, Ã§alÄ±ÅŸtÄ±r, ham Ã§Ä±ktÄ±yÄ± geri ver
-    - SayÄ±sal/DB iddiasÄ±nÄ± execution kaydÄ± olmadan geÃ§irme
+    - Kod bloklarÄ±nÄ± yakala, çalÄ±ÅŸtÄ±r, ham çÄ±ktÄ±yÄ± geri ver
+    - SayÄ±sal/DB iddiasÄ±nÄ± execution kaydÄ± olmadan geçirme
     """
     init_log()
     turn_start_ts = time.time()
@@ -177,14 +177,14 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
         response_text = call_model(messages)
         code_blocks = extract_code_blocks(response_text)
 
-        # Kod varsa gerÃ§ekten Ã§alÄ±ÅŸtÄ±r, Ã§Ä±ktÄ±yÄ± modele geri ver
+        # Kod varsa gerçekten çalÄ±ÅŸtÄ±r, çÄ±ktÄ±yÄ± modele geri ver
         if code_blocks:
             exec_results = [run_and_log(session_id, c) for c in code_blocks]
             messages.append({"role": "assistant", "content": response_text})
             messages.append({
                 "role": "user",
                 "content": f"GERÃ‡EK Ã‡ALIÅTIRMA Ã‡IKTISI:\n{json.dumps(exec_results, ensure_ascii=False, indent=2)}\n"
-                           f"Bu ham Ã§Ä±ktÄ±ya dayanarak nihai cevabÄ±nÄ± ver."
+                           f"Bu ham çÄ±ktÄ±ya dayanarak nihai cevabÄ±nÄ± ver."
             })
             continue
 
@@ -193,8 +193,8 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
             messages.append({"role": "assistant", "content": response_text})
             messages.append({
                 "role": "user",
-                "content": "REDDEDÄ°LDÄ°: SayÄ±sal/DB iddian var ama gerÃ§ek bir kod Ã§alÄ±ÅŸtÄ±rma "
-                           "kaydÄ± yok. Ã–nce ```python bloÄŸunda gerÃ§ek kod Ã¼ret, "
+                "content": "REDDEDÄ°LDÄ°: SayÄ±sal/DB iddian var ama gerçek bir kod çalÄ±ÅŸtÄ±rma "
+                           "kaydÄ± yok. Ã–nce ```python bloÄŸunda gerçek kod üret, "
                            "iddiayÄ± ondan sonra yaz."
             })
             continue
@@ -202,7 +202,7 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
         # Ya iddia yok, ya da execution yapÄ±lmÄ±ÅŸ â†’ kabul
         return response_text
 
-    return "GATEKEEPER: Maksimum deneme sayÄ±sÄ±na ulaÅŸÄ±ldÄ±, doÄŸrulanmÄ±ÅŸ cevap Ã¼retilemedi."
+    return "GATEKEEPER: Maksimum deneme sayÄ±sÄ±na ulaÅŸÄ±ldÄ±, doÄŸrulanmÄ±ÅŸ cevap üretilemedi."
 
 
 # ---------------------------------------------------------------------
@@ -211,9 +211,9 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
 if __name__ == "__main__":
     import sys
     session_id = sys.argv[1] if len(sys.argv) > 1 else f"test_{int(time.time())}"
-    gorev = sys.argv[2] if len(sys.argv) > 2 else "Merhaba, bugÃ¼n nasÄ±lsÄ±n?"
+    gorev = sys.argv[2] if len(sys.argv) > 2 else "Merhaba, bugün nasÄ±lsÄ±n?"
 
     msgs = [{"role": "user", "content": gorev}]
-    print(f"=== GATEKEEPER TEST ===\nSession: {session_id}\nGÃ¶rev: {gorev}\n")
+    print(f"=== GATEKEEPER TEST ===\nSession: {session_id}\nGörev: {gorev}\n")
     sonuc = run_gatekept_turn(session_id, msgs)
     print(f"\n=== NÄ°HAÄ° CEVAP ===\n{sonuc}")

@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.skill_usage shim â€” ReYMeN skill kullanÄ±m takibini yÃ¶nlendirir."""
+"""ReYMeN tools.skill_usage shim â€” ReYMeN skill kullanÄ±m takibini yönlendirir."""
 
 from __future__ import annotations
 

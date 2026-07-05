@@ -1,4 +1,4 @@
-﻿"""_handle_busy_command handler."""
+"""_handle_busy_command handler."""
 
 from reymen.sistem.cli_stream import save_config_value
 from reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM

@@ -1,6 +1,6 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
-Ä°ki Ajan Koordineli Ã‡alÄ±ÅŸma SimÃ¼lasyonu
+Ä°ki Ajan Koordineli Ã‡alÄ±ÅŸma Simülasyonu
 Kali ajanÄ± tespit eder, Windows ajanÄ± engeller.
 """
 
@@ -44,7 +44,7 @@ else:
     log("[KALI] âŒ Hafizada yok â€” LLM cagrilirdi")
     llm_calls += 1
 
-# 1b) Belirsiz gÃ¶rev kontrolÃ¼
+# 1b) Belirsiz görev kontrolü
 log("[KALI] 'localhost port tara' icin belirsiz gorev cozumleme...")
 belirsiz = belirsiz_gorev_cozumle("localhost port tara")
 if belirsiz["tahmin_kategori"]:
@@ -54,7 +54,7 @@ if belirsiz["tahmin_kategori"]:
 else:
     log("[KALI] âŒ Tahmin yok")
 
-# 1c) AÃ§Ä±k port listesi (netstat'tan gerÃ§ek)
+# 1c) AçÄ±k port listesi (netstat'tan gerçek)
 acik_portlar = [
     ("135", "RPC", "Windows Remote Procedure Call"),
     ("445", "SMB", "Windows File Sharing"),
@@ -68,7 +68,7 @@ log("[KALI] Taranan portlar (127.0.0.1):")
 for port, proto, aciklama in acik_portlar:
     log(f"  PORT {port:>8} / {proto:6} â€” {aciklama}")
 
-# 1e) ÅÃ¼pheli port tespiti
+# 1e) Åüpheli port tespiti
 sujehli = [p for p in acik_portlar if p[1] == "DEBUG"]
 if sujehli:
     log(f"[KALI] âš ï¸ SUJEPELI PORT: {sujehli[0][0]} ({sujehli[0][2]})")
@@ -109,7 +109,7 @@ else:
     log("[WIN] âŒ Hafizada yok â€” LLM cagrilirdi")
     llm_calls += 1
 
-# 2c) Port doÄŸrulama (gerÃ§ek netstat)
+# 2c) Port doÄŸrulama (gerçek netstat)
 log("[WIN] netstat -an | findstr 1234...")
 log("[WIN] âœ… Port 1234 dogrulandi: TCP 127.0.0.1:1234 LISTENING")
 

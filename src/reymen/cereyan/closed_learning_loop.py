@@ -1,4 +1,4 @@
-﻿# - Python 3.9+ uyumlu type hints (from __future__ annotations)
+# - Python 3.9+ uyumlu type hints (from __future__ annotations)
 # -*- coding: utf-8 -*-
 """
 closed_learning_loop.py â€” ClosedLearningLoop + FTS5 beceri indeksi.
@@ -626,7 +626,7 @@ class ClosedLearningLoop:
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def observe_self(self) -> dict[str, Any]:
-        """Kendini gÃ¶zlemle: zayÄ±f alanlarÄ± tespit et.
+        """Kendini gözlemle: zayÄ±f alanlarÄ± tespit et.
 
         Returns:
             {"weak_areas": [...], "strong_areas": [...],
@@ -635,7 +635,7 @@ class ClosedLearningLoop:
         beceriler = self.tum_beceriler()
         toplam = len(beceriler)
 
-        # ZayÄ±f alan: hiÃ§ becerisi olmayan kategoriler
+        # ZayÄ±f alan: hiç becerisi olmayan kategoriler
         weak_areas = []
         strong_areas = []
         if toplam == 0:
@@ -656,18 +656,25 @@ class ClosedLearningLoop:
         }
 
     def discover_better_methods(self, focus: str) -> list[dict[str, str]]:
-        """DÄ±ÅŸarÄ±da (web) daha iyi yÃ¶ntem ara.
+        """Dis web'de yontem ara (SADECE url topla, kod asla web'den alinmaz).
+
+        KESIN KURAL:
+        - Bu fonksiyon ASLA web'den kod cekmez (code alani her zaman bos)
+        - Sadece link+baslik toplar (insanin manuel incelemesi icin)
+        - Code field'i bos oldugu icin test_in_sandbox()'dan BASARISIZ doner
+        - Bu BILINCLI bir guvenlik kisitlamasidir
 
         Args:
-            focus: Ä°yileÅŸtirilecek alan adÄ±.
+            focus: Aranacak alan adi.
 
         Returns:
-            [{"name": str, "code": str, "source_url": str, "summary": str}, ...]
+            [{"name": str, "code": "", "source_url": str, "summary": str}, ...]
+            code her zaman BOS — web'den kod cekmek RCE riskidir
         """
         logger.info("[SelfImprove] Araniyor: %s", focus)
         sonuclar = []
 
-        # Web'de ara (DuckDuckGo Ã¼zerinden)
+        # Web'de ara (DuckDuckGo üzerinden)
         try:
             query = urllib.parse.quote(
                 f"best practice {focus} coding tutorial 2025 2026"
@@ -682,7 +689,7 @@ class ClosedLearningLoop:
             )
             with urllib.request.urlopen(req, timeout=15) as resp:
                 html = resp.read().decode("utf-8", errors="replace")
-                # Basit link Ã§ekme
+                # Basit link çekme
                 for m in re.finditer(
                     r'<a[^>]+href="(https?://[^"]+)"[^>]*>([^<]+)</a>',
                     html,
@@ -705,7 +712,7 @@ class ClosedLearningLoop:
         except Exception as e:
             logger.warning("[SelfImprove] Web arama hatasi: %s", e)
 
-        # Fallback: temel yÃ¶ntem
+        # Fallback: temel yöntem
         if not sonuclar:
             sonuclar.append(
                 {
@@ -722,58 +729,75 @@ class ClosedLearningLoop:
     def compare_and_decide(
         self, current_method: dict[str, str], new_methods: list[dict[str, str]]
     ) -> str:
-        """Claude ile karÅŸÄ±laÅŸtÄ±r: UYGULA / REDDET / DAHA_FAZLA_ARAÅTIR.
+        """Yontem karsilastir: UYGULA / REDDET / DAHA_FAZLA_ARAŞTIR.
+
+        NOT: code field'i her zaman bos oldugundan (guvenlik) bu fonksiyon
+        hicbir zaman UYGULA donmez. Sadece REDDET veya DAHA_FAZLA_ARAŞTIR.
 
         Args:
-            current_method: Mevcut yÃ¶ntem.
-            new_methods: Yeni bulunan yÃ¶ntemler.
+            current_method: Mevcut yontem.
+            new_methods: Yeni bulunan yontemler.
 
         Returns:
             Karar stringi.
         """
         if not new_methods:
-            return "DAHA_FAZLA_ARAÅTIR"
+            return "DAHA_FAZLA_ARAŞTIR"
 
         mentor = new_methods[0]
 
-        # Basit skor: kaynak URL'si olanlar daha deÄŸerli
+        # GUIVENLIK KURALI: code alani bos oldugu surece UYGULA asla donme
+        kod = (mentor.get("code", "") or "").strip()
+        if kod and kod != "pass":
+            # Kod var ama guvenlik riski — REDDET
+            logger.warning(
+                "[SelfImprove] GUIVENLIK: Web'den kod iceren yontem REDDEDILDI: %s",
+                mentor.get("name", "?"),
+            )
+            return "REDDET"
+
+        # Skor: icerigin kalitesini degil, sadece metadata varligini puanla
+        # Bu BILINCLI: gercek kalite olcumu icin LLM gerekir
         puan = 0
         if mentor.get("source_url"):
-            puan += 2
-        if mentor.get("name"):
-            puan += 1
-        if mentor.get("summary") and len(mentor["summary"]) > 20:
-            puan += 1
+            puan += 1  # +2'den +1'e dustu — link varligi kalite gostergesi degil
+        if mentor.get("name") and len(mentor["name"]) > 20:
+            puan += 1  # Uzun baslik daha aciklayici
+        if mentor.get("summary") and len(mentor["summary"]) > 50:
+            puan += 1  # Uzun ozet daha degerli
 
-        # Mevcut yÃ¶ntemle kÄ±yasla
-        current_name = (current_method.get("name", "") or "") if current_method else ""
-        if current_name and mentor.get("name") and current_name != mentor["name"]:
-            puan += 1  # Yeni ve farklÄ±
-
+        # code her zaman bos — asla UYGULA donme
         if puan >= 3:
-            return "UYGULA"
+            return "DAHA_FAZLA_ARAŞTIR"  # Eskiden UYGULA idi, guvenlik nedeniyle dustu
         elif puan >= 1:
-            return "DAHA_FAZLA_ARAÅTIR"
+            return "DAHA_FAZLA_ARAŞTIR"
         else:
             return "REDDET"
 
     def test_in_sandbox(self, new_method: dict[str, str]) -> tuple[str, float]:
-        """Ä°zole ortamda test et (E2B benzeri).
+        """Kodu izole ortamda test et (SADECE syntax kontrolu, ASLA exec).
+
+        KESIN KURAL:
+        - Bu fonksiyon ASLA exec() cagirmaz — sadece compile() ile syntax kontrolu
+        - code field'i web'den geldigi icin exec() RCE riski olusturur
+        - Gercek izolasyon (subprocess/container) olmadan exec() EKLENMEYECEK
+        - code == '' veya code == 'pass' ise BASARISIZ doner
 
         Args:
-            new_method: Test edilecek yÃ¶ntem.
+            new_method: Test edilecek yontem.
 
         Returns:
-            ("BAÅARILI" | "BAÅARISIZ", skor)
+            ("BASARILI" | "BASARISIZ", skor)
+            code bostan BASARISIZ doner — bu BILINCLI
         """
         code = (new_method.get("code", "") or "").strip()
         if not code or code == "pass":
-            return "BAÅARISIZ", 0.0
+            return "BASARISIZ", 0.0
 
-        # Basit syntax kontrolÃ¼
+        # SADECE syntax kontrolu — exec() YOK
         try:
             compile(code, "<sandbox>", "exec")
-            # Skor: yÃ¶ntemin adÄ± ne kadar aÃ§Ä±klayÄ±cÄ±ysa o kadar yÃ¼ksek
+            # Skor: yontemin adi ne kadar aciklayiciysa o kadar yuksek
             name = new_method.get("name", "") or ""
             kaynak = new_method.get("source_url", "") or ""
             skor = 5.0
@@ -781,16 +805,16 @@ class ClosedLearningLoop:
                 skor += 2.0
             if kaynak:
                 skor += 3.0
-            return "BAÅARILI", skor
+            return "BASARILI", skor
         except SyntaxError as e:
-            logger.warning("[SelfImprove] Sandbox hatasi: %s", e)
-            return "BAÅARISIZ", 0.0
+            logger.warning("[SelfImprove] Sandbox(Syntax) hatasi: %s", e)
+            return "BASARISIZ", 0.0
 
     def save_as_skill(self, method: dict[str, str], score: float) -> str:
         """BaÅŸarÄ±lÄ± metodu skill olarak kaydet.
 
         Args:
-            method: Kaydedilecek yÃ¶ntem.
+            method: Kaydedilecek yöntem.
             score: BaÅŸarÄ± skoru.
 
         Returns:
@@ -824,19 +848,19 @@ class ClosedLearningLoop:
     def run_forever(
         self, cycle_hours: int = 24, test_mode: bool = False, max_test_iter: int = 672
     ) -> None:
-        """Ana kendini geliÅŸtirme dÃ¶ngÃ¼sÃ¼.
+        """Ana kendini geliÅŸtirme döngüsü.
 
-        1. Kendini gÃ¶zlemle
-        2. En zayÄ±f alanÄ± seÃ§
+        1. Kendini gözlemle
+        2. En zayÄ±f alanÄ± seç
         3. DÄ±ÅŸarÄ±da araÅŸtÄ±r
         4. KarÅŸÄ±laÅŸtÄ±r ve karar ver
         5. Uygun: test et ve kaydet
         6. 24 saat bekle, tekrar baÅŸla
 
         Args:
-            cycle_hours: DÃ¶ngÃ¼ aralÄ±ÄŸÄ± (varsayÄ±lan 24 saat).
-            test_mode: True ise hiÃ§ beklemez, iterasyonlarÄ± hÄ±zlÄ±ca tamamlar.
-            max_test_iter: Test modunda maksimum iterasyon (varsayÄ±lan 672 = 7 gÃ¼n).
+            cycle_hours: Döngü aralÄ±ÄŸÄ± (varsayÄ±lan 24 saat).
+            test_mode: True ise hiç beklemez, iterasyonlarÄ± hÄ±zlÄ±ca tamamlar.
+            max_test_iter: Test modunda maksimum iterasyon (varsayÄ±lan 672 = 7 gün).
         """
         logger.info(
             "[SelfImprove] Meta-dongu basladi (cycle=%dh, test_mode=%s, max_iter=%d)",
@@ -854,54 +878,63 @@ class ClosedLearningLoop:
                     "[SelfImprove] Test modu tamamlandi: %d iterasyon", max_iter
                 )
                 break
-            # 1. Kendini gÃ¶zlemle
-            state = self.observe_self()
-            logger.info(
-                "[SelfImprove] Durum: %d beceri, %d zayif alan",
-                state["total_skills"],
-                len(state["weak_areas"]),
-            )
-
-            # 2. En zayÄ±f alanÄ± seÃ§
-            if not state["weak_areas"]:
-                focus = "yeni_alan_kesfi"
-            else:
-                focus = state["weak_areas"][0]
-
-            logger.info("[SelfImprove] Odaklanilan alan: %s", focus)
-
-            # Mevcut metodu bul
-            current = {"name": focus, "code": "", "summary": ""}
-
-            # 3. DÄ±ÅŸarÄ±da araÅŸtÄ±r
-            discoveries = self.discover_better_methods(focus)
-
-            # 4. KarÅŸÄ±laÅŸtÄ±r
-            decision = self.compare_and_decide(current, discoveries)
-
-            # 5. KararÄ± uygula
-            if decision == "UYGULA":
-                best = discoveries[0]
-                status, score = self.test_in_sandbox(best)
-
-                if status == "BAÅARILI":
-                    self.save_as_skill(best, score)
-                    logger.info("[SelfImprove] âœ… Yeni skill eklendi: %s", focus)
-
-            elif decision == "DAHA_FAZLA_ARAÅTIR":
+            # Ana dongu govdesi — her adim ayri try/except ile korunur
+            try:
+                # 1. Kendini gozlemle
+                try:
+                    state = self.observe_self()
+                except Exception as _e:
+                    logger.error("[SelfImprove] observe_self hatasi: %s", _e)
+                    state = {"total_skills": 0, "weak_areas": []}
                 logger.info(
-                    "[SelfImprove] â³ Eklendi: bekleme listesine alindi: %s", focus
+                    "[SelfImprove] Durum: %d beceri, %d zayif alan",
+                    state["total_skills"],
+                    len(state["weak_areas"]),
                 )
 
-            elif decision == "REDDET":
-                logger.info("[SelfImprove] â­ Reddedildi: %s", focus)
+                # 2. En zayif alani sec
+                if not state["weak_areas"]:
+                    focus = "yeni_alan_kesfi"
+                else:
+                    focus = state["weak_areas"][0]
 
-            # 6. 24 saat bekle (test_mode'de atla)
+                logger.info("[SelfImprove] Odaklanilan alan: %s", focus)
+
+                # Mevcut metodu bul
+                current = {"name": focus, "code": "", "summary": ""}
+
+                # 3. Disarida arastir
+                try:
+                    discoveries = self.discover_better_methods(focus)
+                except Exception as _e:
+                    logger.error("[SelfImprove] discover_better_methods hatasi: %s", _e)
+                    discoveries = []
+
+                # 4. Karsilastir
+                decision = self.compare_and_decide(current, discoveries)
+
+                # 5. Karari uygula
+                if decision == "UYGULA":
+                    best = discoveries[0]
+                    status, score = self.test_in_sandbox(best)
+                    if status == "BASARILI":
+                        self.save_as_skill(best, score)
+                        logger.info("[SelfImprove] Yeni skill eklendi: %s", focus)
+                elif decision == "DAHA_FAZLA_ARASTIR":
+                    logger.info("[SelfImprove] Arastirma listesine alindi: %s", focus)
+                elif decision == "REDDET":
+                    logger.info("[SelfImprove] Reddedildi: %s", focus)
+            except Exception as _loop_e:
+                logger.error(
+                    "[SelfImprove] Ana dongu hatasi (atlanarak devam): %s", _loop_e
+                )
+
+            # 6. bekle
             if test_mode:
                 logger.info(
                     "[SelfImprove] âœ… Test iterasyon %d/%d tamam", iter_sayisi, max_iter
                 )
-                continue  # hiÃ§ beklemeden sonraki iterasyon
+                continue  # hiç beklemeden sonraki iterasyon
             logger.info("[SelfImprove] Bekleniyor (%d saat)...", cycle_hours)
             time.sleep(cycle_hours * 3600)
 
@@ -992,14 +1025,43 @@ def _get_loop():
     return _LOOP_INSTANCE
 
 
+# Guvenlik: LLM'in motor uzerinden cagiracagi beceri limitleri
+_MAX_DAILY_SKILLS = int(os.environ.get("MAX_DAILY_SKILLS", "10"))
+_skill_creation_counter = 0
+_skill_creation_date = ""
+
+
 def _beceri_kristallestir(ad: str = "", aciklama: str = "", adimlar: str = "") -> str:
-    """Agent dostu wrapper: ClosedLearningLoop.beceri_kristallestir()"""
+    """Agent dostu wrapper: ClosedLearningLoop.beceri_kristallestir()
+
+    KESIN KURAL:
+    - Gunluk MAX_DAILY_SKILLS (10) limiti vardir (env ile degistirilebilir)
+    - LLM halusinasyonu sonucu asiri beceri olusumunu engeller
+    - Sinir asilinca hata doner, beceri kaydedilmez
+    """
+    global _skill_creation_counter, _skill_creation_date
+    from datetime import date as _date
+
+    bugun = str(_date.today())
+    if bugun != _skill_creation_date:
+        _skill_creation_date = bugun
+        _skill_creation_counter = 0
+
+    if _skill_creation_counter >= _MAX_DAILY_SKILLS:
+        logger.warning(
+            "[SelfImprove] Gunluk beceri limiti asildi (%d/%d)",
+            _skill_creation_counter,
+            _MAX_DAILY_SKILLS,
+        )
+        return f"[HATA]: Gunluk beceri limiti asildi ({_MAX_DAILY_SKILLS}). Yarini bekle."
+
     if not ad:
         return "[HATA]: Beceri adi gerekli"
     loop = _get_loop()
     yol = loop.beceri_kristallestir(ad, aciklama, adimlar)
     if yol:
-        return f"[BECERI] Kristallesti: {yol}"
+        _skill_creation_counter += 1
+        return f"[BECERI] Kristallesti: {yol} ({_skill_creation_counter}/{_MAX_DAILY_SKILLS} bugun)"
     return f"[HATA]: Beceri kristallestirilemedi: {ad}"
 
 
@@ -1030,7 +1092,7 @@ def _beceri_durum() -> str:
 
 
 def motor_kaydet(motor: object):
-    """motor.py entegrasyonu: Kapali Ogrenme DÃ¶ngÃ¼sÃ¼ araÃ§larÄ±nÄ± kaydet."""
+    """motor.py entegrasyonu: Kapali Ogrenme Döngüsü araçlarÄ±nÄ± kaydet."""
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(
             "BECERI_KRISTALLESTIR",

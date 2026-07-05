@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 cron_skill_sync_register.py â€” Skill sync cron job kaydi.
 

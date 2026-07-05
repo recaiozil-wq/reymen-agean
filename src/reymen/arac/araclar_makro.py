@@ -1,11 +1,11 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 araclar_makro.py â€” Makro kaydet/oynat (TinyTask mantÄ±ÄŸÄ±).
 "Beni takip et" -> fare/klavye olaylarÄ±nÄ± zaman damgasÄ±yla kaydeder.
 "Oynat" -> kaydÄ± aynÄ± sÄ±rayla tekrar eder.
 
-KayÄ±tlar JSON olarak saklanÄ±r; her uygulama/proje iÃ§in ayrÄ± dosya.
-BaÄŸÄ±mlÄ±lÄ±k: pynput (kayÄ±t iÃ§in), pyautogui (oynatma iÃ§in). Opsiyonel.
+KayÄ±tlar JSON olarak saklanÄ±r; her uygulama/proje için ayrÄ± dosya.
+BaÄŸÄ±mlÄ±lÄ±k: pynput (kayÄ±t için), pyautogui (oynatma için). Opsiyonel.
 
 DÄ°KKAT: Bu KÃ–R tekrardÄ±r â€” aynÄ± koordinatlara aynÄ± sÄ±rayla tÄ±klar.
 Pencere yeri/boyutu deÄŸiÅŸirse kayÄ±t bozulabilir. Ekran-OCR-TÄ±kla daha dayanÄ±klÄ±dÄ±r.
@@ -101,7 +101,7 @@ class MakroKaydedici:
         for olay in olaylar:
             bekle = (olay["t"] - onceki_t) / hiz
             if bekle > 0:
-                time.sleep(min(bekle, 5))  # gÃ¼venlik: max 5sn bekleme
+                time.sleep(min(bekle, 5))  # güvenlik: max 5sn bekleme
             onceki_t = olay["t"]
             if olay["tip"] == "click":
                 pyautogui.click(olay["x"], olay["y"])
@@ -121,19 +121,19 @@ class MakroKaydedici:
 
 
 def motor_kaydet(motor):
-    """Makro araÃ§larÄ±nÄ± motora kaydet."""
+    """Makro araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     _mk = MakroKaydedici()
     motor._plugin_arac_kaydet(
         "MAKRO_OYNAT_ADI",
         lambda ad="": _mk.oynat(str(ad)),
-        "KayÄ±tlÄ± makroyu Ã§alÄ±ÅŸtÄ±r (ad: makro adÄ±)",
+        "KayÄ±tlÄ± makroyu çalÄ±ÅŸtÄ±r (ad: makro adÄ±)",
     )
     motor._plugin_arac_kaydet(
         "MAKRO_LISTESI",
         lambda: str(_mk.makro_listesi()),
-        "KayÄ±tlÄ± makro listesini gÃ¶ster",
+        "KayÄ±tlÄ± makro listesini göster",
     )
 
 

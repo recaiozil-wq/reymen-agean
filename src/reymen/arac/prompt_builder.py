@@ -1,18 +1,18 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """prompt_builder.py â€” GeliÅŸmiÅŸ Prompt Ä°nÅŸa Motoru.
 
 Sistem prompt'unu, kullanÄ±cÄ± mesajlarÄ±nÄ±, hafÄ±za, skill,
-trajectory ve referanslarÄ± birleÅŸtirerek LLM'e gÃ¶nderilecek
+trajectory ve referanslarÄ± birleÅŸtirerek LLM'e gönderilecek
 eksiksiz prompt'u oluÅŸturur.
 
 Ã–zellikler:
   - Ã‡oklu kaynak birleÅŸtirme (SOUL, MEMORY, USER, skills, trajectory)
-  - Dinamik araÃ§ listesi (motor tarafÄ±ndan kayÄ±t)
+  - Dinamik araç listesi (motor tarafÄ±ndan kayÄ±t)
   - Kanban durumu enjeksiyonu
   - Context references enjeksiyonu
-  - GÃ¶rev tipine gÃ¶re prompt ÅŸablonu seÃ§imi
-  - Context penceresi yÃ¶netimi (token bÃ¼tÃ§esi)
-  - OpenAI uyumlu mesaj listesi Ã¼retimi (mesaj_listesi / tur_mesaj_listesi)
+  - Görev tipine göre prompt ÅŸablonu seçimi
+  - Context penceresi yönetimi (token bütçesi)
+  - OpenAI uyumlu mesaj listesi üretimi (mesaj_listesi / tur_mesaj_listesi)
   - Token analizi raporu
   - Adaptif detay seviyesi
 """
@@ -34,34 +34,34 @@ KANBAN_YOLU = PROJE_KOK / ".ReYMeN" / "kanban" / "gorevler.json"
 
 CTX_TOKEN_LIMITI = 8000
 
-# â”€â”€ AraÃ§ listesi (statik varsayÄ±lan â€” motor dinamik olarak gÃ¼nceller) â”€â”€
+# â”€â”€ Araç listesi (statik varsayÄ±lan â€” motor dinamik olarak günceller) â”€â”€
 VARSAYILAN_ARACLAR = [
-    'KOMUT_CALISTIR("kabuk komutu")     â€” shell komutu Ã§alÄ±ÅŸtÄ±r',
+    'KOMUT_CALISTIR("kabuk komutu")     â€” shell komutu çalÄ±ÅŸtÄ±r',
     'PYTHON_CALISTIR("python kodu")     â€” python sandbox',
     'DOSYA_YAZ("dosya", "icerik")       â€” dosyaya yaz',
     'DOSYA_OKU("dosya")                 â€” dosyadan oku',
     'WEB_ARA("sorgu")                   â€” web aramasÄ±',
-    'TARAYICI_AC("url")                 â€” sayfayÄ± aÃ§ ve oku',
+    'TARAYICI_AC("url")                 â€” sayfayÄ± aç ve oku',
     'EKRAN_TIKLA("yazi")                â€” ekranda bul ve tÄ±kla',
     "EKRAN_OKU()                        â€” ekran metnini oku",
-    'HAFIZA_ARA("sorgu")                â€” geÃ§miÅŸ deneyimlerde ara',
+    'HAFIZA_ARA("sorgu")                â€” geçmiÅŸ deneyimlerde ara',
     'TELEGRAM_GONDER("mesaj")           â€” telegram bildirimi',
     'MAKRO_OYNAT("makro_adi")           â€” kayÄ±tlÄ± makro oynat',
-    'GOREV_BITTI("kullaniciya_yanit")    â€” gÃ¶revi bitir; argÃ¼man kullanÄ±cÄ±ya gÃ¶sterilir',
+    'GOREV_BITTI("kullaniciya_yanit")    â€” görevi bitir; argüman kullanÄ±cÄ±ya gösterilir',
 ]
 
-# â”€â”€ GÃ¶rev tipi ÅŸablonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Görev tipi ÅŸablonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 TEMPLATELER = {
     "genel": {
-        "aciklama": "Genel amaÃ§lÄ± gÃ¶rev",
+        "aciklama": "Genel amaçlÄ± görev",
         "vurgu": "Hedefe odaklan, adÄ±m adÄ±m ilerle.",
     },
     "dosya": {
         "aciklama": "Dosya iÅŸlemi",
-        "vurgu": "Dosya yolunu doÄŸrula, iÃ§eriÄŸi kontrol et, hata varsa raporla.",
+        "vurgu": "Dosya yolunu doÄŸrula, içeriÄŸi kontrol et, hata varsa raporla.",
     },
     "kod": {
-        "aciklama": "Kod yazma/Ã§alÄ±ÅŸtÄ±rma",
+        "aciklama": "Kod yazma/çalÄ±ÅŸtÄ±rma",
         "vurgu": "Ã–nce PYTHON_CALISTIR ile test et, hata yoksa DOSYA_YAZ ile kaydet. try/except kullan.",
     },
     "web": {
@@ -82,7 +82,7 @@ TEMPLATELER = {
 REACT_TALIMATI = ""
 
 
-# â”€â”€ Token yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Token yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _token_say(metin: str) -> int:
     """4 karakter â‰ˆ 1 token yaklaÅŸÄ±mÄ±."""
     return max(1, len(metin) // 4)
@@ -119,15 +119,15 @@ class PromptBuilder:
         self.max_token = max_token
         self._araclar: list[str] = []  # motor tarafÄ±ndan doldurulur
 
-    # â”€â”€ AraÃ§ kaydÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Araç kaydÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def araclar_kaydet(self, araclar: list[str]):
-        """Motor mevcut araÃ§ listesini bildirir."""
+        """Motor mevcut araç listesini bildirir."""
         self._araclar = list(araclar)
 
     def _araclar_metni(self) -> str:
         liste = self._araclar or VARSAYILAN_ARACLAR
-        satirlar = ["## KullanÄ±labilir AraÃ§lar"]
+        satirlar = ["## KullanÄ±labilir Araçlar"]
         for a in liste:
             satirlar.append(f"  â€¢ {a}")
         return "\n".join(satirlar)
@@ -163,7 +163,7 @@ class PromptBuilder:
             ]
             if not aktif:
                 return ""
-            satirlar = ["[Kanban Aktif GÃ¶revler]"]
+            satirlar = ["[Kanban Aktif Görevler]"]
             for g in aktif[:4]:
                 durum = g.get("durum", "?").upper()
                 baslik = g.get("baslik", g.get("hedef", "?"))[:55]
@@ -190,7 +190,7 @@ class PromptBuilder:
         adimlar: Optional[list] = None,
         son_n: int = 4,
     ) -> str:
-        """DoÄŸrudan adÄ±mlar listesinden ya da dosyadan Ã¶zet al."""
+        """DoÄŸrudan adÄ±mlar listesinden ya da dosyadan özet al."""
         if adimlar:
             son = adimlar[-son_n:]
             satirlar = ["[Son AdÄ±mlar]"]
@@ -215,7 +215,7 @@ class PromptBuilder:
                 logger.warning("[Trajectory gecmis] JSON: %s", _e)
 
         if satirlar:
-            return "[GeÃ§miÅŸ GÃ¶revler]\n" + "\n".join(satirlar)
+            return "[GeçmiÅŸ Görevler]\n" + "\n".join(satirlar)
         return ""
 
     def _referanslar_metni(self, referanslar: Optional[list] = None) -> str:
@@ -249,7 +249,7 @@ class PromptBuilder:
             gorev_tipi:      "genel" | "dosya" | "kod" | "web" | "ekran" | "arastirma"
             ek_bilgi:        Ek baÄŸlam
             gecmis_konusma:  Ã–nceki mesajlar listesi
-            onceki_gozlem:   Bir Ã¶nceki turun gÃ¶zlemi
+            onceki_gozlem:   Bir önceki turun gözlemi
             tur:             Mevcut tur numarasÄ±
             adimlar:         trajectory.adimlar (doÄŸrudan enjeksiyon)
             referanslar:     context_references listesi
@@ -275,7 +275,7 @@ class PromptBuilder:
         if user_bilgi:
             parcalar.append(f"## KullanÄ±cÄ± Profili\n{user_bilgi}")
         if memory:
-            parcalar.append(f"## GeÃ§miÅŸ Deneyimler\n{memory}")
+            parcalar.append(f"## GeçmiÅŸ Deneyimler\n{memory}")
         if kanban:
             parcalar.append(kanban)
         if skills:
@@ -296,7 +296,7 @@ class PromptBuilder:
 
         if tur > 1 and onceki_gozlem:
             parcalar.append(
-                f"## Mevcut Durum\nTur: {tur}\nGÃ¶zlem: {_kes(onceki_gozlem, 150)}"
+                f"## Mevcut Durum\nTur: {tur}\nGözlem: {_kes(onceki_gozlem, 150)}"
             )
 
         sistem_prompt = _kes("\n\n".join(p for p in parcalar if p), limit)
@@ -325,7 +325,7 @@ class PromptBuilder:
         referanslar: Optional[list] = None,
         ek_bilgi: str = "",
     ) -> str:
-        """YalnÄ±zca sistem promptunu dÃ¶ndÃ¼r."""
+        """YalnÄ±zca sistem promptunu döndür."""
         sistem, _ = self.insa(
             hedef=hedef,
             gorev_tipi=gorev_tipi,
@@ -363,7 +363,7 @@ class PromptBuilder:
         gorev_tipi: str = "genel",
         referanslar: Optional[list] = None,
     ) -> list[dict]:
-        """Devam eden tur iÃ§in tam konuÅŸma geÃ§miÅŸli mesaj listesi."""
+        """Devam eden tur için tam konuÅŸma geçmiÅŸli mesaj listesi."""
         sistem = self.sistem_prompt(
             hedef=hedef,
             gorev_tipi=gorev_tipi,
@@ -372,7 +372,7 @@ class PromptBuilder:
         )
         mesajlar: list[dict] = [{"role": "system", "content": sistem}]
 
-        # Son 6 adÄ±mÄ± konuÅŸma geÃ§miÅŸi olarak ekle
+        # Son 6 adÄ±mÄ± konuÅŸma geçmiÅŸi olarak ekle
         if adimlar:
             for a in adimlar[-6:]:
                 eylem = str(a.get("eylem", "")).strip()
@@ -383,7 +383,7 @@ class PromptBuilder:
                     mesajlar.append(
                         {
                             "role": "user",
-                            "content": f"GÃ¶zlem: {_kes(gozlem, 150)}",
+                            "content": f"Gözlem: {_kes(gozlem, 150)}",
                         }
                     )
 
@@ -409,9 +409,9 @@ class PromptBuilder:
         if hedef:
             satirlar.append(f"Hedef: {hedef}")
         if onceki_gozlem:
-            satirlar.append(f"GÃ¶zlem: {_kes(onceki_gozlem, 200)}")
+            satirlar.append(f"Gözlem: {_kes(onceki_gozlem, 200)}")
         if dusunce:
-            satirlar.append(f"DÃ¼ÅŸÃ¼nce: {dusunce}")
+            satirlar.append(f"DüÅŸünce: {dusunce}")
         satirlar.append("\nÅimdi: DoÄŸrudan yanÄ±t ver veya uygun aracÄ± kullan.")
         return "\n".join(satirlar)
 
@@ -467,7 +467,7 @@ if __name__ == "__main__":
     pb = PromptBuilder()
     pb.araclar_kaydet(
         [
-            'DOSYA_OKU("yol")          â€” dosya iÃ§eriÄŸini oku',
+            'DOSYA_OKU("yol")          â€” dosya içeriÄŸini oku',
             'DOSYA_YAZ("yol","icerik") â€” dosyaya yaz',
             'WEB_ARA("sorgu")          â€” web aramasÄ±',
             'KOMUT("cmd")              â€” shell komutu',
@@ -475,7 +475,7 @@ if __name__ == "__main__":
         ]
     )
 
-    hedef = "Proje klasÃ¶rÃ¼ndeki Python dosyalarÄ±nÄ± analiz et, Ã¶zet rapor yaz"
+    hedef = "Proje klasöründeki Python dosyalarÄ±nÄ± analiz et, özet rapor yaz"
 
     print("=== TOKEN ANALÄ°ZÄ° ===")
     for k, v in pb.token_analizi(hedef).items():

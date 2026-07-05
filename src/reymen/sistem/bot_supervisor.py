@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 bot_supervisor.py â€” ReYMeN Bot Supervisor
 
@@ -69,7 +69,7 @@ def bot_baslat(bot):
     env["REYMEN_GATEWAY"] = "ai"
 
     # ReYMeN kendi venv'ini kullansin
-    reymen_python = PROJE_KOK / "venv" / "Scripts" / "python.exe"
+    reymen_python = PROJE_KOK / ".venv_reymen" / "Scripts" / "python.exe"
     if not reymen_python.exists():
         reymen_python = sys.executable  # fallback
 

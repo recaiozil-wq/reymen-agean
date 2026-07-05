@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 whatsapp_gateway.py â€” WhatsApp Mesaj Gonderme Gateway.

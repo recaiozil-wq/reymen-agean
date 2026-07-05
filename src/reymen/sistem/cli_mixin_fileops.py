@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module â€” File/DevOps operations (rollback, snapshot, stop, debug, update)."""
+"""ReYMeNCLI mixin module â€” File/DevOps operations (rollback, snapshot, stop, debug, update)."""
 
 import logging
 import os

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 ReYMeN Terminal Tool â€” Direkt PowerShell/Bash Komut Ã‡alÄ±ÅŸtÄ±rÄ±cÄ±
 
@@ -71,7 +71,7 @@ def terminal_calistir(komut, shell="auto", timeout=60, workdir=None, env_ek=None
             "shell": shell,
         }
     except subprocess.TimeoutExpired:
-        raise TerminalTimeout(f"Komut {timeout}s iÃ§inde bitmedi: {komut[:60]}")
+        raise TerminalTimeout(f"Komut {timeout}s içinde bitmedi: {komut[:60]}")
     except Exception as e:
         raise TerminalHatasi(f"Terminal hatasÄ±: {e}")
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     if not args.komut:
         print(
-            f"{C.BOLD}{C.BLU}ReYMeN Terminal Tool{C.RESET}\n  {C.YEL}exit ile Ã§Ä±k{C.RESET}\n"
+            f"{C.BOLD}{C.BLU}ReYMeN Terminal Tool{C.RESET}\n  {C.YEL}exit ile çÄ±k{C.RESET}\n"
         )
         while True:
             try:

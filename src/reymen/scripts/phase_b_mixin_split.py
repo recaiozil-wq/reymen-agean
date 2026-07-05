@@ -1,7 +1,7 @@
-﻿"""Phase B: ReYMeNCLI class'Ä±nÄ± 6 mixin'e bÃ¶l.
+"""Phase B: ReYMeNCLI class'Ä±nÄ± 6 mixin'e böl.
 
 Her mixin dosyasÄ±: reymen/sistem/cli_mixin_*.py
-Kaynak: cli_main.py iÃ§indeki ReYMeNCLI class'Ä± (185 metot)
+Kaynak: cli_main.py içindeki ReYMeNCLI class'Ä± (185 metot)
 """
 
 import ast
@@ -17,7 +17,7 @@ MIXIN_DIR = os.path.join(ROOT, "reymen", "sistem")
 CATEGORIES = {
     "display": {
         "name": "MixinDisplay",
-        "desc": "UI/ekran/Ã§Ä±ktÄ± formatlama metotlarÄ±",
+        "desc": "UI/ekran/çÄ±ktÄ± formatlama metotlarÄ±",
         "patterns": [
             "_format_",
             "_print_",
@@ -82,7 +82,7 @@ CATEGORIES = {
     },
     "approval": {
         "name": "MixinApproval",
-        "desc": "Onay/gÃ¼venlik metotlarÄ±",
+        "desc": "Onay/güvenlik metotlarÄ±",
         "patterns": [
             "_approval_",
             "_sudo_",
@@ -179,7 +179,7 @@ def categorize(method_name):
 
 
 def extract_method_source(main_path, method_name):
-    """Ast kullanarak bir metodun kaynak kodunu Ã§Ä±kar."""
+    """Ast kullanarak bir metodun kaynak kodunu çÄ±kar."""
     with open(main_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
@@ -202,7 +202,7 @@ def extract_method_source(main_path, method_name):
 
 
 def main():
-    # 1) TÃ¼m metodlarÄ± parse et
+    # 1) Tüm metodlarÄ± parse et
     with open(MAIN_PATH, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -229,13 +229,13 @@ def main():
         desc = CATEGORIES.get(cat, {}).get("desc", "")
         print(f"  {cat_name:25s} ({cat:15s}): {cat_counts[cat]:3d} metot  {desc}")
 
-    # 2) Her kategori iÃ§in mixin dosyasÄ± oluÅŸtur
+    # 2) Her kategori için mixin dosyasÄ± oluÅŸtur
     import_line = "from reymen.sistem.cli_main import ReYMeNCLI"
 
     # Kategori listesi
     all_cats = list(CATEGORIES.keys()) + ["core"]
 
-    # core kategorisi iÃ§in dict
+    # core kategorisi için dict
     CATEGORIES["core"] = {
         "name": "MixinCore",
         "desc": "Ana/kalan metotlar",
@@ -258,7 +258,7 @@ def main():
         file_name = f"cli_mixin_{cat_key}.py"
         file_path = os.path.join(MIXIN_DIR, file_name)
 
-        # Mixin iÃ§eriÄŸini oluÅŸtur
+        # Mixin içeriÄŸini oluÅŸtur
         mixin_lines = [
             f'"""ReYMeNCLI {mixin_name} â€” {cat_info["desc"]}."""',
             "",
@@ -298,7 +298,7 @@ def main():
         )
         mixin_names.append(mixin_name)
 
-    # 3) cli_main.py'yi gÃ¼ncelle
+    # 3) cli_main.py'yi güncelle
     # Import'larÄ± ekle
     import_block = "\n".join(mixin_imports)
 
@@ -324,7 +324,7 @@ def main():
                 lines[i] = new_class_line
                 break
 
-        # Import'larÄ± ekle (en Ã¼stteki __init__ dÄ±ÅŸÄ± import'lardan sonra)
+        # Import'larÄ± ekle (en üstteki __init__ dÄ±ÅŸÄ± import'lardan sonra)
         last_import = 0
         for i, line in enumerate(lines):
             if line.startswith(("import ", "from ")):
@@ -339,7 +339,7 @@ def main():
         with open(MAIN_PATH, "w", encoding="utf-8") as f:
             f.write(main_content)
 
-        print(f"\nâœ… cli_main.py gÃ¼ncellendi: {old_class_line} â†’ {new_class_line}")
+        print(f"\nâœ… cli_main.py güncellendi: {old_class_line} â†’ {new_class_line}")
         print(f"   {len(mixin_imports)} import eklendi")
 
     print("\nâœ… Phase B tamam!")

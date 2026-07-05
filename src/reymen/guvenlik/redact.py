@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """redact.py â€” PII temizleme fonksiyonlari.
 
 Email, telefon, kredi karti, API key, TC kimlik numarasi gibi

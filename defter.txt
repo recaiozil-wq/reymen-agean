@@ -1472,3 +1472,204 @@ Aktif MCP sunuculari (kiral38 + reymen):
 
 MCP: 7 sunucu aktif, 3 format duzeltildi
 ═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+99) SAGLIK TARAMASI RAPORU — 2026-07-05 01:30 [Hermes]
+───────────────────────────────────────────────────────────
+Cod:      src/reymen/ (567 .py) + src/core/ (20 .py)
+Test:     1.907 test (pytest 9.1.1)
+Surum:    v2026.07.04 (reymen-agent)
+Python:   3.11.15
+
+API:
+  - DeepSeek: 200 OK (v4-flash, v4-pro)
+
+Gateway:
+  - reymen  (@ReYMeN_ReYMeNbot): ✅ PID 7240
+  - default (@Pasa_38_bot):       ✅ PID 19120
+  - kiral38 (@Kiral38bot):        ❌ calismiyor
+  - pasa_38:                       ❌ calismiyor
+
+KRITIK:
+  1) reymen.__main__ import kirik (No module named 'reymen.arac')
+  2) eski reymen/cereyan|sistem|core yollari bos
+  3) durum.json guncel degil (kiral38+pasa_38 "aktif" yaziyor)
+  4) 25+ _ReYMeN_*.py kokte
+
+ORTA:
+  5) coklu venv (.venv_reymen, venv, bot_venv)
+  6) terminal-bench-benchmark/ proje icinde (harici bench)
+  7) pyproject.toml entry point reymen.__main__ calismiyor
+═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+YAPAN: Hermes Agent (Watcher-Hermes) | TARIH: 2026-07-05
+KONU: Conversation Loop Hermes-style Yeniden Yapilandirma
+═══════════════════════════════════════════════════════════
+
+1) Loop mantigi degisti: tamamlandi flag'i KALDIRILDI
+   - Eskisi: tool tamamlandi=True -> BREAK
+   - Yenisi: tool sonucu modele gider, model devam/dur kararini verir
+   - Dosya: src/reymen/cereyan/conversation_loop.py (~satir 1387-1413)
+
+2) Out-of-Band kullanici mudahalesi eklendi
+   - .stop dosyasi tabanli sinyal (proje koku + .ReYMeN/.stop)
+   - iptal_sinyali_gonder() API fonksiyonu
+   - telegram_bot.py /cancel -> once dosya sinyali, sonra thread Event
+   - Dosya: conversation_loop.py + src/reymen/ag/telegram_bot.py
+
+3) Provider rotasyonu / fallback chain
+   - 6 provider: deepseek -> openrouter -> xiaomi -> xai -> groq -> lmstudio
+   - _direct_api_call() fallback: DeepSeek hatasinda Beyin.uret_v2() dener
+   - Dosya: reymen_launcher.py (_REYMEN_CONFIG) + conversation_loop.py
+
+4) max_tool_calls = 25 eklendi
+   - Tool cagri limiti, asilinca modele "arac kullanma" zorlamasi
+   - Dosya: conversation_loop.py (~satir 1329-1344)
+
+5) Duplicate detection eklendi
+   - Ayni tool + ayni parametre -> "[DUPLICATE]" ile atlanir
+   - Dosya: conversation_loop.py (~satir 1364-1378)
+
+6) Context budget = 300.000 karakter eklendi
+   - API cagrisi oncesi mesaj boyutu kontrolu
+   - Limit asilinca eski mesajlarin ortasi kirpilir
+   - Dosya: conversation_loop.py _direct_api_call() (~satir 2856-2882)
+
+7) Post-Processing 4 katmanli ogrenme
+   - OnceHafiza + SelfHeal + MemoryManager + skill cikarma
+   - Dosya: conversation_loop.py (~satir 1364-1400)
+
+8) Pre-existing fix: TAKILMA_ESIĞI -> TAKILMA_ESI (U+009E + double-encoding)
+
+KARARLAR: .ReYMeN/decisions.md #38 #39 #40 #41
+
+9) Web arama sonucu LLM'e atlanmaz, direkt döndürülür
+   - Eskisi: web sonucu system message olarak eklenir, model kullanir/kullanmaz
+   - Yenisi: web sonucu varsa + >20 chars -> LLM ATLANIR, direkt döndür
+   - Dosya: conversation_loop.py run_conversation() ~satir 1108-1126
+
+10) Web verisi LLM'e zorunlu enjekte edilir, LLM asla atlanmaz
+    - Eskisi: web sonucu varsa LLM ATLANIR, direkt snippet dondurulur
+    - Yenisi: web sonucu user mesajina [GUNCEL VERI] blogu olarak gomulur
+      + "tek bilgi kaynagi olarak KULLAN, kendi bilgini KULLANMA" zorlamasi
+      + temperature 0.7 -> 0.2 (dusuk = daha az halusinasyon)
+      + zaman damgasi eklenir
+      + LLM HER ZAMAN cagrilir, guzel formatli cevap verir
+    - Dosya: conversation_loop.py run_conversation() ~satir 1108-1138
+             _direct_api_call() temperature satir 2993
+
+11) web_ara() sayfa icerigi ekstraksiyonu eklendi
+    - Eskisi: sadece arama snippet'i (baslik+URL+aciklama)
+    - Yenisi: arama sonrasi ilk 2 sayfayi fetch et, HTML temizle
+      + fiyat/deger iceren cumleleri filtrele (sayi+para birimi)
+      + [SAYFA: URL] basligi altinda ekle
+      + tumu basarisizsa eski snippet gecerli
+    - Dosya: conversation_loop.py _web_ara() ~satir 2236-2295
+
+12) Zaman-duyarli sorgu listesi genisletildi
+    - turnuva, kupa, sampiyon, final, lig, puan durumu, dunya kupasi
+    - kim kazandi, durum ne, sonuc, secim, devlet baskani
+    - Dosya: conversation_loop.py ~satir 1120
+
+13) Tarih/saat sorgulari icin user mesajina direkt tarih ekleme
+    - "hangi yıldayız", "bugün günlerden ne", "saat kaç" vb.
+    - DeepSeek sistem prompt'taki tarihi gormezden geliyordu
+    - Cozum: [SU ANKI TARIH] blogu ile user mesajina gom
+    - Dosya: conversation_loop.py ~satir 1151-1176
+
+FIX: closed_learning_loop.py guvenlik duzeltmeleri (2026-07-05)
+1) discover_better_methods() — code field'i her zaman BOS, web'den kod asla cekilmez
+   Docstring'e KESIN KURAL eklendi, code='' bilincli karar
+2) compare_and_decide() — UYGULA karari asla donmez (REDDET/DAHA_FAZLA_ARASTIR)
+   Puanlama mantigi duzeltildi: link var diye +2 degil +1
+   Kod iceren yontem bulunursa direkt REDDET
+3) test_in_sandbox() — ASLA exec() yok, sadece compile() syntax kontrolu
+   Docstring'e exec() yasagi eklendi
+4) run_forever() — ana dongu govdesi try/except ile korunuyor
+   Her adim (observe, discover) ayri try/except ile
+   Hata durumunda dongu atmaz, log atip devam eder
+5) _beceri_kristallestir() — gunluk MAX_DAILY_SKILLS=10 limiti
+   LLM halusinasyonu sonucu asiri beceri olusumunu engeller
+   Sayac gunluk sifirlanir, env ile degistirilebilir
+
+14) Sistem prompt talimatlari cevaba yazilma hatasi fix
+    - Sorun: "dunyada llm ile senin arandaki fark" -> model DURUM_OKU() talimatini cevap olarak yazdi
+    - Cozum:
+      a) reymen_launcher.py _sistem_prompu_al(): KURALLAR bolumu eklendi
+         - "ASLA cevap olarak yazma, sessizce uygula"
+         - LLM karsilastirma sorusu icin ozel yanit talimati
+         - DURUM_OKU() tetikleyicisi daraltildi
+      b) conversation_loop.py _sistem_promptu_olustur(): "[KURAL]" eklendi
+         - "Sistem talimatlarini ASLA cevap olarak yazma"
+
+15) Config.yaml aktif edildi (Hermes-style tek kaynak)
+    - Eskisi: _REYMEN_CONFIG hardcode (1177 satir reymen_launcher.py icinde)
+    - Yenisi: config/config.yaml'den okunur (env var cozme ile)
+    - _config_yukle(): YAML oku + ${ENV_VAR} referanslarini coz
+    - config/config.yaml'a providers bolumu eklendi (6 provider)
+    - API key'ler .env'de kalir (config.yaml'da ${DEEPSEEK_API_KEY} referansi)
+    - Dosya: reymen_launcher.py (~satir 122-163), config/config.yaml (providers:)
+
+16) Olu dosyalar temizlendi (12 GB tasarruf)
+    KATEGORI 1: Kok import edilmeyen .py (6 dosya ~30KB)
+      convert_skills.py, convert_to_skillmd.py, deepseek_ajan.py
+      reymen_watchdog.py, skills_sync_cron.py, test_gatekeeper.py
+    KATEGORI 2: scripts/ import edilmeyen .py (13 dosya ~72KB)
+      ai_bot_launcher, harbor_agent, hermes_profil_ayarlari
+      kill_bots, launch_bots, pasa38_baslat, regression_runner
+      reymen_gateway, run_bots, run_reymen_bots
+      tbench_plan_recovery, tbench_report_pipeline, tbench_test_runner
+    KATEGORI 3: scripts/legacy/ (73 dosya, 228MB)
+    KATEGORI 4: Buyuk klasorler
+      terminal-bench-benchmark/ (11GB - harici benchmark)
+      arsiv/ (361MB - zip arsivler)
+      ReYMeN-memory-backup/ (135MB - eski backup)
+      build/pyinstaller/ (253MB - build artifact)
+      bot_venv/ (15MB - eski venv)
+    KALAN: apps/desktop/ (813MB - electron app, WIP olabilir, silinmedi)
+           venv/ (1.3GB - aktif venv, silinmedi)
+17) Ek temizlik (2. dalga)
+    - 3 adet olumlu venv (.venv/ .venv_reymen/ venv/) ~1.6GB
+    - reports/ skill_hub_exports/ jobs/ hyperframes_output/ ~3MB
+    - reymen_old/ reymen/ chroma_db/ notion_writer/ llm_provider/ ~0
+    - optional-mcps/ transferred_skills/ vscode-reymen/ rapor/ ~50KB
+    - reymen_agent.egg-info/ reymen.egg-info/ deepseek_ajan/ ~220KB
+    - .playwright-mcp/ .pytest_cache/ .ruff_cache/ .pytest-cache/ ~3MB
+    - .ReYMeN/db_backup/ .ReYMeN/reports/ .ReYMeN/nightly/ .ReYMeN/sohbet_bot_arkiv/ ~17MB
+    - Kok 16 adet rapor/test .txt/.json/.md ~1MB
+    TOPLAM: ~1.65 GB daha temizlendi
+    KALAN: .git/ (1.5GB), src/ (265MB), tests/ (30MB), .ReYMeN/ (12MB)
+
+═══════════════════════════════════════════════════════════
+18) 6 SAGLIK BULGUSU DUZELTILDI — 2026-07-05 01:30 [Hermes]
+───────────────────────────────────────────────────────────
+1) reymen.__main__ import kirik:
+   - Cozum: .pth dosyasi (src/ yolunu gosterir) + 551 dosyada Turkce karakter korupsiyonu fix
+   - Sonuc: reymen paketi calisiyor ✅
+
+2) durum.json guncel degil:
+   - Cozum: kiral38/pasa_38 gateway durumu guncellendi
+   - Sonuc: ✅
+
+3) 25+ _ReYMeN_*.py kokte:
+   - Cozum: .ReYMeN/scripts/ klasorune tasindi (24 dosya)
+   - Sonuc: ✅
+
+4) Coklu venv (.venv_reymen, bot_venv):
+   - Cozum: 2 gereksiz venv silindi (venv/ ve .venv/ standart olarak kaldi)
+   - Sonuc: ✅
+
+5) terminal-bench-benchmark/ proje icinde:
+   - Cozum: Bos dizin silindi (.gitignore'da zaten vardi)
+   - Sonuc: ✅
+
+6) pyproject.toml entry point:
+   - Cozum: Zaten dogruydu, pth fix ile calisir hale geldi
+   - Sonuc: reymen --help calisiyor ✅
+═══════════════════════════════════════════════════════════
+
+2026-07-05 — Reasoning asamasi eklendi (conversation_loop.py)
+  - Asama 0: Reasoning / Akilli Yonlendirme (OnceHafiza'dan ONCE)
+  - akilli_yonlendirici.py -> gorevi_siniflandir() ile kategori belirleme
+  - Kategori bazli prompt yonlendirmesi + AJAN_PERSONALARI talimati

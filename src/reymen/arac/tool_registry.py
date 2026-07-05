@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """tool_registry.py â€” Advanced ToolRegistry + check_fn TTL cache + ToolsetManager.
 
 Auto-discovers and registers all tools from the tools/ folder.

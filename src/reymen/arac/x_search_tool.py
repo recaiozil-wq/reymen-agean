@@ -1,7 +1,7 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """x_search_tool.py â€” X (Twitter) Arama AracÄ±.
 
-X/Twitter v2 API kullanarak tweet arar, kullanÄ±cÄ± profili Ã§eker,
+X/Twitter v2 API kullanarak tweet arar, kullanÄ±cÄ± profili çeker,
 trend konularÄ± listeler. Bearer Token yeterli â€” OAuth 1.0a gerekmez.
 ENV: X_BEARER_TOKEN
 """
@@ -42,13 +42,13 @@ def tweet_ara(
 
     Args:
         sorgu:            Arama terimi (#hashtag, @kullanici, kelime)
-        max_sonuc:        KaÃ§ tweet dÃ¶neceÄŸi (10-100)
+        max_sonuc:        Kaç tweet döneceÄŸi (10-100)
         lang:             Dil filtresi (tr, en, â€¦)
-        exclude_replies:  YanÄ±tlarÄ± hariÃ§ tut
-        exclude_retweets: RT'leri hariÃ§ tut
+        exclude_replies:  YanÄ±tlarÄ± hariç tut
+        exclude_retweets: RT'leri hariç tut
 
     Returns:
-        SonuÃ§lar metin formatÄ±nda
+        Sonuçlar metin formatÄ±nda
     """
     q = sorgu
     if lang:
@@ -76,7 +76,7 @@ def tweet_ara(
     kullanicilar = {u["id"]: u for u in yanit.get("includes", {}).get("users", [])}
 
     if not tweetler:
-        return f"'{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
+        return f"'{sorgu}' için sonuç bulunamadÄ±."
 
     satirlar = [f"X Arama: '{sorgu}' â€” {len(tweetler)} tweet"]
     for t in tweetler:
@@ -96,7 +96,7 @@ def kullanici_profili(kullanici_adi: str) -> str:
     """X kullanÄ±cÄ± profili getir.
 
     Args:
-        kullanici_adi: @ iÅŸareti olmadan (Ã¶r. elonmusk)
+        kullanici_adi: @ iÅŸareti olmadan (ör. elonmusk)
 
     Returns:
         Profil bilgisi metin olarak
@@ -119,7 +119,7 @@ def kullanici_profili(kullanici_adi: str) -> str:
     return (
         f"@{data.get('username')} â€” {data.get('name')}\n"
         f"{data.get('description','')}\n"
-        f"TakipÃ§i: {m.get('followers_count',0):,} | "
+        f"Takipçi: {m.get('followers_count',0):,} | "
         f"Takip: {m.get('following_count',0):,} | "
         f"Tweet: {m.get('tweet_count',0):,}"
     )
@@ -143,7 +143,7 @@ def son_tweetler(kullanici_adi: str, max_sonuc: int = 5) -> str:
 
     tweetler = yanit.get("data", [])
     if not tweetler:
-        return f"@{kullanici_adi} iÃ§in tweet bulunamadÄ±."
+        return f"@{kullanici_adi} için tweet bulunamadÄ±."
 
     satirlar = [f"@{kullanici_adi} â€” Son {len(tweetler)} Tweet"]
     for t in tweetler:
@@ -155,7 +155,7 @@ def son_tweetler(kullanici_adi: str, max_sonuc: int = 5) -> str:
 
 
 def motor_kaydet(motor):
-    """X araÃ§larÄ±nÄ± motora kaydet."""
+    """X araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 

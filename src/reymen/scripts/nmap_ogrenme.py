@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """nmap_ogrenme.py â€” Kali nmap taramasi OnceHafiza testi"""
 
 import json

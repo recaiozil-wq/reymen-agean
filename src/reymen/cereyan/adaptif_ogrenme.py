@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 adaptif_ogrenme.py â€” Adaptive learning and self-correction module.
 
@@ -36,20 +36,20 @@ ROOT = Path(__file__).parent.resolve()
 TERCIH_DOSYASI = ROOT / ".ReYMeN" / "kullanici_tercihleri.json"
 MAKS_TERCIH = 50  # En fazla bu kadar tercih saklanÄ±r
 
-# KullanÄ±cÄ± dÃ¼zeltme sinyalleri
+# KullanÄ±cÄ± düzeltme sinyalleri
 _DUZELTME_SINYALLERI = [
     r"\bhay[Ä±i]r\b",
     r"\bdeÄŸil\b",
     r"\byapma\b",
     r"\bstop\b",
     r"\bher\s+zaman\b",
-    r"\bhiÃ§(?:bir\s+zaman)?\b",
-    r"\bbÃ¶yle\s+(?:yapma|yap)\b",
-    r"\b(?:ÅŸÃ¶yle|bu\s+ÅŸekilde)\s+yap\b",
+    r"\bhiç(?:bir\s+zaman)?\b",
+    r"\bböyle\s+(?:yapma|yap)\b",
+    r"\b(?:ÅŸöyle|bu\s+ÅŸekilde)\s+yap\b",
     r"\bkullanma\b",
     r"\bnot:\b",
     r"\bhatÄ±rl[ae]\b",
-    r"\blÃ¼tfen\s+(?:bir\s+daha)?\s*yapma\b",
+    r"\blütfen\s+(?:bir\s+daha)?\s*yapma\b",
     r"\bgeleceÄŸe\s+not\b",
 ]
 
@@ -64,7 +64,7 @@ class AdaptifOgrenme:
         self._dosya.parent.mkdir(parents=True, exist_ok=True)
         self._tercihler: list = self._yukle()
 
-    # â”€â”€ Tercih yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Tercih yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _yukle(self) -> list:
         if self._dosya.exists():
@@ -177,37 +177,37 @@ class AdaptifOgrenme:
                 and "Traceback" not in sonuc
             ):
                 if deneme > 0:
-                    print(f"[Self-correction]: {deneme}. denemede dÃ¼zeldi.")
+                    print(f"[Self-correction]: {deneme}. denemede düzeldi.")
                 return sonuc
 
             son_hata = sonuc
             if deneme >= max_deneme or provider is None:
                 break
 
-            # LLM'den dÃ¼zeltme iste
+            # LLM'den düzeltme iste
             duzeltme_promptu = (
                 f"AÅŸaÄŸÄ±daki Python kodu ÅŸu hatayÄ± verdi:\n\n"
                 f"KOD:\n```python\n{mevcut_kod}\n```\n\n"
                 f"HATA:\n{son_hata[:500]}\n\n"
-                f"Kodu dÃ¼zelt ve SADECE dÃ¼zeltilmiÅŸ kodu yaz. AÃ§Ä±klama ekleme."
+                f"Kodu düzelt ve SADECE düzeltilmiÅŸ kodu yaz. AçÄ±klama ekleme."
             )
             try:
                 yanit = provider.uret(
-                    "Sen bir Python kod dÃ¼zeltici asistanÄ±sÄ±n.",
+                    "Sen bir Python kod düzeltici asistanÄ±sÄ±n.",
                     [{"role": "user", "content": duzeltme_promptu}],
                 )
-                # Kod bloÄŸunu Ã§Ä±kar
+                # Kod bloÄŸunu çÄ±kar
                 m = re.search(r"```(?:python)?\s*\n(.+?)```", yanit, re.DOTALL)
                 if m:
                     mevcut_kod = m.group(1).strip()
                 else:
                     mevcut_kod = yanit.strip()
-                print(f"[Self-correction]: Deneme {deneme + 1}, kod dÃ¼zeltildi.")
+                print(f"[Self-correction]: Deneme {deneme + 1}, kod düzeltildi.")
             except Exception as e:
                 print(f"[Self-correction]: LLM hatasÄ±: {e}")
                 break
 
-        return f"[Self-correction]: {max_deneme} denemede dÃ¼zeltilemedi.\nSon hata: {son_hata[:300]}"
+        return f"[Self-correction]: {max_deneme} denemede düzeltilemedi.\nSon hata: {son_hata[:300]}"
 
 
 # â”€â”€ Motor entegrasyon yardÄ±mcÄ±sÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -221,15 +221,15 @@ def adaptif_ogrenme_sistemi_kur() -> AdaptifOgrenme:
 if __name__ == "__main__":
     ao = AdaptifOgrenme()
 
-    # DÃ¼zeltme tespiti testi
+    # Düzeltme tespiti testi
     testler = [
         "hayÄ±r, her zaman UTF-8 kullan",
         "tamam harika",
-        "bunu bir daha yapma lÃ¼tfen",
+        "bunu bir daha yapma lütfen",
         "dosya oluÅŸtur",
         "hatÄ±rla: API key'i asla yazdÄ±rma",
     ]
-    print("=== DÃ¼zeltme Tespiti ===")
+    print("=== Düzeltme Tespiti ===")
     for t in testler:
         tespit = ao.kullanici_mesaji_isle(t)
         print(f"{'[KAYDEDILDI]' if tespit else '[normal]  '} {t}")

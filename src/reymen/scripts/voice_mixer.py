@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """voice_mixer.py â€” Pure-PCM voice mixer for Discord audio.
 
 Exports:

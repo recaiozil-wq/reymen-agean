@@ -1,4 +1,4 @@
-﻿"""_handle_paste_command handler."""
+"""_handle_paste_command handler."""
 
 from reymen.sistem.cli_display import _cprint, _DIM, _RST
 from reymen.sistem.ReYMeN_constants import is_termux as _is_termux_environment

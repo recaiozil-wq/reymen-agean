@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """3000 soru testi - API'yi dogrudan cagirir, ciktiyi dosyaya yazar."""
 
 import json, os, sys, time, requests as req

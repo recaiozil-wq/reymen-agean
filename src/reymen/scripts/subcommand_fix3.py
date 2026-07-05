@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """subcommand_fix3.py â€” run_xxx fonksiyon govdesini bastan yaz."""
 
 import re

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 meta_prompt_optimizer.py â€” Automatic Prompt Engineering (APE, Zhou et al. 2022).
 
@@ -35,7 +35,7 @@ SISTEM_EKLERI = ROOT / ".ReYMeN" / "sistem_ekleri.md"
 
 # â”€â”€ Promptlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-_ANALIZ_SISTEM = """Sen bir yapay zeka sistem mimarissin ve prompt mÃ¼hendisisin.
+_ANALIZ_SISTEM = """Sen bir yapay zeka sistem mimarissin ve prompt mühendisisin.
 Sana bir otonom ajandaki son hata kayitlari verilecek.
 Bu hatalari analiz ederek sistem tarimantinin hangi alaninda iyilestirme
 yapilmasi gerektigini belirle ve YENÄ° bir ek blok yaz.
@@ -57,7 +57,7 @@ ONERI_BLOK:
 /ONERI_BLOK
 """
 
-_REVIZYON_SISTEM = """Sen bir teknik yazar ve prompt mÃ¼hendisisin.
+_REVIZYON_SISTEM = """Sen bir teknik yazar ve prompt mühendisisin.
 Sana iki sistem talimati blogu verilecek: MEVCUT ve ONERI.
 Cakismalari tespit et ve MEVCUT blogu ONERI ile birlestirecek
 FINAL blogu yaz. Muzikeri KALDIR; YENILERI EKLE.

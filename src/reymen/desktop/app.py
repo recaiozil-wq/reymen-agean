@@ -1,4 +1,4 @@
-﻿"""ReYMeN Desktop uygulamasi (ust seviye API)."""
+"""ReYMeN Desktop uygulamasi (ust seviye API)."""
 
 from __future__ import annotations
 from reymen.desktop.server import WebServerManager, web_server

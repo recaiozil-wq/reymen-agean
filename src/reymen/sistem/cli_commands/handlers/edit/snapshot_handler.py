@@ -1,4 +1,4 @@
-﻿"""_handle_snapshot_command handler."""
+"""_handle_snapshot_command handler."""
 
 
 def _handle_snapshot_command(cli, command: str):

@@ -1,4 +1,4 @@
-﻿"""_handle_subgoal_command handler."""
+"""_handle_subgoal_command handler."""
 
 from reymen.sistem.cli_display import _cprint, _DIM, _RST
 

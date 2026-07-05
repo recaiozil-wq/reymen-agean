@@ -1,4 +1,4 @@
-﻿"""ReYMeN Web UI sunucu daemon'i â€” arka planda calisir."""
+"""ReYMeN Web UI sunucu daemon'i â€” arka planda calisir."""
 
 import os
 import sys

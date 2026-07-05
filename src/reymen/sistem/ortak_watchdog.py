@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 ortak_watchdog.py â€” ReYMeN Otonom Degisiklik Izleyici.
 

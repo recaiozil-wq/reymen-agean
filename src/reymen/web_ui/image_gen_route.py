@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Apache 2.0 â€” ReYMeN Web UI Image Gen Route
 """
 image_gen_route.py â€” FastAPI route for image generation.
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["image-gen"])
 
-# Templates â€” parent dir'deki templates/ klasÃ¶rÃ¼
+# Templates â€” parent dir'deki templates/ klasörü
 from pathlib import Path
 
 _TEMPLATE_DIR = Path(__file__).parent / "templates"
@@ -69,9 +69,9 @@ async def image_gen_generate(
         )
 
     try:
-        # Provider'a gÃ¶re davran
+        # Provider'a göre davran
         if provider == "stub":
-            # Stub: her zaman place holder dÃ¶ndÃ¼r
+            # Stub: her zaman place holder döndür
             result = _stub_generate(prompt, aspect_ratio)
         else:
             # ReYMeN engine (auto-selection)
@@ -103,7 +103,7 @@ async def image_gen_generate(
                 "provider": provider,
                 "model": result.get("model", ""),
                 "duration": round(duration, 2),
-                "error": result.get("error", "GÃ¶rsel Ã¼retilemedi."),
+                "error": result.get("error", "Görsel üretilemedi."),
             }
         )
 
@@ -122,7 +122,7 @@ async def image_gen_generate(
 
 
 def _stub_generate(prompt: str, aspect_ratio: str) -> dict[str, Any]:
-    """Stub/fallback â€” SVG placeholder Ã¼ret."""
+    """Stub/fallback â€” SVG placeholder üret."""
     import hashlib
     import base64
 

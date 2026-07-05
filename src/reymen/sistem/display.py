@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 display.py â€” Goruntuleme sistemi.
 
@@ -118,7 +118,7 @@ class Display:
             renk: Renk adi (bos = renksiz)
             kalin: Kalin yaz
             stiller: Ekstra stil listesi (kalin, italik vb.)
-            yeni_satir: Sonuna newline ekle (son parametresi varsa geÃ§ersiz)
+            yeni_satir: Sonuna newline ekle (son parametresi varsa geçersiz)
             son: print() end parametresi (yeni_satir yerine kullanilir)
         """
         try:

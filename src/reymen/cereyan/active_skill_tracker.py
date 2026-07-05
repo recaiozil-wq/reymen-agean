@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 active_skill_tracker.py â€” Aktif skill takibi ve LLM context enjeksiyonu.
 

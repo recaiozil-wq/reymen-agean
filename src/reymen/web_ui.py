@@ -1,6 +1,6 @@
-﻿"""
+"""
 ReYMeN Web UI â€” Geriye uyumluluk shim'i.
-Eski `from reymen.web_ui import baslat` Ã§alÄ±ÅŸmaya devam etsin diye.
+Eski `from reymen.web_ui import baslat` çalÄ±ÅŸmaya devam etsin diye.
 Yeni kod: reymen/web_ui/ paketinde.
 """
 

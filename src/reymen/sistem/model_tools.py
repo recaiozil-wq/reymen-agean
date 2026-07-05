@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Apache 2.0 â€” Bu dosya Hermes Agent'ten esinlenilmistir (github.com/NousResearch/hermes-agent)
 """
 Model Tools Module

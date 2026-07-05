@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """codex_runtime.py â€” OpenAI Codex CLI Runtime Adaptoru.
 
 Codex CLI'yi bir LLM provider olarak sarar. Codex'i

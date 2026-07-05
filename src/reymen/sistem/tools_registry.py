@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Central registry for all ReYMeN tools.
 
 Each tool file calls ``registry.register()`` at module level to declare its

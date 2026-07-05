@@ -1,4 +1,4 @@
-﻿"""
+"""
 ReYMeN Cron â€” schedule-based job runner.
 
 Hermes Agent (Nous Research, Apache 2.0) kaynak kodundan uyarlanmistir.

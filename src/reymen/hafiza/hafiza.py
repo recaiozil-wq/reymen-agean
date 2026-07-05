@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-hafiza.py â€” Katman 1: KalÄ±cÄ± GÃ¶rev HafÄ±zasÄ±
+hafiza.py â€” Katman 1: KalÄ±cÄ± Görev HafÄ±zasÄ±
 
 Her alt ajan adÄ±mÄ±nÄ±n JSON dosyasÄ±na kaydedilmesi.
-Process crash olsa bile task sonuÃ§larÄ± kaybolmaz.
+Process crash olsa bile task sonuçlarÄ± kaybolmaz.
 
 KullanÄ±m:
     from hafiza import alt_ajan_hafiza
@@ -27,7 +27,7 @@ HAFIZA_DIZINI = ROOT / ".alt_ajan_hafiza"
 MAX_JSON_BOYUT = 10 * 1024 * 1024  # 10MB â€” dizin temizleme limiti
 MAX_DOSYA_YAS_SAAT = 72  # 72 saatten eski task dosyalari temizlenir
 
-# Thread-safe yazma iÃ§in kilit
+# Thread-safe yazma için kilit
 _yazma_kilit = threading.Lock()
 
 
@@ -35,12 +35,12 @@ _yazma_kilit = threading.Lock()
 
 
 def _task_yolu(task_id: str) -> Path:
-    """task_id'ye ait JSON dosya yolunu dÃ¶ndÃ¼rÃ¼r."""
+    """task_id'ye ait JSON dosya yolunu döndürür."""
     return HAFIZA_DIZINI / f"{task_id}.json"
 
 
 def _dizin_temizle():
-    """72 saatten eski task dosyalarÄ±nÄ± temizle (disk ÅŸiÅŸmesini Ã¶nle)."""
+    """72 saatten eski task dosyalarÄ±nÄ± temizle (disk ÅŸiÅŸmesini önle)."""
     if not HAFIZA_DIZINI.exists():
         return
     simdi = time.time()
@@ -58,8 +58,8 @@ def _dizin_temizle():
 class AltAjanHafiza:
     """Task ID bazlÄ± kalÄ±cÄ± JSON hafÄ±zasÄ±.
 
-    Her task iÃ§in tek bir JSON dosyasÄ±. Her kayÄ±t append deÄŸil,
-    dosyayÄ± oku â†’ gÃ¼ncelle â†’ yaz ÅŸeklinde (kÃ¼Ã§Ã¼k task'lar iÃ§in ideal).
+    Her task için tek bir JSON dosyasÄ±. Her kayÄ±t append deÄŸil,
+    dosyayÄ± oku â†’ güncelle â†’ yaz ÅŸeklinde (küçük task'lar için ideal).
     """
 
     def __init__(self):
@@ -67,12 +67,12 @@ class AltAjanHafiza:
         _dizin_temizle()
 
     def kaydet(self, task_id: str, tur: str, veri: dict) -> None:
-        """Bir adÄ±m/sonuÃ§/hata kaydÄ±nÄ± task JSON'una ekler.
+        """Bir adÄ±m/sonuç/hata kaydÄ±nÄ± task JSON'una ekler.
 
         Args:
             task_id: Alt ajan task ID'si
             tur: "adim" | "sonuc" | "hata" | "gozlem"
-            veri: Kaydedilecek sÃ¶zlÃ¼k
+            veri: Kaydedilecek sözlük
         """
         if not task_id or not tur:
             return
@@ -118,13 +118,13 @@ class AltAjanHafiza:
                             indent=2,
                         )
                 except OSError as _e:
-                    pass  # Sessiz geÃ§ â€” disk dolmuÅŸ olabilir
+                    pass  # Sessiz geç â€” disk dolmuÅŸ olabilir
 
     def yukle(self, task_id: str) -> dict | None:
-        """Task'Ä±n tÃ¼m kayÄ±tlarÄ±nÄ± yÃ¼kler.
+        """Task'Ä±n tüm kayÄ±tlarÄ±nÄ± yükler.
 
         Returns:
-            KayÄ±t sÃ¶zlÃ¼ÄŸÃ¼ veya None (dosya yoksa / bozuksa)
+            KayÄ±t sözlüÄŸü veya None (dosya yoksa / bozuksa)
         """
         dosya = _task_yolu(task_id)
         if not dosya.exists():
@@ -136,14 +136,14 @@ class AltAjanHafiza:
             return None
 
     def son_kayit(self, task_id: str) -> dict | None:
-        """Task'Ä±n son kaydÄ±nÄ± dÃ¶ndÃ¼rÃ¼r (hÄ±zlÄ± sorgu iÃ§in)."""
+        """Task'Ä±n son kaydÄ±nÄ± döndürür (hÄ±zlÄ± sorgu için)."""
         kayit = self.yukle(task_id)
         if kayit and kayit.get("kayitlar"):
             return kayit["kayitlar"][-1]
         return None
 
     def task_listele(self, limit: int = 20) -> list[dict]:
-        """Son N task'Ä±n Ã¶zetini listeler."""
+        """Son N task'Ä±n özetini listeler."""
         if not HAFIZA_DIZINI.exists():
             return []
         dosyalar = sorted(
@@ -180,7 +180,7 @@ class AltAjanHafiza:
             return False
 
     def temizle_hepsi(self) -> int:
-        """TÃ¼m alt ajan hafÄ±zasÄ±nÄ± temizle. Silinen dosya sayÄ±sÄ±nÄ± dÃ¶ndÃ¼r."""
+        """Tüm alt ajan hafÄ±zasÄ±nÄ± temizle. Silinen dosya sayÄ±sÄ±nÄ± döndür."""
         if not HAFIZA_DIZINI.exists():
             return 0
         sayac = 0

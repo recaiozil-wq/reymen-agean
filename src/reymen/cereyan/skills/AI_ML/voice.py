@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 voice.py â€” AI_ML skill: Ses (TTS/STT) motoru.
 
@@ -17,7 +17,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-# Engine'i iÃ§e aktar
+# Engine'i içe aktar
 try:
     from reymen.arac.voice_engine import (
         EdgeTTS,

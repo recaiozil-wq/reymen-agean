@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 beyin.py â€” Multi-provider LLM connection layer.
 
@@ -50,7 +50,7 @@ try:
 
     _TRACE_LLM_AKTIF = True
 except ImportError:
-    # Observability modÃ¼lÃ¼ yoksa no-op dekoratÃ¶r
+    # Observability modülü yoksa no-op dekoratör
     def trace_llm_call(span_adi=None, attributes=None):
         def decorator(func):
             return func
@@ -59,7 +59,7 @@ except ImportError:
 
     _TRACE_LLM_AKTIF = False
 
-# â”€â”€ ModÃ¼l dÃ¼zeyinde logger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Modül düzeyinde logger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 logger = logging.getLogger(__name__)
 
 # â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -81,11 +81,11 @@ except ImportError:
     _FailoverReason = None  # type: ignore[assignment]
     _HATA_SINIF_AKTIF = False
 
-# â”€â”€ Opsiyonel modÃ¼l yÃ¼kleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Opsiyonel modül yükleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _guvensiz_import(modul_adi: str) -> Any:
-    """ModÃ¼lÃ¼ iÃ§e aktar; bulunamazsa None dÃ¶ndÃ¼r (hata yÃ¼kseltme)."""
+    """Modülü içe aktar; bulunamazsa None döndür (hata yükseltme)."""
     try:
         import importlib
 
@@ -130,7 +130,7 @@ class SaglayCiAdim:
 
 @dataclass
 class LLMYanitMeta:
-    """_cagir() dÃ¶nÃ¼ÅŸ deÄŸeri: metin + basit Ã¼stveri."""
+    """_cagir() dönüÅŸ deÄŸeri: metin + basit üstveri."""
 
     metin: str
     provider: str
@@ -194,13 +194,13 @@ class Beyin:
         * Otomatik fallback zinciri â€” birincil saÄŸlayÄ±cÄ± baÅŸarÄ±sÄ±z olursa
           yapÄ±landÄ±rmadaki diÄŸer saÄŸlayÄ±cÄ±lar sÄ±rayla denenir.
         * Rate-limit yeniden deneme â€” exponential backoff ile.
-        * Ä°ptal edilebilir API Ã§aÄŸrÄ±larÄ± â€” iptal_et() / sifirla() API'si.
-        * Streaming desteÄŸi â€” dusun_stream() generator arayÃ¼zÃ¼.
+        * Ä°ptal edilebilir API çaÄŸrÄ±larÄ± â€” iptal_et() / sifirla() API'si.
+        * Streaming desteÄŸi â€” dusun_stream() generator arayüzü.
         * Opsiyonel entegrasyonlar: credential_pool, prompt_caching,
           nous_rate_guard, account_usage.
 
     Args:
-        config: SaÄŸlayÄ±cÄ± yapÄ±landÄ±rma sÃ¶zlÃ¼ÄŸÃ¼.  Beklenen alanlar::
+        config: SaÄŸlayÄ±cÄ± yapÄ±landÄ±rma sözlüÄŸü.  Beklenen alanlar::
 
             {
                 "default_provider": "lmstudio",
@@ -229,7 +229,7 @@ class Beyin:
             model_provider = ""
             model_model = ""
 
-        # Ã–nce Ã¼st dÃ¼zey anahtarlarÄ±, yoksa "general" altÄ±ndakileri oku
+        # Ã–nce üst düzey anahtarlarÄ±, yoksa "general" altÄ±ndakileri oku
         self.provider: str = model_provider or config.get(
             "default_provider",
             config.get("general", {}).get("default_provider", "lmstudio"),
@@ -244,7 +244,7 @@ class Beyin:
 
         self.base_url, self.api_key = self._saglayici_baglantisi_kur(self.provider)
 
-        # Ä°ptal olayÄ± â€” _zincir_insa_et() Ã¶ncesinde oluÅŸturulmalÄ±
+        # Ä°ptal olayÄ± â€” _zincir_insa_et() öncesinde oluÅŸturulmalÄ±
         self._iptal_olayi = threading.Event()
         self._fallback_zinciri: list[SaglayCiAdim] = self._zincir_insa_et()
         # Instance-level FC cache (class attr'dan baÄŸÄ±msÄ±z â€” test izolasyonu)
@@ -255,7 +255,7 @@ class Beyin:
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _saglayici_baglantisi_kur(self, provider: str) -> Tuple[str, str]:
-        """base_url ve api_key deÄŸerlerini dÃ¶ndÃ¼rÃ¼r."""
+        """base_url ve api_key deÄŸerlerini döndürür."""
         prov_conf = self.config.get("providers", {}).get(provider, {})
 
         # SaÄŸlayÄ±cÄ± kayÄ±t defterinden varsayÄ±lan base_url
@@ -274,11 +274,11 @@ class Beyin:
         """API anahtarÄ±nÄ± ÅŸu sÄ±rayla arar: credential_pool â†’ config â†’ os.environ.
 
         Args:
-            provider:  SaÄŸlayÄ±cÄ± adÄ± (Ã¶r. "openai").
-            prov_conf: config["providers"][provider] sÃ¶zlÃ¼ÄŸÃ¼.
+            provider:  SaÄŸlayÄ±cÄ± adÄ± (ör. "openai").
+            prov_conf: config["providers"][provider] sözlüÄŸü.
 
         Returns:
-            Bulunan anahtar ya da lmstudio iÃ§in "not-needed", diÄŸerleri iÃ§in "".
+            Bulunan anahtar ya da lmstudio için "not-needed", diÄŸerleri için "".
         """
         env_adi = _PROVIDER_ENV.get(provider)
 
@@ -307,7 +307,7 @@ class Beyin:
         return "not-needed" if provider == "lmstudio" else ""
 
     def _varsayilan_model(self, provider: str) -> str:
-        """Provider iÃ§in varsayÄ±lan model adÄ±nÄ± dÃ¶ndÃ¼rÃ¼r."""
+        """Provider için varsayÄ±lan model adÄ±nÄ± döndürür."""
         env_degerleri: dict[str, str] = {
             "azure": os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
             "bedrock": os.environ.get(
@@ -325,7 +325,7 @@ class Beyin:
     def _zincir_insa_et(self) -> list[SaglayCiAdim]:
         """Fallback saÄŸlayÄ±cÄ± zincirini oluÅŸturur.
 
-        SÄ±ra: birincil â†’ fallback_model â†’ anahtarÄ± geÃ§erli diÄŸer saÄŸlayÄ±cÄ±lar.
+        SÄ±ra: birincil â†’ fallback_model â†’ anahtarÄ± geçerli diÄŸer saÄŸlayÄ±cÄ±lar.
         """
         zincir: list[SaglayCiAdim] = [
             SaglayCiAdim(
@@ -336,7 +336,7 @@ class Beyin:
             )
         ]
 
-        # AÃ§Ä±kÃ§a tanÄ±mlÄ± fallback model
+        # AçÄ±kça tanÄ±mlÄ± fallback model
         fb = self.config.get("fallback_model")
         if fb and isinstance(fb, dict):
             key = fb.get("api_key", "")
@@ -372,11 +372,11 @@ class Beyin:
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def iptal_et(self) -> None:
-        """Devam eden API Ã§aÄŸrÄ±sÄ±nÄ± iptal et (ReYMeN interruptible API pattern)."""
+        """Devam eden API çaÄŸrÄ±sÄ±nÄ± iptal et (ReYMeN interruptible API pattern)."""
         self._iptal_olayi.set()
 
     def sifirla(self) -> None:
-        """Ä°ptal olayÄ±nÄ± sÄ±fÄ±rla â€” yeni gÃ¶rev baÅŸlamadan Ã¶nce Ã§aÄŸÄ±r."""
+        """Ä°ptal olayÄ±nÄ± sÄ±fÄ±rla â€” yeni görev baÅŸlamadan önce çaÄŸÄ±r."""
         self._iptal_olayi.clear()
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -385,7 +385,7 @@ class Beyin:
 
     @staticmethod
     def _rate_limit_mi(hata: Exception) -> bool:
-        """HTTP 429 / 'rate limit' iÃ§erikli hata mÄ±?"""
+        """HTTP 429 / 'rate limit' içerikli hata mÄ±?"""
         mesaj = str(hata).lower()
         if any(k in mesaj for k in ("429", "rate limit", "too many requests")):
             return True
@@ -410,7 +410,7 @@ class Beyin:
     ) -> str:
         """Rate-limit hatasÄ±nda exponential backoff ile yeniden dener.
 
-        402/403/401 hatlarÄ± retry edilmez â€” hemen fallback zincirine geÃ§ilir.
+        402/403/401 hatlarÄ± retry edilmez â€” hemen fallback zincirine geçilir.
         """
         bekleme = self.ILK_BEKLEME
         son_hata: Exception | None = None
@@ -435,7 +435,7 @@ class Beyin:
                     )
                 ):
                     logger.warning(
-                        "[Beyin] %s â€” retry edilmiyor, fallback'a geÃ§iliyor.",
+                        "[Beyin] %s â€” retry edilmiyor, fallback'a geçiliyor.",
                         adim.provider,
                     )
                     raise
@@ -457,10 +457,10 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """API Ã§aÄŸrÄ±sÄ±nÄ± arka plan thread'inde Ã§alÄ±ÅŸtÄ±r; iptal olayÄ± set edilirse kes.
+        """API çaÄŸrÄ±sÄ±nÄ± arka plan thread'inde çalÄ±ÅŸtÄ±r; iptal olayÄ± set edilirse kes.
 
-        Ana thread iptal olayÄ±nÄ± izler; API thread'i arka planda Ã§alÄ±ÅŸmaya devam
-        eder ama sonucu gÃ¶rmezden gelinir (ReYMeN interruptible_api_call pattern).
+        Ana thread iptal olayÄ±nÄ± izler; API thread'i arka planda çalÄ±ÅŸmaya devam
+        eder ama sonucu görmezden gelinir (ReYMeN interruptible_api_call pattern).
         """
         sonuc_kabi: list[str | None] = [None]
         hata_kabi: list[Exception | None] = [None]
@@ -480,7 +480,7 @@ class Beyin:
         while not tamam.wait(timeout=0.5):
             if self._iptal_olayi.is_set():
                 raise InterruptedError(
-                    "[Beyin] API Ã§aÄŸrÄ±sÄ± kullanÄ±cÄ± tarafÄ±ndan iptal edildi."
+                    "[Beyin] API çaÄŸrÄ±sÄ± kullanÄ±cÄ± tarafÄ±ndan iptal edildi."
                 )
 
         if hata_kabi[0] is not None:
@@ -491,7 +491,7 @@ class Beyin:
         return sonuc_kabi[0]
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # Genel yÃ¼ksek-seviye arayÃ¼z
+    # Genel yüksek-seviye arayüz
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @trace_llm_call()
@@ -502,18 +502,18 @@ class Beyin:
         model: Optional[str] = None,
         provider: Optional[str] = None,
     ) -> str:
-        """LLM'den yanÄ±t Ã¼ret; fallback zincirine gÃ¶re saÄŸlayÄ±cÄ±lar denenir.
+        """LLM'den yanÄ±t üret; fallback zincirine göre saÄŸlayÄ±cÄ±lar denenir.
 
         Args:
             sistem_prompt: Sistem talimatÄ±.
-            mesajlar:      KonuÅŸma geÃ§miÅŸi ({"role": ..., "content": ...} listesi).
-            model:         Ä°steÄŸe baÄŸlÄ± model geÃ§ersiz kÄ±lma.
-            provider:      Ä°steÄŸe baÄŸlÄ± saÄŸlayÄ±cÄ± geÃ§ersiz kÄ±lma.
+            mesajlar:      KonuÅŸma geçmiÅŸi ({"role": ..., "content": ...} listesi).
+            model:         Ä°steÄŸe baÄŸlÄ± model geçersiz kÄ±lma.
+            provider:      Ä°steÄŸe baÄŸlÄ± saÄŸlayÄ±cÄ± geçersiz kÄ±lma.
 
         Returns:
             LLM yanÄ±tÄ± metni ya da "[Beyin HatasÄ±] â€¦" hata dizesi.
         """
-        # Tek seferlik saÄŸlayÄ±cÄ± geÃ§ersiz kÄ±lma
+        # Tek seferlik saÄŸlayÄ±cÄ± geçersiz kÄ±lma
         if provider and provider != self.provider:
             return self._tek_seferlik_cagri(provider, model, sistem_prompt, mesajlar)
 
@@ -525,7 +525,7 @@ class Beyin:
             try:
                 t0 = time.monotonic()
 
-                # Rate guard â€” izin kontrolÃ¼
+                # Rate guard â€” izin kontrolü
                 if _GUARD_AKTIF:
                     try:
                         if not _nous_rate_guard.rate_guard_izin_ver(adim.provider):  # type: ignore[union-attr]
@@ -570,18 +570,18 @@ class Beyin:
 
             except Exception as e:
                 son_hata = str(e)
-                # â”€â”€ TÃ¼rkÃ§e hata mesajÄ± Ã§evirisi â”€â”€
+                # â”€â”€ Türkçe hata mesajÄ± çevirisi â”€â”€
                 hata_str = str(e)
                 if "402" in hata_str or "Payment Required" in hata_str:
-                    turkce_hata = f"âŒ {adim.provider} kredisi bitti (402 Payment Required). HesabÄ±na kredi yÃ¼klemelisin."
+                    turkce_hata = f"âŒ {adim.provider} kredisi bitti (402 Payment Required). HesabÄ±na kredi yüklemelisin."
                 elif "401" in hata_str or "Unauthorized" in hata_str:
-                    turkce_hata = f"âŒ {adim.provider} API anahtarÄ± geÃ§ersiz (401 Unauthorized). .env dosyasÄ±ndaki key'i kontrol et."
+                    turkce_hata = f"âŒ {adim.provider} API anahtarÄ± geçersiz (401 Unauthorized). .env dosyasÄ±ndaki key'i kontrol et."
                 elif (
                     "429" in hata_str
                     or "Rate limit" in hata_str
                     or "Too Many Requests" in hata_str
                 ):
-                    turkce_hata = f"â³ {adim.provider} hÄ±z sÄ±nÄ±rÄ± aÅŸÄ±ldÄ± (429). KÄ±sa sÃ¼re bekle, otomatik dÃ¼zelecek."
+                    turkce_hata = f"â³ {adim.provider} hÄ±z sÄ±nÄ±rÄ± aÅŸÄ±ldÄ± (429). KÄ±sa süre bekle, otomatik düzelecek."
                 elif "403" in hata_str or "Forbidden" in hata_str:
                     turkce_hata = f"ğŸš« {adim.provider} eriÅŸim reddedildi (403). API key izinlerini kontrol et."
                 elif "500" in hata_str or "Internal Server Error" in hata_str:
@@ -591,7 +591,7 @@ class Beyin:
                 else:
                     turkce_hata = f"âŒ {adim.provider} hatasÄ±: {e}"
 
-                # OpenRouter fallback: 402/403/429 hatasÄ± varsa otomatik OpenRouter'a geÃ§
+                # OpenRouter fallback: 402/403/429 hatasÄ± varsa otomatik OpenRouter'a geç
                 if not openrouter_eklendi and adim.provider != "openrouter":
                     if any(
                         k in hata_str
@@ -633,7 +633,7 @@ class Beyin:
 
                 if self._rate_limit_mi(e):
                     logger.warning(
-                        "[Beyin] Rate limit (%s) â€” sonraki saÄŸlayÄ±cÄ±ya geÃ§iliyor.",
+                        "[Beyin] Rate limit (%s) â€” sonraki saÄŸlayÄ±cÄ±ya geçiliyor.",
                         adim.provider,
                     )
                 else:
@@ -645,17 +645,17 @@ class Beyin:
                     except Exception:
                         logger.warning("[fix_01_sessiz_except] Exception")
 
-        # â”€â”€ TÃ¼m saÄŸlayÄ±cÄ±lar baÅŸarÄ±sÄ±z â€” TÃ¼rkÃ§e Ã¶zet â”€â”€
+        # â”€â”€ Tüm saÄŸlayÄ±cÄ±lar baÅŸarÄ±sÄ±z â€” Türkçe özet â”€â”€
         if "402" in son_hata:
-            return "[Beyin HatasÄ±] âŒ HiÃ§bir saÄŸlayÄ±cÄ± Ã§alÄ±ÅŸmÄ±yor. DeepSeek/OpenRouter kredisi bitmiÅŸ olabilir."
+            return "[Beyin HatasÄ±] âŒ Hiçbir saÄŸlayÄ±cÄ± çalÄ±ÅŸmÄ±yor. DeepSeek/OpenRouter kredisi bitmiÅŸ olabilir."
         elif "401" in son_hata:
-            return "[Beyin HatasÄ±] âŒ HiÃ§bir saÄŸlayÄ±cÄ± Ã§alÄ±ÅŸmÄ±yor. API anahtarlarÄ± geÃ§ersiz."
+            return "[Beyin HatasÄ±] âŒ Hiçbir saÄŸlayÄ±cÄ± çalÄ±ÅŸmÄ±yor. API anahtarlarÄ± geçersiz."
         elif "429" in son_hata:
-            return "[Beyin HatasÄ±] â³ TÃ¼m saÄŸlayÄ±cÄ±lar hÄ±z sÄ±nÄ±rÄ±nda. Biraz bekle tekrar dene."
+            return "[Beyin HatasÄ±] â³ Tüm saÄŸlayÄ±cÄ±lar hÄ±z sÄ±nÄ±rÄ±nda. Biraz bekle tekrar dene."
         elif "timeout" in son_hata.lower():
-            return "[Beyin HatasÄ±] â° TÃ¼m saÄŸlayÄ±cÄ±larda zaman aÅŸÄ±mÄ±. Ä°nternet baÄŸlantÄ±nÄ± kontrol et."
+            return "[Beyin HatasÄ±] â° Tüm saÄŸlayÄ±cÄ±larda zaman aÅŸÄ±mÄ±. Ä°nternet baÄŸlantÄ±nÄ± kontrol et."
         else:
-            return f"[Beyin HatasÄ±] âŒ TÃ¼m saÄŸlayÄ±cÄ±lar baÅŸarÄ±sÄ±z. Son hata: {son_hata}"
+            return f"[Beyin HatasÄ±] âŒ Tüm saÄŸlayÄ±cÄ±lar baÅŸarÄ±sÄ±z. Son hata: {son_hata}"
 
     def _tek_seferlik_cagri(
         self,
@@ -664,7 +664,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """GeÃ§ici saÄŸlayÄ±cÄ± geÃ§ersiz kÄ±lmasÄ± iÃ§in yardÄ±mcÄ±."""
+        """Geçici saÄŸlayÄ±cÄ± geçersiz kÄ±lmasÄ± için yardÄ±mcÄ±."""
         pconf = self.config.get("providers", {}).get(provider, {})
         adim = SaglayCiAdim(
             provider=provider,
@@ -683,7 +683,7 @@ class Beyin:
         mesajlar: list[dict],
         **kwargs: Any,
     ) -> str:
-        """dusun() iÃ§in geriye dÃ¶nÃ¼k uyumlu alias."""
+        """dusun() için geriye dönük uyumlu alias."""
         return self.dusun(sistem_prompt, mesajlar)
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -699,10 +699,10 @@ class Beyin:
         mesajlar: list[dict],
         tools: Optional[list] = None,
     ) -> dict:
-        """OpenAI-uyumlu tek API Ã§aÄŸrÄ±sÄ±; tool_calls'Ä± ayrÄ±ÅŸtÄ±rÄ±r.
+        """OpenAI-uyumlu tek API çaÄŸrÄ±sÄ±; tool_calls'Ä± ayrÄ±ÅŸtÄ±rÄ±r.
 
         Provider tools parametresini desteklemiyorsa tools olmadan yeniden dener
-        (graceful degradation) ve sonucu tool_calls=[] ile dÃ¶ndÃ¼rÃ¼r.
+        (graceful degradation) ve sonucu tool_calls=[] ile döndürür.
 
         Returns:
             {"role": "assistant", "content": str, "tool_calls": list}
@@ -752,10 +752,10 @@ class Beyin:
             raise
 
     def fc_destekleniyor(self) -> bool:
-        """Aktif provider'Ä±n native function calling'i destekleyip desteklemediÄŸini dÃ¶ndÃ¼rÃ¼r.
+        """Aktif provider'Ä±n native function calling'i destekleyip desteklemediÄŸini döndürür.
 
-        Ä°lk Ã§aÄŸrÄ±da bilinmez (True dÃ¶ner â€” dene ve Ã¶ÄŸren). BaÅŸarÄ±sÄ±z olursa
-        _fc_desteklenmeyen cache'ine eklenir ve False dÃ¶ner.
+        Ä°lk çaÄŸrÄ±da bilinmez (True döner â€” dene ve öÄŸren). BaÅŸarÄ±sÄ±z olursa
+        _fc_desteklenmeyen cache'ine eklenir ve False döner.
         """
         _key = f"{self.base_url}:{self.model}"
         return _key not in self._fc_desteklenmeyen
@@ -767,10 +767,10 @@ class Beyin:
         mesajlar: list[dict],
         tools: Optional[list] = None,
     ) -> dict:
-        """Native function calling destekli LLM Ã§aÄŸrÄ±sÄ±.
+        """Native function calling destekli LLM çaÄŸrÄ±sÄ±.
 
-        Fallback zincirini dener; tÃ¼m provider'lar baÅŸarÄ±sÄ±z olursa
-        tools olmadan metin Ã¼retir ve tool_calls=[] ile dÃ¶ner.
+        Fallback zincirini dener; tüm provider'lar baÅŸarÄ±sÄ±z olursa
+        tools olmadan metin üretir ve tool_calls=[] ile döner.
 
         Returns:
             {"role": "assistant", "content": str, "tool_calls": list}
@@ -802,10 +802,10 @@ class Beyin:
                             sinif.yeniden_denenebilir,
                             e,
                         )
-                        # Ä°Ã§erik politikasÄ± ihlali â†’ fallback dene ama zinciri de kÄ±r
+                        # Ä°çerik politikasÄ± ihlali â†’ fallback dene ama zinciri de kÄ±r
                         if neden == _FailoverReason.content_policy_blocked:
                             logger.warning(
-                                "[uret_v2] Ä°Ã§erik politikasÄ± ihlali (%s) â€” metin fallback.",
+                                "[uret_v2] Ä°çerik politikasÄ± ihlali (%s) â€” metin fallback.",
                                 adim.provider,
                             )
                             break
@@ -820,16 +820,16 @@ class Beyin:
                 else:
                     logger.debug("[uret_v2] %s baÅŸarÄ±sÄ±z: %s", adim.provider, e)
                 continue
-        # TÃ¼m provider'lar baÅŸarÄ±sÄ±z â†’ metin fallback
+        # Tüm provider'lar baÅŸarÄ±sÄ±z â†’ metin fallback
         logger.warning(
-            "[uret_v2] TÃ¼m provider'lar baÅŸarÄ±sÄ±z (%s) â†’ metin moduna geÃ§ildi.",
+            "[uret_v2] Tüm provider'lar baÅŸarÄ±sÄ±z (%s) â†’ metin moduna geçildi.",
             _son_hata,
         )
         metin = self.dusun(sistem_prompt, mesajlar)
         return {"role": "assistant", "content": metin or "", "tool_calls": []}
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # Streaming arayÃ¼zÃ¼
+    # Streaming arayüzü
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def dusun_stream(
@@ -850,7 +850,7 @@ class Beyin:
                 print(token, end="", flush=True)
 
         Yields:
-            str: Bir token veya kÃ¼Ã§Ã¼k metin parÃ§asÄ±.
+            str: Bir token veya küçük metin parçasÄ±.
         """
         aktif_model = model or self.model
 
@@ -861,7 +861,7 @@ class Beyin:
                 )
             except Exception as e:
                 logger.warning(
-                    "[Beyin] Anthropic stream baÅŸarÄ±sÄ±z, tam yanÄ±ta dÃ¼ÅŸÃ¼lÃ¼yor: %s", e
+                    "[Beyin] Anthropic stream baÅŸarÄ±sÄ±z, tam yanÄ±ta düÅŸülüyor: %s", e
                 )
                 yield self.dusun(sistem_prompt, mesajlar, model=model)
             return
@@ -871,7 +871,7 @@ class Beyin:
                 self.base_url, self.api_key, aktif_model, sistem_prompt, mesajlar
             )
         except Exception as e:
-            logger.warning("[Beyin] Streaming baÅŸarÄ±sÄ±z, tam yanÄ±ta dÃ¼ÅŸÃ¼lÃ¼yor: %s", e)
+            logger.warning("[Beyin] Streaming baÅŸarÄ±sÄ±z, tam yanÄ±ta düÅŸülüyor: %s", e)
             yield self.dusun(sistem_prompt, mesajlar, model=model)
 
     def _stream_openai_uyumlu(
@@ -931,7 +931,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> Generator[str, None, None]:
-        """Anthropic Messages API akÄ±ÅŸÄ±nÄ± text_delta olaylarÄ± Ã¼zerinden yield eder."""
+        """Anthropic Messages API akÄ±ÅŸÄ±nÄ± text_delta olaylarÄ± üzerinden yield eder."""
         ant_base = (
             self.config.get("providers", {})
             .get("anthropic", {})
@@ -980,7 +980,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> LLMYanitMeta:
-        """DoÄŸru provider Ã§aÄŸrÄ± metodunu seÃ§er ve LLMYanitMeta dÃ¶ndÃ¼rÃ¼r."""
+        """DoÄŸru provider çaÄŸrÄ± metodunu seçer ve LLMYanitMeta döndürür."""
         t0 = time.monotonic()
 
         dispatch: dict[str, Callable[[], str]] = {
@@ -1074,7 +1074,7 @@ class Beyin:
         )
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # Genel provider Ã§aÄŸrÄ± metodu (harici kullanÄ±m)
+    # Genel provider çaÄŸrÄ± metodu (harici kullanÄ±m)
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @trace_llm_call()
@@ -1085,13 +1085,13 @@ class Beyin:
         mesajlar: list[dict],
         sistem_prompt: str = "",
     ) -> str:
-        """Herhangi bir provider'a API Ã§aÄŸrÄ±sÄ± yap.
+        """Herhangi bir provider'a API çaÄŸrÄ±sÄ± yap.
 
-        Config'den base_url ve api_key'i okur, doÄŸru API metoduna yÃ¶nlendirir.
-        try/except ile gÃ¼venli â€” hata durumunda "[Beyin HatasÄ±] â€¦" dÃ¶ner.
+        Config'den base_url ve api_key'i okur, doÄŸru API metoduna yönlendirir.
+        try/except ile güvenli â€” hata durumunda "[Beyin HatasÄ±] â€¦" döner.
 
         Args:
-            provider:      SaÄŸlayÄ±cÄ± adÄ± (Ã¶r. "openai", "anthropic", "gemini").
+            provider:      SaÄŸlayÄ±cÄ± adÄ± (ör. "openai", "anthropic", "gemini").
             model:         Model adÄ±.
             mesajlar:      KonuÅŸma mesajlarÄ± listesi.
             sistem_prompt: Sistem prompt'u (opsiyonel).
@@ -1224,7 +1224,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """LM Studio: sistem mesajÄ± [SISTEM]: Ã¶neki ile user rolÃ¼ne Ã§evrilir."""
+        """LM Studio: sistem mesajÄ± [SISTEM]: öneki ile user rolüne çevrilir."""
         url = f"{base_url}/v1/chat/completions"
         donusturulmus: list[dict] = []
         if sistem_prompt:
@@ -1263,7 +1263,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """Genel OpenAI-uyumlu /v1/chat/completions Ã§aÄŸrÄ±sÄ±.
+        """Genel OpenAI-uyumlu /v1/chat/completions çaÄŸrÄ±sÄ±.
 
         base_url sondaki /v1 varsa temizlenir (config'de /v1 olabilir).
         """
@@ -1295,7 +1295,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """Anthropic /v1/messages Ã§aÄŸrÄ±sÄ±."""
+        """Anthropic /v1/messages çaÄŸrÄ±sÄ±."""
         url = f"{base_url}/v1/messages"
         headers = {
             "x-api-key": api_key,
@@ -1320,7 +1320,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """Moonshot AI Ã§aÄŸrÄ±sÄ±; moonshot_schema tercih edilir, yoksa REST."""
+        """Moonshot AI çaÄŸrÄ±sÄ±; moonshot_schema tercih edilir, yoksa REST."""
         try:
             from reymen.sistem.moonshot_schema import MoonshotProvider  # type: ignore[import]
 
@@ -1339,7 +1339,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """Azure OpenAI Ã§aÄŸrÄ±sÄ±."""
+        """Azure OpenAI çaÄŸrÄ±sÄ±."""
         endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT", "").rstrip("/")
         version = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-02-01")
         if not endpoint:
@@ -1362,11 +1362,11 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """AWS Bedrock Ã§aÄŸrÄ±sÄ±; bedrock_adapter gerektirir."""
+        """AWS Bedrock çaÄŸrÄ±sÄ±; bedrock_adapter gerektirir."""
         try:
             from reymen.sistem.bedrock_adapter import BedrockAdapter  # type: ignore[import]
         except ImportError as exc:
-            raise RuntimeError("bedrock_adapter modÃ¼lÃ¼ bulunamadÄ±") from exc
+            raise RuntimeError("bedrock_adapter modülü bulunamadÄ±") from exc
 
         adapter = BedrockAdapter(
             region=os.environ.get("AWS_REGION", "us-east-1"),
@@ -1381,10 +1381,10 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """Google Gemini REST API (generateContent) Ã§aÄŸrÄ±sÄ±.
+        """Google Gemini REST API (generateContent) çaÄŸrÄ±sÄ±.
 
         Config'den gelen base_url (https://generativelanguage.googleapis.com)
-        ve api_key (GEMINI_API_KEY) ile Ã§alÄ±ÅŸÄ±r.
+        ve api_key (GEMINI_API_KEY) ile çalÄ±ÅŸÄ±r.
         Fallback: Vertex AI adapter (gemini_cloudcode_adapter).
         """
         # 1. Vertex AI / Cloud Code adapter (opsiyonel)
@@ -1461,7 +1461,7 @@ class Beyin:
         sistem_prompt: str,
         mesajlar: list[dict],
     ) -> str:
-        """LM Studio derin akÄ±l yÃ¼rÃ¼tme modu; yoksa standart LM Studio'ya dÃ¼ÅŸer."""
+        """LM Studio derin akÄ±l yürütme modu; yoksa standart LM Studio'ya düÅŸer."""
         try:
             from reymen.sistem.lmstudio_reasoning import LMStudioReasoning  # type: ignore[import]
 
@@ -1486,7 +1486,7 @@ class Beyin:
         try:
             from reymen.cereyan.codex_responses_adapter import CodexResponsesAdapter  # type: ignore[import]
         except ImportError as exc:
-            raise RuntimeError("codex_responses_adapter modÃ¼lÃ¼ bulunamadÄ±") from exc
+            raise RuntimeError("codex_responses_adapter modülü bulunamadÄ±") from exc
 
         adapter = CodexResponsesAdapter(model=model)
         return adapter.uret(sistem_prompt, mesajlar)
@@ -1526,14 +1526,14 @@ class Beyin:
             pass
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # YÃ¶nlendirici & eriÅŸilebilirlik yardÄ±mcÄ±larÄ±
+    # Yönlendirici & eriÅŸilebilirlik yardÄ±mcÄ±larÄ±
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def rota_belirle(self, hedef: str) -> Tuple[str, str]:
-        """AkÄ±llÄ± yÃ¶nlendirici ile gÃ¶reve gÃ¶re en iyi (provider, model) seÃ§.
+        """AkÄ±llÄ± yönlendirici ile göreve göre en iyi (provider, model) seç.
 
         Returns:
-            (provider_adÄ±, model_adÄ±) â€” router yoksa varsayÄ±lanÄ± dÃ¶ner.
+            (provider_adÄ±, model_adÄ±) â€” router yoksa varsayÄ±lanÄ± döner.
         """
         try:
             from reymen.cereyan.akilli_yonlendirici import (  # type: ignore[import]
@@ -1545,7 +1545,7 @@ class Beyin:
             if musait:
                 prov, mdl = gorev_icin_model_sec(hedef, musait)
                 if prov != self.provider or mdl != self.model:
-                    logger.info("[Router] %s/%s seÃ§ildi.", prov, mdl)
+                    logger.info("[Router] %s/%s seçildi.", prov, mdl)
                 return prov, mdl
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -1580,7 +1580,7 @@ class Beyin:
             return False
 
     def aktif_providerlar(self) -> List[str]:
-        """Ping testi geÃ§en saÄŸlayÄ±cÄ±larÄ±n listesini dÃ¶ndÃ¼rÃ¼r."""
+        """Ping testi geçen saÄŸlayÄ±cÄ±larÄ±n listesini döndürür."""
         return [a.provider for a in self._fallback_zinciri if self.ping(a.provider)]
 
 

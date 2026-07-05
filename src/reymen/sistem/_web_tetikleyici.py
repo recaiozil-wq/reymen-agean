@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Web tetikleyici â€” web tarama sonuclarina gore ogrenmeleri tetikler."""
 
 import os

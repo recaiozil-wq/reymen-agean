@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 prompt_caching.py â€” Prompt Onbellekleme.
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 findings_board.py â€” Ortak bulgu panosu (SQLite WAL modu)
 

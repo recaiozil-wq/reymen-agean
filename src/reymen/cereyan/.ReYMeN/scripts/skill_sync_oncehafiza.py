@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 skill_sync_oncehafiza.py â€” Cron job: skills/.md -> OnceHafiza DB sync.

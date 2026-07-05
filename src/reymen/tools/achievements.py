@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.achievements shim â€” ReYMeN baÅŸarÄ±mlarÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.achievements shim â€” ReYMeN baÅŸarÄ±mlarÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

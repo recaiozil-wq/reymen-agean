@@ -1,14 +1,14 @@
-﻿"""
-Agent Gatekeeper â€” ReYMeN / DeepSeek-V4-Flash iÃ§in
-zorunlu araÃ§-Ã§alÄ±ÅŸtÄ±rma doÄŸrulama iskeleti.
+"""
+Agent Gatekeeper â€” ReYMeN / DeepSeek-V4-Flash için
+zorunlu araç-çalÄ±ÅŸtÄ±rma doÄŸrulama iskeleti.
 
-AmaÃ§: Modelin "TOOL CALL yaptÄ±m" ya da "test ettim" demesine
+Amaç: Modelin "TOOL CALL yaptÄ±m" ya da "test ettim" demesine
 GÃœVENMEMEK. Bunun yerine:
-  1. Modelin Ã¼rettiÄŸi kodu gerÃ§ekten Ã§alÄ±ÅŸtÄ±r.
+  1. Modelin ürettiÄŸi kodu gerçekten çalÄ±ÅŸtÄ±r.
   2. Ã‡alÄ±ÅŸtÄ±rma logunu diske yaz.
-  3. Final cevap Ã¼retilmeden Ã¶nce, o oturumda gerÃ§ek bir
+  3. Final cevap üretilmeden önce, o oturumda gerçek bir
      execution kaydÄ± var mÄ± diye kontrol et (gatekeeper).
-  4. KayÄ±t yoksa cevabÄ± REDDET, modele "Ã¶nce Ã§alÄ±ÅŸtÄ±r" diye geri gÃ¶nder.
+  4. KayÄ±t yoksa cevabÄ± REDDET, modele "önce çalÄ±ÅŸtÄ±r" diye geri gönder.
 
 Bu enforcement modelin PROMPT'una deÄŸil, bu koda dayanÄ±r.
 """
@@ -24,7 +24,7 @@ import urllib.request
 import urllib.error
 from pathlib import Path
 
-# â”€â”€ KonfigÃ¼rasyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Konfigürasyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent.parent
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
 DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
@@ -51,7 +51,7 @@ def init_log():
 
 
 def run_and_log(session_id: str, code: str, timeout: int = 15) -> dict:
-    """Kodu gerÃ§ekten Ã§alÄ±ÅŸtÄ±rÄ±r, ham Ã§Ä±ktÄ±yÄ± yakalar ve DB'ye yazar."""
+    """Kodu gerçekten çalÄ±ÅŸtÄ±rÄ±r, ham çÄ±ktÄ±yÄ± yakalar ve DB'ye yazar."""
     try:
         result = subprocess.run(
             [sys.executable if hasattr(__import__('sys'), 'executable') else "python3", "-c", code],
@@ -76,7 +76,7 @@ def run_and_log(session_id: str, code: str, timeout: int = 15) -> dict:
 
 
 def has_real_execution(session_id: str, since_ts: float = 0) -> bool:
-    """Gatekeeper: bu oturumda, since_ts'ten sonra gerÃ§ek bir Ã§alÄ±ÅŸtÄ±rma var mÄ±?"""
+    """Gatekeeper: bu oturumda, since_ts'ten sonra gerçek bir çalÄ±ÅŸtÄ±rma var mÄ±?"""
     conn = sqlite3.connect(str(LOG_DB))
     row = conn.execute(
         "SELECT COUNT(*) FROM executions WHERE session_id=? AND ts>?",
@@ -88,11 +88,11 @@ def has_real_execution(session_id: str, since_ts: float = 0) -> bool:
 
 # ---------------------------------------------------------------------
 # 2) SayÄ±sal / DB iddiasÄ± tespiti
-#    ReYMeN'e Ã¶zgÃ¼ pattern'ler: SQL, dosya sayÄ±sÄ±, satÄ±r sayÄ±sÄ±, yÃ¼zde, hata kodu
+#    ReYMeN'e özgü pattern'ler: SQL, dosya sayÄ±sÄ±, satÄ±r sayÄ±sÄ±, yüzde, hata kodu
 # ---------------------------------------------------------------------
 NUMERIC_CLAIM_PATTERN = re.compile(
     r"(\bSELECT\b|\bCOUNT\b|\bSUM\b|\bAVG\b|"
-    r"sonuÃ§.*\d|toplam.*\d|"
+    r"sonuç.*\d|toplam.*\d|"
     r"=\s*\d+\.?\d*|%\s*\d+|"
     r"\d+\s*kayÄ±t|\d+\s*satÄ±r|\d+\s*dosya|"
     r"HTTP\s*\d+|exit\s*=\s*\d+|"
@@ -106,11 +106,11 @@ def response_makes_numeric_claim(text: str) -> bool:
 
 
 # ---------------------------------------------------------------------
-# 3) Model Ã§aÄŸrÄ±sÄ± â€” DeepSeek-V4-Flash / OpenAI-uyumlu endpoint
+# 3) Model çaÄŸrÄ±sÄ± â€” DeepSeek-V4-Flash / OpenAI-uyumlu endpoint
 # ---------------------------------------------------------------------
 def call_model(messages: list, model: str = None, temperature: float = 0.3) -> str:
     """
-    DeepSeek-V4-Flash API'sine OpenAI-uyumlu chat completions Ã§aÄŸrÄ±sÄ± yapar.
+    DeepSeek-V4-Flash API'sine OpenAI-uyumlu chat completions çaÄŸrÄ±sÄ± yapar.
 
     Args:
         messages:  OpenAI-uyumlu mesaj listesi [{"role": "...", "content": "..."}]
@@ -165,26 +165,26 @@ def call_model(messages: list, model: str = None, temperature: float = 0.3) -> s
 
 
 def extract_code_blocks(text: str) -> list:
-    """Metinden ```python ... ``` bloklarÄ±nÄ± Ã§Ä±karÄ±r."""
+    """Metinden ```python ... ``` bloklarÄ±nÄ± çÄ±karÄ±r."""
     return re.findall(r"```python\s*(.*?)```", text, re.DOTALL)
 
 
 # ---------------------------------------------------------------------
-# 4) Gatekeeper dÃ¶ngÃ¼sÃ¼ â€” asÄ±l enforcement burada
+# 4) Gatekeeper döngüsü â€” asÄ±l enforcement burada
 # ---------------------------------------------------------------------
 def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> str:
     """
-    Gatekeeper ile korunan model Ã§aÄŸrÄ±sÄ±.
+    Gatekeeper ile korunan model çaÄŸrÄ±sÄ±.
 
-    SÃ¼reÃ§:
-      1. Modeli Ã§aÄŸÄ±r
-      2. Kod bloÄŸu varsa â†’ Ã§alÄ±ÅŸtÄ±r, logla, Ã§Ä±ktÄ±yÄ± modele geri ver
+    Süreç:
+      1. Modeli çaÄŸÄ±r
+      2. Kod bloÄŸu varsa â†’ çalÄ±ÅŸtÄ±r, logla, çÄ±ktÄ±yÄ± modele geri ver
       3. SayÄ±sal/DB iddiasÄ± varsa ama execution kaydÄ± yoksa â†’ REDDET
       4. Ä°kisi de yoksa â†’ cevabÄ± kabul et
 
     Args:
         session_id: Oturum kimliÄŸi (UUID)
-        messages:   KonuÅŸma geÃ§miÅŸi
+        messages:   KonuÅŸma geçmiÅŸi
         max_retries: Maksimum yeniden deneme sayÄ±sÄ±
 
     Returns:
@@ -197,10 +197,10 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
     gk_talimat = (
         "\n[GATEKEEPER KURALI]\n"
         "SayÄ±sal deÄŸer, DB sorgusu, dosya sayÄ±sÄ± veya benzer bir "
-        "kanÄ±t gerektiren iddiada bulunacaksan, mutlaka Ã¶nce "
-        "```python\nkod bloÄŸu Ã¼ret. Sistem bu bloÄŸu otomatik "
-        "Ã§alÄ±ÅŸtÄ±rÄ±p sana gerÃ§ek Ã§Ä±ktÄ±yÄ± geri verecek. "
-        "Ä°ddianÄ± ancak bu Ã§Ä±ktÄ±ya dayanarak yaz.\n"
+        "kanÄ±t gerektiren iddiada bulunacaksan, mutlaka önce "
+        "```python\nkod bloÄŸu üret. Sistem bu bloÄŸu otomatik "
+        "çalÄ±ÅŸtÄ±rÄ±p sana gerçek çÄ±ktÄ±yÄ± geri verecek. "
+        "Ä°ddianÄ± ancak bu çÄ±ktÄ±ya dayanarak yaz.\n"
         "Kodsuz sayÄ±sal iddia = REDDEDÄ°LÄ°R."
     )
     system_eklendi = False
@@ -216,7 +216,7 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
         response_text = call_model(messages)
         code_blocks = extract_code_blocks(response_text)
 
-        # â”€â”€ Kod bloÄŸu varsa gerÃ§ekten Ã§alÄ±ÅŸtÄ±r â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ Kod bloÄŸu varsa gerçekten çalÄ±ÅŸtÄ±r â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if code_blocks:
             exec_results = [run_and_log(session_id, c) for c in code_blocks]
             messages.append({"role": "assistant", "content": response_text})
@@ -225,10 +225,10 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
                 "content": (
                     f"GERÃ‡EK Ã‡ALIÅTIRMA Ã‡IKTISI:\n"
                     f"{json.dumps(exec_results, ensure_ascii=False, indent=2)}\n"
-                    f"Bu ham Ã§Ä±ktÄ±ya dayanarak nihai cevabÄ±nÄ± ver."
+                    f"Bu ham çÄ±ktÄ±ya dayanarak nihai cevabÄ±nÄ± ver."
                 ),
             })
-            continue  # model ham Ã§Ä±ktÄ±yÄ± gÃ¶rÃ¼p nihai cevabÄ± Ã¼retsin
+            continue  # model ham çÄ±ktÄ±yÄ± görüp nihai cevabÄ± üretsin
 
         # â”€â”€ SayÄ±sal/DB iddiasÄ± var ama execution kaydÄ± yok â†’ REDDET â”€â”€
         since = turn_start_ts if attempt > 0 else 0
@@ -237,19 +237,19 @@ def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> 
             messages.append({
                 "role": "user",
                 "content": (
-                    "REDDEDÄ°LDÄ°: SayÄ±sal/DB iddian var ama gerÃ§ek bir kod Ã§alÄ±ÅŸtÄ±rma "
-                    "kaydÄ± yok. Ã–nce ```python kod bloÄŸunda gerÃ§ek kod Ã¼ret, "
-                    "Ã§alÄ±ÅŸmasÄ±nÄ± bekle, iddiayÄ± ondan sonra yaz."
+                    "REDDEDÄ°LDÄ°: SayÄ±sal/DB iddian var ama gerçek bir kod çalÄ±ÅŸtÄ±rma "
+                    "kaydÄ± yok. Ã–nce ```python kod bloÄŸunda gerçek kod üret, "
+                    "çalÄ±ÅŸmasÄ±nÄ± bekle, iddiayÄ± ondan sonra yaz."
                 ),
             })
             continue
 
-        # â”€â”€ Kabul: ya iddia yok, ya da execution gerÃ§ekten yapÄ±lmÄ±ÅŸ â”€â”€
+        # â”€â”€ Kabul: ya iddia yok, ya da execution gerçekten yapÄ±lmÄ±ÅŸ â”€â”€
         return response_text
 
     return (
         "GATEKEEPER: Maksimum deneme sayÄ±sÄ±na ulaÅŸÄ±ldÄ±, "
-        "doÄŸrulanmÄ±ÅŸ cevap Ã¼retilemedi."
+        "doÄŸrulanmÄ±ÅŸ cevap üretilemedi."
     )
 
 
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     print(f"DeepSeek API: {DEEPSEEK_BASE_URL} model={DEEPSEEK_MODEL}")
     print(f"API Key var: {'EVET' if DEEPSEEK_API_KEY and not DEEPSEEK_API_KEY.startswith('***') else 'HAYIR'}")
 
-    # Test: kod Ã§alÄ±ÅŸtÄ±rma
+    # Test: kod çalÄ±ÅŸtÄ±rma
     sonuc = run_and_log("test-session", "print('hello gatekeeper')")
     print(f"Kod calistirma testi: {sonuc}")
 

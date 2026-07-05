@@ -1,4 +1,4 @@
-﻿"""
+"""
 ReYMeN tools.environments.local â€” Local subprocess environment.
 
 Yerel makinede shell komutlari calistirir. Python standard kutuphanesi

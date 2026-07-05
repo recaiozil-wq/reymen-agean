@@ -1,4 +1,4 @@
-﻿"""Windows UTF-8 bootstrap for ReYMeN entry points.
+"""Windows UTF-8 bootstrap for ReYMeN entry points.
 
 Python on Windows has two long-standing text-encoding footguns:
 

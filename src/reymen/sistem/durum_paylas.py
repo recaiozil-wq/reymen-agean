@@ -1,10 +1,10 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 durum_paylas.py â€” Botlar ArasÄ± PaylaÅŸÄ±mlÄ± Durum Sistemi.
 
-TÃ¼m botlarÄ±n (R>eYMeN_Â¥, Kral_38, PaÅŸa_38 vb.) aynÄ±
-durum.json dosyasÄ±nÄ± okuyup yazmasÄ±nÄ± saÄŸlar. BÃ¶ylece
-her bot gÃ¼ncel proje durumunu gÃ¶rÃ¼r.
+Tüm botlarÄ±n (R>eYMeN_Â¥, Kral_38, PaÅŸa_38 vb.) aynÄ±
+durum.json dosyasÄ±nÄ± okuyup yazmasÄ±nÄ± saÄŸlar. Böylece
+her bot güncel proje durumunu görür.
 
 KullanÄ±m:
     from reymen.sistem.durum_paylas import durum_oku, durum_guncelle
@@ -12,7 +12,7 @@ KullanÄ±m:
     # Durumu oku
     durum = durum_oku()
 
-    # Durumu gÃ¼ncelle
+    # Durumu güncelle
     durum_guncelle(bot_adi="Kral_38", ozellik="provider_sistemi", durum="tamam")
 
     # CLI: python -m reymen.sistem.durum_paylas --oku
@@ -35,8 +35,8 @@ logger = logging.getLogger(__name__)
 
 # â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# durum.json proje kÃ¶kÃ¼nde â€” tÃ¼m botlar eriÅŸebilir
-# Ortak yol: her bot aynÄ± proje dizininden Ã§alÄ±ÅŸÄ±yorsa
+# durum.json proje kökünde â€” tüm botlar eriÅŸebilir
+# Ortak yol: her bot aynÄ± proje dizininden çalÄ±ÅŸÄ±yorsa
 _PROJE_KOKU = (
     Path(__file__).resolve().parent.parent.parent
 )  # reymen/sistem/ -> reymen/ -> proje/
@@ -60,7 +60,7 @@ VARSAYILAN_DURUM: Dict[str, Any] = {
 
 
 def _kilitle():
-    """Basit dosya kilidi â€” aynÄ± anda yazma Ã§akÄ±ÅŸmasÄ±nÄ± Ã¶nler."""
+    """Basit dosya kilidi â€” aynÄ± anda yazma çakÄ±ÅŸmasÄ±nÄ± önler."""
     kilit_dosyasi = _DURUM_DOSYASI.with_suffix(".json.lock")
     max_bekle = 5  # saniye
     baslangic = time.monotonic()
@@ -89,7 +89,7 @@ def durum_oku() -> Dict[str, Any]:
     """durum.json dosyasÄ±nÄ± oku.
 
     Returns:
-        Durum sÃ¶zlÃ¼ÄŸÃ¼. Dosya yoksa varsayÄ±lan ÅŸablon dÃ¶ner.
+        Durum sözlüÄŸü. Dosya yoksa varsayÄ±lan ÅŸablon döner.
     """
     if not _DURUM_DOSYASI.exists():
         return dict(VARSAYILAN_DURUM)
@@ -106,8 +106,8 @@ def durum_yaz(durum: Dict[str, Any], bot_adi: str = ""):
     """durum.json dosyasÄ±na yaz.
 
     Args:
-        durum: YazÄ±lacak durum sÃ¶zlÃ¼ÄŸÃ¼
-        bot_adi: GÃ¼ncelleyen bot adÄ± (opsiyonel)
+        durum: YazÄ±lacak durum sözlüÄŸü
+        bot_adi: Güncelleyen bot adÄ± (opsiyonel)
     """
     durum["son_guncelleme"] = datetime.now().strftime("%Y-%m-%d %H:%M")
     if bot_adi:
@@ -132,22 +132,22 @@ def durum_guncelle(
     dosyalar: Optional[List[str]] = None,
     aktif_ajan: bool = False,
 ) -> Dict[str, Any]:
-    """Tek bir Ã¶zellik durumunu gÃ¼ncelle.
+    """Tek bir özellik durumunu güncelle.
 
     Args:
-        bot_adi: GÃ¼ncelleyen bot adÄ± (Ã¶rn: "R>eYMeN_Â¥", "Kral_38")
-        ozellik: Ã–zellik adÄ± (Ã¶rn: "provider_sistemi")
+        bot_adi: Güncelleyen bot adÄ± (örn: "R>eYMeN_Â¥", "Kral_38")
+        ozellik: Ã–zellik adÄ± (örn: "provider_sistemi")
         durum: Yeni durum ("tamam", "isleniyor", "eksik")
-        detay: AÃ§Ä±klama (opsiyonel)
+        detay: AçÄ±klama (opsiyonel)
         dosyalar: Ä°lgili dosya listesi (opsiyonel)
         aktif_ajan: True ise aktif_ajanlar listesine ekle
 
     Returns:
-        GÃ¼ncellenmiÅŸ durum sÃ¶zlÃ¼ÄŸÃ¼
+        GüncellenmiÅŸ durum sözlüÄŸü
     """
     mevcut = durum_oku()
 
-    # Ã–zellik bilgilerini gÃ¼ncelle
+    # Ã–zellik bilgilerini güncelle
     mevcut.setdefault("ozellikler", {})
     guncel = mevcut["ozellikler"].get(ozellik, {})
     guncel["durum"] = durum
@@ -159,7 +159,7 @@ def durum_guncelle(
         guncel["dosyalar"] = dosyalar
     mevcut["ozellikler"][ozellik] = guncel
 
-    # Aktif ajan listesini gÃ¼ncelle
+    # Aktif ajan listesini güncelle
     if aktif_ajan and durum == "isleniyor":
         mevcut.setdefault("aktif_ajanlar", {})
         mevcut["aktif_ajanlar"][ozellik] = "calisiyor"
@@ -182,14 +182,14 @@ def durum_guncelle(
     return mevcut
 
 
-# â”€â”€ Tamamlanan ModÃ¼l Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Tamamlanan Modül Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _sync_tamamlanan_moduller(mevcut: dict) -> None:
     """tamamlanan_moduller'i coverage_durumu.core_moduller'dan senkronize eder.
 
     coverage_durumu.core_moduller TEK kaynaktÄ±r. tamamlanan_moduller
-    buradan tÃ¼retilir. BÃ¶ylece iki ayrÄ± kaynak olmaz.
+    buradan türetilir. Böylece iki ayrÄ± kaynak olmaz.
     """
     mevcut.setdefault("coverage_durumu", {})
     mevcut["coverage_durumu"].setdefault("core_moduller", {})
@@ -218,16 +218,16 @@ def modul_tamamla(
     test_sayisi: int,
     aciklama: str = "",
 ):
-    """Bir modÃ¼lÃ¼ tamamlandÄ± olarak durum.json'a kaydeder.
+    """Bir modülü tamamlandÄ± olarak durum.json'a kaydeder.
 
     TEK kaynak coverage_durumu.core_moduller'dir. tamamlanan_moduller
     otomatik senkronize edilir.
 
     Args:
-        modul_adi: ModÃ¼l adÄ± (Ã¶rn: "guardrails_manager")
-        coverage: Coverage yÃ¼zdesi (Ã¶rn: "100.00%")
+        modul_adi: Modül adÄ± (örn: "guardrails_manager")
+        coverage: Coverage yüzdesi (örn: "100.00%")
         test_sayisi: Test sayÄ±sÄ±
-        aciklama: AÃ§Ä±klama (opsiyonel)
+        aciklama: AçÄ±klama (opsiyonel)
 
     Ã–rnek:
         modul_tamamla("guardrails_manager", "100.00%", 58,
@@ -239,7 +239,7 @@ def modul_tamamla(
 
     simdi = bilgi = mevcut["coverage_durumu"]["core_moduller"].get(modul_adi, {})
 
-    # coverage_durumu.core_moduller TEK kaynak â€” tÃ¼m veriyi buraya yaz
+    # coverage_durumu.core_moduller TEK kaynak â€” tüm veriyi buraya yaz
     mevcut["coverage_durumu"]["core_moduller"][modul_adi] = {
         "once": simdi.get("once", ""),
         "simdi": coverage,
@@ -263,10 +263,10 @@ def modul_tamamla(
 
 
 def tamamlanan_moduller() -> List[str]:
-    """Tamamlanan modÃ¼l adlarÄ±nÄ± dÃ¶ndÃ¼rÃ¼r.
+    """Tamamlanan modül adlarÄ±nÄ± döndürür.
 
     Returns:
-        ModÃ¼l adÄ± listesi (Ã¶rn: ["guardrails_manager", "oauth_manager"])
+        Modül adÄ± listesi (örn: ["guardrails_manager", "oauth_manager"])
     """
     mevcut = durum_oku()
     # Ã–NCE coverage_durumu.core_moduller'dan senkronize et
@@ -276,25 +276,25 @@ def tamamlanan_moduller() -> List[str]:
 
 
 def modul_tamamlandi_mi(modul_adi: str) -> bool:
-    """Bir modÃ¼lÃ¼n tamamlandÄ± olarak iÅŸaretlenip iÅŸaretlenmediÄŸini kontrol eder.
+    """Bir modülün tamamlandÄ± olarak iÅŸaretlenip iÅŸaretlenmediÄŸini kontrol eder.
 
     Args:
-        modul_adi: ModÃ¼l adÄ±
+        modul_adi: Modül adÄ±
 
     Returns:
-        True ise modÃ¼l daha Ã¶nce tamamlandÄ±
+        True ise modül daha önce tamamlandÄ±
     """
     return modul_adi in tamamlanan_moduller()
 
 
 def tamamlanmayanlar(tum_moduller: List[str]) -> List[str]:
-    """Verilen listeden tamamlanmÄ±ÅŸ modÃ¼lleri Ã§Ä±karÄ±r.
+    """Verilen listeden tamamlanmÄ±ÅŸ modülleri çÄ±karÄ±r.
 
     Args:
-        tum_moduller: Kontrol edilecek modÃ¼l adÄ± listesi
+        tum_moduller: Kontrol edilecek modül adÄ± listesi
 
     Returns:
-        Sadece tamamlanmamÄ±ÅŸ modÃ¼ller
+        Sadece tamamlanmamÄ±ÅŸ modüller
 
     Ã–rnek:
         adaylar = ["guardrails_manager", "cost_tracker", "kanban"]
@@ -306,7 +306,7 @@ def tamamlanmayanlar(tum_moduller: List[str]) -> List[str]:
 
 
 def durum_raporu() -> str:
-    """Ä°nsan tarafÄ±ndan okunabilir durum raporu Ã¼ret.
+    """Ä°nsan tarafÄ±ndan okunabilir durum raporu üret.
 
     Returns:
         FormatlÄ± metin raporu
@@ -314,8 +314,8 @@ def durum_raporu() -> str:
     durum = durum_oku()
     satirlar = [
         f"ğŸ“Š ReYMeN Proje Durumu",
-        f"   Son GÃ¼ncelleme: {durum.get('son_guncelleme', '?')}",
-        f"   GÃ¼ncelleyen: {durum.get('guncelleyen_bot', '?')}",
+        f"   Son Güncelleme: {durum.get('son_guncelleme', '?')}",
+        f"   Güncelleyen: {durum.get('guncelleyen_bot', '?')}",
         f"   Ä°statistik: {durum.get('tamam', 0)}/{durum.get('toplam_ozellik', 0)} tamam, {durum.get('isleniyor', 0)} iÅŸleniyor",
         "",
     ]
@@ -337,7 +337,7 @@ def durum_raporu() -> str:
         satirlar.append(f"  {durum_simge} {ad}: {bilgi.get('detay', '')}")
         dosyalar = bilgi.get("dosyalar", [])
         if dosyalar:
-            for d in dosyalar[:3]:  # En fazla 3 dosya gÃ¶ster
+            for d in dosyalar[:3]:  # En fazla 3 dosya göster
                 satirlar.append(f"      ğŸ“„ {d}")
 
     return "\n".join(satirlar)
@@ -351,17 +351,17 @@ def _cli():
     import argparse
 
     parser = argparse.ArgumentParser(description="Botlar ArasÄ± PaylaÅŸÄ±mlÄ± Durum")
-    parser.add_argument("--oku", action="store_true", help="Durumu oku ve gÃ¶ster")
+    parser.add_argument("--oku", action="store_true", help="Durumu oku ve göster")
     parser.add_argument(
-        "--rapor", action="store_true", help="Ä°nsan-okunabilir rapor gÃ¶ster"
+        "--rapor", action="store_true", help="Ä°nsan-okunabilir rapor göster"
     )
-    parser.add_argument("--guncelle", action="store_true", help="Durum gÃ¼ncelle")
-    parser.add_argument("--bot", default="cli", help="GÃ¼ncelleyen bot adÄ±")
+    parser.add_argument("--guncelle", action="store_true", help="Durum güncelle")
+    parser.add_argument("--bot", default="cli", help="Güncelleyen bot adÄ±")
     parser.add_argument("--ozellik", help="Ã–zellik adÄ±")
     parser.add_argument(
         "--durum", choices=["tamam", "isleniyor", "eksik"], help="Yeni durum"
     )
-    parser.add_argument("--detay", default="", help="AÃ§Ä±klama")
+    parser.add_argument("--detay", default="", help="AçÄ±klama")
 
     args = parser.parse_args()
 
@@ -371,10 +371,10 @@ def _cli():
         print(durum_raporu())
     elif args.guncelle:
         if not args.ozellik or not args.durum:
-            print("Hata: --guncelle iÃ§in --ozellik ve --durum gerekli")
+            print("Hata: --guncelle için --ozellik ve --durum gerekli")
             sys.exit(1)
         durum_guncelle(args.bot, args.ozellik, args.durum, args.detay)
-        print(f"âœ… {args.ozellik} â†’ {args.durum} olarak gÃ¼ncellendi (bot: {args.bot})")
+        print(f"âœ… {args.ozellik} â†’ {args.durum} olarak güncellendi (bot: {args.bot})")
     else:
         parser.print_help()
 

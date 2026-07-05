@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 discord_bot.py â€” Discord Bot Gateway Wrapper.
 

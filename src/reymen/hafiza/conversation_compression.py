@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """conversation_compression.py â€” Konusma Sikistirma.
 
 Uzun konusma gecmisini LLM ile ozetleyerek context'e sigdirir.

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 skill_aktive_et.py â€” Motor baslangicinda skill'leri otomatik yukler.
 """

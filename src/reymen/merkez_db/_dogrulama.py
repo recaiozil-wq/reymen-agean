@@ -1,4 +1,4 @@
-﻿"""Adim 1: Restart dogrulama - Merkez DB yazma testi"""
+"""Adim 1: Restart dogrulama - Merkez DB yazma testi"""
 
 import sqlite3, time, os
 

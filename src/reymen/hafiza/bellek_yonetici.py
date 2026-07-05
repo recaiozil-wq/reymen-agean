@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 bellek_yonetici.py â€” BellekYonetici: Vektor + SQLite hibrit hafiza yoneticisi.
 

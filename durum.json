@@ -7,10 +7,10 @@
       "bot_adi": "@Pasa_38_bot",
       "gateway": "aktif",
       "yetki": "tam",
-      "browser": "?",
+      "browser": "acik",
       "terminal": "acik",
       "web": "firecrawl",
-      "soul_boyut": 0,
+      "soul_boyut": 1806,
       "tools": "tum"
     },
     "reymen": {
@@ -18,10 +18,10 @@
       "bot_adi": "@ReYMeN_ReYMeNbot",
       "gateway": "aktif",
       "yetki": "tam",
-      "browser": "?",
+      "browser": "acik",
       "terminal": "acik",
       "web": "firecrawl",
-      "soul_boyut": 0,
+      "soul_boyut": 1806,
       "tools": "tum"
     },
     "kiral38": {
@@ -29,10 +29,10 @@
       "bot_adi": "@Kiral38bot",
       "gateway": "aktif",
       "yetki": "tam",
-      "browser": "?",
+      "browser": "acik",
       "terminal": "acik",
       "web": "firecrawl",
-      "soul_boyut": 0,
+      "soul_boyut": 1806,
       "tools": "tum"
     }
   },

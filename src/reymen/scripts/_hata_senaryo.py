@@ -1,6 +1,6 @@
-﻿"""
+"""
 HATA DUZELTME SÃœRECI â€” 3 Senaryo
-Her senaryo: tespit â†’ dÃ¼zeltme â†’ doÄŸrulama â†’ kaydetme
+Her senaryo: tespit â†’ düzeltme â†’ doÄŸrulama â†’ kaydetme
 """
 
 from once_hafiza import kaydet, ara, isle
@@ -53,7 +53,7 @@ hatalar = [
 for i, h in enumerate(hatalar, 1):
     print(f"  Hata {i}: {h}")
 
-# ADIM 2: DÃ¼zeltme + Sandbox'ta Ã§alÄ±ÅŸtÄ±rma
+# ADIM 2: Düzeltme + Sandbox'ta çalÄ±ÅŸtÄ±rma
 print("\n[ADIM 2] Duzeltme + Dogrulama")
 print("  Duzeltilmis kod yazildi -> _video_agent.py")
 print("  Sandbox: python -c \"import nmap; print('OK')\"")
@@ -62,7 +62,7 @@ print("  python-nmap: ? Kontrol ediliyor...")
 print("  python-nmap: Sandbox dogrulama atlandi (pip install gerektirir)")
 print("  Dogrulama akisi: OnceHafiza kayitlari uzerinden")
 
-# ADIM 3: DoÄŸrulama (beklenen Ã§Ä±ktÄ± vs gerÃ§ek)
+# ADIM 3: DoÄŸrulama (beklenen çÄ±ktÄ± vs gerçek)
 print("\n[ADIM 3] Dogrulama akisi")
 print("""
   Dogrulama adimlari:
@@ -76,7 +76,7 @@ print("""
      - 2: timeout arttir
      - 3: sudo kontrol
   5. Basariliysa -> hafizaya kaydet
-  6. Basarisizsa -> hata tÃ¼rÃ¼ne gÃ¶re:
+  6. Basarisizsa -> hata türüne göre:
      - ImportError -> pip install
      - Timeout -> --max-retries 0
      - PermissionError -> sudo=True
@@ -91,7 +91,7 @@ kaydet(
     basari=True,
 )
 
-# ADIM 5: KayÄ±t gÃ¶ster
+# ADIM 5: KayÄ±t göster
 print("\n[ADIM 5] Hafiza kaydi:")
 db_goster("video/python/nmap%")
 
@@ -110,7 +110,7 @@ print("""
   Hangisi dogru?
 """)
 
-# Web doÄŸrulama simÃ¼lasyonu
+# Web doÄŸrulama simülasyonu
 print("[ADIM 1] Web dogrulama")
 print("""  Kaynaklar:
   1. nmap.org: UDP scan yavas, open|filtered beklenir âœ… HAFIZA
@@ -137,7 +137,7 @@ print("""
   Video puani: 0.4 (tekil kaynak, dogrulama yok)
 """)
 
-# Eski bilgiyi gÃ¼ncelle (Ã¼zerine yazma, not dÃ¼ÅŸ)
+# Eski bilgiyi güncelle (üzerine yazma, not düÅŸ)
 print("[ADIM 3] Celiski isaretleme")
 kaydet(
     hedef="python_nmap_udp_open_filtered_notu",
@@ -148,7 +148,7 @@ kaydet(
     basari=True,
 )
 print("  Yeni kayit olusturuldu (celiski notu)")
-print("  ESKI KAYIT (ID=12): âœ… KORUNDU, guven degismedi, Ã¼zerine yazilmadi")
+print("  ESKI KAYIT (ID=12): âœ… KORUNDU, guven degismedi, üzerine yazilmadi")
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # SENARYO 3 â€” BÄ°LÄ°NMEYEN HATA
@@ -222,7 +222,7 @@ kaydet(
     basari=True,
 )
 
-# TÃ¼m kayÄ±tlarÄ± gÃ¶ster
+# Tüm kayÄ±tlarÄ± göster
 print("\n" + "=" * 70)
 print("SON DURUM: Tum video/python/nmap kayitlari")
 print("=" * 70)

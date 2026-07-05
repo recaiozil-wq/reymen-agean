@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Fix skill_index.db - only broken DB"""
 
 import sqlite3, os, shutil

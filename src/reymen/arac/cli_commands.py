@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """cli_commands.py â€” ReYMeN CLI alt komutlarÄ± (gateway, config, session, doctor, backup)."""
 
 import os
@@ -46,7 +46,7 @@ def _r(t):
 
 # â”€â”€ GATEWAY (ReYMeN bagimsiz) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_gateway(args) -> int:
-    """Gateway yÃ¶netimi â€” ReYMeN kendi gateway sistemi."""
+    """Gateway yönetimi â€” ReYMeN kendi gateway sistemi."""
     alt = args.sub or "status"
     profil = getattr(args, "profil", None) or "reymen"
 
@@ -108,7 +108,11 @@ def _gateway_baslat(profil: str) -> int:
     try:
         # reymen_launcher.py uzerinden gateway baslat
         reymen_bin = str(_KOK / "reymen_launcher.py")
-        cmd = f'start /MIN cmd /c "python {reymen_bin} --profil {profil} gateway start"'
+        reymen_python = _KOK / ".venv_reymen" / "Scripts" / "python.exe"
+        if not reymen_python.exists():
+            import sys as _sys
+            reymen_python = _sys.executable
+        cmd = f'start /MIN cmd /c ""{reymen_python}" "{reymen_bin}" --profil {profil} gateway start"'
         subprocess.Popen(cmd, shell=True)
         print(f"  {_g('âœ“')} {profil} gateway baslatiliyor...")
         return 0
@@ -264,7 +268,7 @@ def _session_son() -> int:
 def cmd_doctor(args) -> int:
     """Sistem saglik kontrolu."""
     sorun = 0
-    print(f"\n  {_c('ReYMeN Sistem KontrolÃ¼')}")
+    print(f"\n  {_c('ReYMeN Sistem Kontrolü')}")
     print(f"  {_d('â”€'*50)}")
 
     # 1. Proje dizini
@@ -342,6 +346,62 @@ def cmd_doctor(args) -> int:
 
 
 # â”€â”€ BACKUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── WEB (Hermes Studio) ─────────────────────────────────────────────────────
+def cmd_web(args=None) -> int:
+    """Hermes Studio'yu başlat (EKKOLearnAI/hermes-studio)."""
+    import subprocess as _sp
+    import time as _time
+    import shutil as _shutil
+
+    # npm global bin yolunu bul
+    _npm_bin = _shutil.which("hermes-web-ui.cmd") or _shutil.which("hermes-web-ui")
+    if not _npm_bin:
+        _npm_bin = _shutil.which("hermes-web-ui.cmd", path=os.environ.get("PATH","") + os.pathsep + os.path.expanduser("~/AppData/Roaming/npm"))
+    if not _npm_bin:
+        print(f"  {_r('[HATA]')} hermes-web-ui bulunamadi — 'npm install -g hermes-web-ui' ile kur")
+        return 1
+
+    # 1. Hermes Studio çalışıyor mu kontrol et
+    r = _sp.run(
+        [_npm_bin, "status"],
+        capture_output=True, text=True, timeout=10, shell=False
+    )
+
+    if "is running" in r.stdout:
+        print(f"  {_g('✓')} Hermes Studio zaten çalışıyor (localhost:8648)")
+    else:
+        print(f"  {_c('∘')} Hermes Studio başlatılıyor...")
+        _sp.Popen(
+            [_npm_bin, "start", "8648"],
+            creationflags=_sp.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            stdout=_sp.DEVNULL, stderr=_sp.DEVNULL
+        )
+        _time.sleep(3)
+        r2 = _sp.run(
+            [_npm_bin, "status"],
+            capture_output=True, text=True, timeout=10
+        )
+        if "is running" in r2.stdout:
+            print(f"  {_g('✓')} Hermes Studio başlatıldı (localhost:8648)")
+        else:
+            print(f"  {_y('!')} Hermes Studio başlatılamadı — 'hermes-web-ui start' ile manuel dene")
+            return 1
+
+    # 2. Browser'da aç
+    print(f"  {_c('∘')} Browser açılıyor...")
+    try:
+        _sp.run(
+            ["cmd", "/c", "start", "http://localhost:8648"],
+            timeout=5, stdout=_sp.DEVNULL, stderr=_sp.DEVNULL
+        )
+        print(f"  {_g('✓')} http://localhost:8648 açıldı")
+        print(f"  {_d('Giriş: admin / 123456')}")
+        print(f"  {_d('Profiller → reymen seçeneğini kullan')}")
+    except Exception:
+        print(f"  {_y('!')} Browser açılamadı, manuel: http://localhost:8648")
+    return 0
+
+
 def cmd_backup(args) -> int:
     """Git push ile yedekle."""
     alt = getattr(args, "sub", None) or "status"

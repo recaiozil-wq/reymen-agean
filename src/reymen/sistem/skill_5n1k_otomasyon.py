@@ -1,11 +1,11 @@
-﻿"""
+"""
 skill_5n1k_otomasyon.py â€” Cron ile otomatik skill 5N1K formatlama
 
-Her Ã§alÄ±ÅŸtÄ±rmada:
-1. reymen/cereyan/skills/ altÄ±ndaki tÃ¼m .md dosyalarÄ±nÄ± tara
-2. 5N1K tablosu olmayanlara auto-ekle (baÅŸlÄ±ktan/description'dan Ã§Ä±kar)
-3. Kategoriye gÃ¶re doÄŸru alt dizine taÅŸÄ±
-4. SKILLS_KATALOG.md'yi gÃ¼ncelle
+Her çalÄ±ÅŸtÄ±rmada:
+1. reymen/cereyan/skills/ altÄ±ndaki tüm .md dosyalarÄ±nÄ± tara
+2. 5N1K tablosu olmayanlara auto-ekle (baÅŸlÄ±ktan/description'dan çÄ±kar)
+3. Kategoriye göre doÄŸru alt dizine taÅŸÄ±
+4. SKILLS_KATALOG.md'yi güncelle
 """
 
 import os
@@ -16,7 +16,7 @@ from pathlib import Path
 SKILLS_DIR = Path(__file__).parent.parent / "cereyan" / "skills"
 KATALOG = SKILLS_DIR / "SKILLS_KATALOG.md"
 
-# Ana kategoriler (alt dizin ismi â†’ emoji + aÃ§Ä±klama)
+# Ana kategoriler (alt dizin ismi â†’ emoji + açÄ±klama)
 KATEGORILER = {
     "reymen": ("âš™ï¸", "ReYMeN Ã–zel"),
     "kali": ("ğŸ‰", "Kali Pentest"),
@@ -28,7 +28,7 @@ KATEGORILER = {
     "mlops": ("ğŸ› ", "MLOps"),
     "software-development": ("ğŸ’»", "YazÄ±lÄ±m"),
     "autonomous-ai-agents": ("ğŸ¤–", "Otonom Ajanlar"),
-    "security": ("ğŸ”’", "GÃ¼venlik"),
+    "security": ("ğŸ”’", "Güvenlik"),
     "productivity": ("âš¡", "Verimlilik"),
     "devops": ("ğŸš€", "DevOps"),
     "creative": ("ğŸ¨", "YaratÄ±cÄ±"),
@@ -50,7 +50,7 @@ def besN1K_var_mi(icerik: str) -> bool:
 
 
 def besN1K_olustur(dosya_yolu: Path) -> str:
-    """Dosyadan bilgi Ã§Ä±karÄ±p 5N1K tablosu oluÅŸtur."""
+    """Dosyadan bilgi çÄ±karÄ±p 5N1K tablosu oluÅŸtur."""
     try:
         with open(dosya_yolu, "r", encoding="utf-8") as f:
             icerik = f.read()
@@ -73,14 +73,14 @@ def besN1K_olustur(dosya_yolu: Path) -> str:
     if not name:
         name = dosya_yolu.stem
 
-    # Ä°lk ### veya ## baÅŸlÄ±ktan Ne Ã§Ä±kar
+    # Ä°lk ### veya ## baÅŸlÄ±ktan Ne çÄ±kar
     ne = desc or name.replace("-", " ").title()
 
-    # Kategoriyi dizin isminden Ã§Ä±kar
+    # Kategoriyi dizin isminden çÄ±kar
     kategori = dosya_yolu.parent.name
 
-    # Dosya adÄ±ndan Kim Ã§Ä±kar
-    kim = "TÃ¼m ajanlar"
+    # Dosya adÄ±ndan Kim çÄ±kar
+    kim = "Tüm ajanlar"
     if "kali" in name.lower() or kategori == "kali":
         kim = "Kali ajanÄ±"
     elif "windows" in name.lower() or kategori == "windows":
@@ -100,7 +100,7 @@ def besN1K_olustur(dosya_yolu: Path) -> str:
 | **Kim?** | {kim} |
 | **Ne?** | {ne} |
 | **Nerede?** | {kategori}/ |
-| **Ne Zaman?** | Ä°htiyaÃ§ duyulduÄŸunda |
+| **Ne Zaman?** | Ä°htiyaç duyulduÄŸunda |
 | **Neden?** | Otomatik kategorilendirme |
 | **NasÄ±l?** | Skill referansÄ± ile |
 
@@ -145,7 +145,7 @@ def besN1K_ekle(dosya_yolu: Path) -> bool:
 
 
 def tarama_yap() -> dict:
-    """TÃ¼m skill'leri tara, 5N1K durumunu raporla."""
+    """Tüm skill'leri tara, 5N1K durumunu raporla."""
     sonuc = {
         "toplam": 0,
         "5n1k_var": 0,

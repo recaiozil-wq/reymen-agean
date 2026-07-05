@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 reflexion_motoru.py â€” Reflexion Pattern (Shinn et al. 2023).
 

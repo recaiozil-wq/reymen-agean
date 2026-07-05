@@ -1,12 +1,12 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 proaktif_bakim.py â€” ReYMeN 3 profil otomatik bakÄ±m scripti.
 
 Ã‡alÄ±ÅŸma modu: no_agent (cron ile)
-  - Sorun yok â†’ sessiz (Ã§Ä±ktÄ±sÄ±z)
+  - Sorun yok â†’ sessiz (çÄ±ktÄ±sÄ±z)
   - Sorun var â†’ rapor (stdout)
-  - Pazar gÃ¼nÃ¼ â†’ haftalÄ±k rapor (her zaman Ã§Ä±ktÄ±)
+  - Pazar günü â†’ haftalÄ±k rapor (her zaman çÄ±ktÄ±)
 """
 
 import json
@@ -45,7 +45,7 @@ def ekle(seviye: str, mesaj: str):
     RAPOR.append(f"[{seviye}] {mesaj}")
 
 
-# â”€â”€ 1. Config Drift DedektÃ¶rÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ 1. Config Drift Dedektörü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def config_drift_kontrol():
     """3 config.yaml kritik alanlarÄ±nÄ± karÅŸÄ±laÅŸtÄ±r."""
     import yaml
@@ -89,7 +89,7 @@ def config_drift_kontrol():
 
 # â”€â”€ 2. Gateway Watchdog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def gateway_watchdog():
-    """409 + Ã§Ã¶kme korumasÄ±, lock temizle + restart."""
+    """409 + çökme korumasÄ±, lock temizle + restart."""
     for ad, yol in PROFILLER.items():
         lock = yol / "gateway.lock"
         pid = yol / "gateway.pid"
@@ -104,7 +104,7 @@ def gateway_watchdog():
             try:
                 pid_str = pid.read_text().strip()
                 pid_int = int(pid_str)
-                # Windows'ta process var mÄ± kontrolÃ¼
+                # Windows'ta process var mÄ± kontrolü
                 if platform.system() == "Windows":
                     r = subprocess.run(
                         ["tasklist", "/FI", f"PID eq {pid_int}", "/NH"],
@@ -121,7 +121,7 @@ def gateway_watchdog():
             except (ValueError, subprocess.TimeoutExpired):
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-    # Debug log'da 409 kontrolÃ¼
+    # Debug log'da 409 kontrolü
     debug_log = PROJE_KOK / "bot_debug.log"
     if debug_log.exists():
         icerik = debug_log.read_text(encoding="utf-8", errors="ignore")
@@ -156,7 +156,7 @@ def soul_sync():
 
 # â”€â”€ 4. state.db Prune â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def state_db_prune():
-    """30 gÃ¼n eski session'larÄ± temizle."""
+    """30 gün eski session'larÄ± temizle."""
     kesim_saniye = (BUGUN - timedelta(days=30)).timestamp()
 
     for ad, yol in PROFILLER.items():
@@ -217,7 +217,7 @@ def memory_sync():
 
         # Symlink mi kontrol et
         if hedef.is_symlink():
-            continue  # Symlink zaten shared'i gÃ¶steriyor
+            continue  # Symlink zaten shared'i gösteriyor
 
         shutil.copy2(shared, hedef)
         ekle("BILGI", f"[5] {ad} MEMORY.md guncellendi")
@@ -227,12 +227,12 @@ def memory_sync():
 
 # â”€â”€ 6. HaftalÄ±k Rapor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def haftalik_rapor():
-    """Pazar gÃ¼nÃ¼ 3 bot durum Ã¶zeti."""
+    """Pazar günü 3 bot durum özeti."""
     if not PAZAR_MI:
         return
 
     global SESSIZ
-    SESSIZ = False  # Pazar raporu her zaman gÃ¶ster
+    SESSIZ = False  # Pazar raporu her zaman göster
 
     ekle("RAPOR", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
     ekle("RAPOR", f"  Haftalik Bot Raporu â€” {BUGUN.strftime('%d %B %Y')}")
@@ -350,7 +350,7 @@ def main():
     config_template_kontrol()
     gateway_health()
 
-    # SonuÃ§
+    # Sonuç
     hata_say = sum(1 for r in RAPOR if r.startswith("[HATA]"))
     uyari_say = sum(1 for r in RAPOR if r.startswith("[UYARI]"))
 
@@ -360,7 +360,7 @@ def main():
         print(f"[proaktif_bakim] {hata_say} hata, {uyari_say} uyari")
         print("\n".join(RAPOR))
     else:
-        # Tamamen sessiz â€” cron no_agent modunda sorunsuz Ã§alÄ±ÅŸma
+        # Tamamen sessiz â€” cron no_agent modunda sorunsuz çalÄ±ÅŸma
         pass
 
 

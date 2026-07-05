@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """browser_camofox.py â€” Tarayici Parmak Izi Korumasi.
 
 Playwright ile tarayici acarken fingerprint'i gizler,

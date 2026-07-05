@@ -1,9 +1,9 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FIX 03 â€” Coverage Kurulum & HÄ±zlÄ± Test KoÅŸucusu
 Yapar : pytest-cov kurar, sadece reymen/ paketini test eder
-Test  : her modÃ¼lÃ¼ ayrÄ± ayrÄ± Ã§alÄ±ÅŸtÄ±rÄ±r
-Rapor : fix_03_rapor.json + konsol Ã¶zeti
+Test  : her modülü ayrÄ± ayrÄ± çalÄ±ÅŸtÄ±rÄ±r
+Rapor : fix_03_rapor.json + konsol özeti
 """
 
 import sys, json, time, shutil, subprocess
@@ -62,13 +62,13 @@ def pip_kur(paket):
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 03 â€” Coverage & Test KoÅŸucusu\nKÃ¶k: {kok}")
+    hdr(f"FIX 03 â€” Coverage & Test KoÅŸucusu\nKök: {kok}")
     t0 = time.time()
     rapor = {
         "tarih": datetime.now().isoformat(),
         "kok": str(kok),
         "paket_kurulum": {},
-        "modÃ¼l_testler": [],
+        "modül_testler": [],
         "coverage": {},
         "genel": {},
     }
@@ -86,7 +86,7 @@ def main():
             err(f"{p} kurulamadÄ±")
             rapor["paket_kurulum"][p] = "HATA"
 
-    hdr("2. ModÃ¼l BazlÄ± Test")
+    hdr("2. Modül BazlÄ± Test")
     test_dizinleri = []
     for mod in ["cereyan", "sistem", "hafiza", "arac", "guvenlik"]:
         for td in [kok / "tests" / mod, kok / f"tests/test_{mod}"]:
@@ -98,7 +98,7 @@ def main():
             if testler:
                 test_dizinleri.append((mod, testler[0].parent))
     if not test_dizinleri:
-        warn("ModÃ¼l test dizini bulunamadÄ±")
+        warn("Modül test dizini bulunamadÄ±")
         test_dizinleri = [("reymen", kok / "tests")] if (kok / "tests").exists() else []
 
     for mod, td in test_dizinleri:
@@ -141,9 +141,9 @@ def main():
                     print(f"    {C.RED}{s}{C.RESET}")
         if cov_satir:
             print(f"    {C.BLU}{cov_satir}{C.RESET}")
-        rapor["modÃ¼l_testler"].append(
+        rapor["modül_testler"].append(
             {
-                "modÃ¼l": mod,
+                "modül": mod,
                 "dizin": str(td),
                 "return_code": kod,
                 "ozet": ozet,
@@ -173,7 +173,7 @@ def main():
             timeout=180,
         )
         if kod == -1:
-            warn("Genel coverage timeout â€” modÃ¼l raporlarÄ±na bak")
+            warn("Genel coverage timeout â€” modül raporlarÄ±na bak")
         else:
             for s in out.splitlines():
                 if "TOTAL" in s or "passed" in s or "failed" in s:
@@ -185,7 +185,7 @@ def main():
                 rapor["coverage"] = {
                     "toplam_satir": cd.get("num_statements"),
                     "kapsanan": cd.get("covered_lines"),
-                    "yÃ¼zde": cd.get("percent_covered_display"),
+                    "yüzde": cd.get("percent_covered_display"),
                 }
                 ok(f"Coverage: %{cd.get('percent_covered_display','?')}")
             except Exception as _e:
@@ -222,15 +222,15 @@ def main():
 
     rapor["genel"]["sure"] = round(time.time() - t0, 1)
     hdr("Ã–ZET RAPOR")
-    gecen = sum(1 for m in rapor["modÃ¼l_testler"] if m["return_code"] == 0)
-    hata = sum(1 for m in rapor["modÃ¼l_testler"] if m["return_code"] not in (0, -1))
-    timeout = sum(1 for m in rapor["modÃ¼l_testler"] if m["return_code"] == -1)
-    print(f"  Test geÃ§en modÃ¼l  : {C.GRN}{gecen}{C.RESET}")
-    print(f"  Test hata modÃ¼l   : {C.RED}{hata}{C.RESET}")
-    print(f"  Timeout modÃ¼l     : {C.YEL}{timeout}{C.RESET}")
-    if rapor["coverage"].get("yÃ¼zde"):
-        print(f"  Genel coverage    : {C.BLU}%{rapor['coverage']['yÃ¼zde']}{C.RESET}")
-    print(f"  SÃ¼re              : {rapor['genel']['sure']}s")
+    gecen = sum(1 for m in rapor["modül_testler"] if m["return_code"] == 0)
+    hata = sum(1 for m in rapor["modül_testler"] if m["return_code"] not in (0, -1))
+    timeout = sum(1 for m in rapor["modül_testler"] if m["return_code"] == -1)
+    print(f"  Test geçen modül  : {C.GRN}{gecen}{C.RESET}")
+    print(f"  Test hata modül   : {C.RED}{hata}{C.RESET}")
+    print(f"  Timeout modül     : {C.YEL}{timeout}{C.RESET}")
+    if rapor["coverage"].get("yüzde"):
+        print(f"  Genel coverage    : {C.BLU}%{rapor['coverage']['yüzde']}{C.RESET}")
+    print(f"  Süre              : {rapor['genel']['sure']}s")
     rapor_yolu = kok / "fix_03_rapor.json"
     with open(rapor_yolu, "w") as fp:
         json.dump(rapor, fp, ensure_ascii=False, indent=2)

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 tts_stt_tool.py â€” ReYMeN TTS (Text-to-Speech) ve STT (Speech-to-Text) araclari.
 

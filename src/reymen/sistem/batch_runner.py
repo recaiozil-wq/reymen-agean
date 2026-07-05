@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 batch_runner.py â€” ReYMeN Paralel Toplu Gorev Isleme.
 
@@ -240,7 +240,7 @@ def main():
 
 
 def motor_kaydet(motor):
-    """Batch runner araÃ§larÄ±nÄ± motora kaydet."""
+    """Batch runner araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     import subprocess, sys as _sys
@@ -254,7 +254,7 @@ def motor_kaydet(motor):
             timeout=300,
         ).stdout[:500]
         or "[Batch]: Ã‡alÄ±ÅŸtÄ±rÄ±ldÄ±",
-        "Toplu gÃ¶rev dosyasÄ±nÄ± Ã§alÄ±ÅŸtÄ±r (dosya: jsonl yolu, paralel: iÅŸ sayÄ±sÄ±)",
+        "Toplu görev dosyasÄ±nÄ± çalÄ±ÅŸtÄ±r (dosya: jsonl yolu, paralel: iÅŸ sayÄ±sÄ±)",
     )
 
 

@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Agent Gatekeeper â€” ReYMeN / DeepSeek-V4-Flash icin
 zorunlu arac-calistirma dogrulama motoru.
 
-AmaÃ§: Modelin "TOOL CALL yaptim" ya da "test ettim" demesine
+Amaç: Modelin "TOOL CALL yaptim" ya da "test ettim" demesine
 GUVENMEMEK. Bunun yerine:
   1. Modelin urettigi kodu gercekten calistir.
   2. Calistirma logunu SQLite'a yaz.
@@ -90,7 +90,7 @@ def has_real_execution(session_id: str, since_ts: float = 0) -> bool:
 # 2) Sayisal / DB iddiasi tespiti
 # ---------------------------------------------------------------------
 NUMERIC_CLAIM_PATTERN = re.compile(
-    r"(\bSELECT\b|\bsonuÃ§\b.*\d|\btoplam\b.*\d|=\s*\d+\.?\d*|%\d+)", re.IGNORECASE
+    r"(\bSELECT\b|\bsonuç\b.*\d|\btoplam\b.*\d|=\s*\d+\.?\d*|%\d+)", re.IGNORECASE
 )
 
 def response_makes_numeric_claim(text: str) -> bool:

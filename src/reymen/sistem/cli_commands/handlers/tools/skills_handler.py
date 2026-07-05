@@ -1,4 +1,4 @@
-﻿"""_handle_skills_command handler."""
+"""_handle_skills_command handler."""
 
 
 def _handle_skills_command(cli, cmd: str):

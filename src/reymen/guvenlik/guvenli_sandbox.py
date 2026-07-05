@@ -1,12 +1,12 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-guvenli_sandbox.py â€” ReYMeN GÃ¼venli Kod Ã‡alÄ±ÅŸtÄ±rma Sandbox'Ä±.
+guvenli_sandbox.py â€” ReYMeN Güvenli Kod Ã‡alÄ±ÅŸtÄ±rma Sandbox'Ä±.
 
-Python kodunu izole bir alt sÃ¼reÃ§te Ã§alÄ±ÅŸtÄ±rÄ±r:
+Python kodunu izole bir alt süreçte çalÄ±ÅŸtÄ±rÄ±r:
   - Timeout (zaman aÅŸÄ±mÄ±)
   - Bellek sÄ±nÄ±rÄ±
-  - ModÃ¼l allowlist'i (sadece izin verilen modÃ¼ller)
-  - Dosya sistemi kÄ±sÄ±tlamasÄ± (geÃ§ici dizin)
+  - Modül allowlist'i (sadece izin verilen modüller)
+  - Dosya sistemi kÄ±sÄ±tlamasÄ± (geçici dizin)
   - Ã‡Ä±ktÄ± boyut sÄ±nÄ±rÄ±
   - Tehlikeli iÅŸlemleri engelleme (subprocess, eval, exec, import blacklist)
 
@@ -38,10 +38,10 @@ logger = logging.getLogger(__name__)
 
 # â”€â”€ VarsayÄ±lan Ayarlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# Ä°zin verilen modÃ¼ller (allowlist)
+# Ä°zin verilen modüller (allowlist)
 VARSAYILAN_MODUL_LISTESI = frozenset(
     {
-        # Python standart kÃ¼tÃ¼phanesi (gÃ¼venli)
+        # Python standart kütüphanesi (güvenli)
         "math",
         "random",
         "datetime",
@@ -72,11 +72,11 @@ VARSAYILAN_MODUL_LISTESI = frozenset(
         "operator",
         "functools",
         "abc",
-        "pathlib",  # sadece okuma iÃ§in
+        "pathlib",  # sadece okuma için
     }
 )
 
-# Kesinlikle yasaklÄ± modÃ¼ller/kodlar
+# Kesinlikle yasaklÄ± modüller/kodlar
 YASAKLI_ANAHTAR_KELIMELER = [
     "import os",
     "from os",
@@ -120,7 +120,7 @@ YASAKLI_ANAHTAR_KELIMELER = [
 
 
 class SandboxError(RuntimeError):
-    """Sandbox Ã§alÄ±ÅŸtÄ±rma hatasÄ±."""
+    """Sandbox çalÄ±ÅŸtÄ±rma hatasÄ±."""
 
 
 class SandboxTimeout(SandboxError):
@@ -128,7 +128,7 @@ class SandboxTimeout(SandboxError):
 
 
 class YasakliModulHatasi(SandboxError):
-    """YasaklÄ± modÃ¼l kullanÄ±mÄ±."""
+    """YasaklÄ± modül kullanÄ±mÄ±."""
 
 
 class CiktiSiniriHatasi(SandboxError):
@@ -139,13 +139,13 @@ class CiktiSiniriHatasi(SandboxError):
 
 
 class Sandbox:
-    """GÃ¼venli kod Ã§alÄ±ÅŸtÄ±rma sandbox'Ä±.
+    """Güvenli kod çalÄ±ÅŸtÄ±rma sandbox'Ä±.
 
     Args:
-        timeout: Maksimum Ã§alÄ±ÅŸma sÃ¼resi (saniye).
-        max_chars: Maksimum Ã§Ä±ktÄ± boyutu (karakter).
-        modul_listesi: Ä°zin verilen modÃ¼ller (None=varsayÄ±lan).
-        calisma_dizini: Kodun Ã§alÄ±ÅŸacaÄŸÄ± dizin (None=geÃ§ici dizin).
+        timeout: Maksimum çalÄ±ÅŸma süresi (saniye).
+        max_chars: Maksimum çÄ±ktÄ± boyutu (karakter).
+        modul_listesi: Ä°zin verilen modüller (None=varsayÄ±lan).
+        calisma_dizini: Kodun çalÄ±ÅŸacaÄŸÄ± dizin (None=geçici dizin).
     """
 
     def __init__(
@@ -165,26 +165,26 @@ class Sandbox:
     # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def calistir(self, kod: str, baglam: dict[str, Any] | None = None) -> str:
-        """Kodu sandbox iÃ§inde Ã§alÄ±ÅŸtÄ±r.
+        """Kodu sandbox içinde çalÄ±ÅŸtÄ±r.
 
         Args:
             kod: Ã‡alÄ±ÅŸtÄ±rÄ±lacak Python kodu.
             baglam: Koda eklenecek deÄŸiÅŸkenler (opsiyonel).
 
         Returns:
-            stdout Ã§Ä±ktÄ±sÄ± veya hata mesajÄ±.
+            stdout çÄ±ktÄ±sÄ± veya hata mesajÄ±.
 
         Raises:
             SandboxTimeout: Zaman aÅŸÄ±mÄ±.
-            YasakliModulHatasi: YasaklÄ± modÃ¼l kullanÄ±mÄ±.
+            YasakliModulHatasi: YasaklÄ± modül kullanÄ±mÄ±.
         """
-        # 1. Kod Ã¶n kontrolÃ¼
+        # 1. Kod ön kontrolü
         self._kod_kontrol(kod)
 
-        # 2. GeÃ§ici script dosyasÄ± oluÅŸtur
+        # 2. Geçici script dosyasÄ± oluÅŸtur
         script = self._script_olustur(kod, baglam or {})
 
-        # 3. Subprocess ile Ã§alÄ±ÅŸtÄ±r
+        # 3. Subprocess ile çalÄ±ÅŸtÄ±r
         import subprocess
 
         try:
@@ -210,7 +210,7 @@ class Sandbox:
         return cikti
 
     def _script_olustur(self, kod: str, baglam: dict[str, Any]) -> str:
-        """Kodu geÃ§ici bir script dosyasÄ±na yaz."""
+        """Kodu geçici bir script dosyasÄ±na yaz."""
         wrapper_bas = (
             "# ReYMeN Sandbox - Izole Calistirma\n"
             "import sys\n\n"
@@ -264,7 +264,7 @@ class Sandbox:
         return yol
 
     def __del__(self):
-        # GeÃ§ici script dosyasÄ±nÄ± temizle
+        # Geçici script dosyasÄ±nÄ± temizle
         if (
             hasattr(self, "_son_script")
             and self._son_script
@@ -277,10 +277,10 @@ class Sandbox:
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )
 
-    # â”€â”€ Kod Ã–n KontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Kod Ã–n Kontrolü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _kod_kontrol(self, kod: str) -> None:
-        """Kodu Ã§alÄ±ÅŸtÄ±rmadan Ã¶nce gÃ¼venlik kontrolÃ¼ yap."""
+        """Kodu çalÄ±ÅŸtÄ±rmadan önce güvenlik kontrolü yap."""
         for yasakli in YASAKLI_ANAHTAR_KELIMELER:
             if yasakli in kod:
                 raise YasakliModulHatasi(f"Yasakli ifade tespit edildi: {yasakli!r}")
@@ -288,8 +288,8 @@ class Sandbox:
     # â”€â”€ Kod Ã‡alÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _guvenli_import(self, name: str, *args: Any, **kwargs: Any) -> Any:
-        """Sadece izin verilen modÃ¼lleri import et."""
-        # __import__ Ã§aÄŸrÄ±sÄ±ndaki ana modÃ¼l adÄ±nÄ± al
+        """Sadece izin verilen modülleri import et."""
+        # __import__ çaÄŸrÄ±sÄ±ndaki ana modül adÄ±nÄ± al
         import_name = name.split(".")[0] if "." in name else name
 
         if import_name not in self.modul_listesi:
@@ -298,7 +298,7 @@ class Sandbox:
                 f"{sorted(self.modul_listesi)}"
             )
 
-        # builtins.__import__ ile gerÃ§ek import
+        # builtins.__import__ ile gerçek import
         import builtins
 
         return builtins.__import__(name, *args, **kwargs)
@@ -315,12 +315,12 @@ def guvenli_calistir(
     max_chars: int = 5000,
     baglam: dict[str, Any] | None = None,
 ) -> str:
-    """Kodu gÃ¼venli sandbox'ta Ã§alÄ±ÅŸtÄ±r (tek satÄ±rlÄ±k API).
+    """Kodu güvenli sandbox'ta çalÄ±ÅŸtÄ±r (tek satÄ±rlÄ±k API).
 
     Args:
         kod: Ã‡alÄ±ÅŸtÄ±rÄ±lacak Python kodu.
-        timeout: Zaman aÅŸÄ±mÄ± sÃ¼resi (saniye).
-        max_chars: Maksimum Ã§Ä±ktÄ± boyutu.
+        timeout: Zaman aÅŸÄ±mÄ± süresi (saniye).
+        max_chars: Maksimum çÄ±ktÄ± boyutu.
         baglam: Koda eklenecek deÄŸiÅŸkenler.
 
     Returns:
@@ -346,11 +346,11 @@ def _test() -> None:
     sonuc = guvenli_calistir("print(2 + 3 * 4)")
     print(f"2. Matematik: {'âœ…' if '14' in sonuc else 'âŒ'}")
 
-    # 3. DÃ¶ngÃ¼
+    # 3. Döngü
     sonuc = guvenli_calistir("toplam = sum(range(100)); print(toplam)")
-    print(f"3. DÃ¶ngu: {'âœ…' if '4950' in sonuc else 'âŒ'}")
+    print(f"3. Döngu: {'âœ…' if '4950' in sonuc else 'âŒ'}")
 
-    # 4. YasaklÄ± modÃ¼l
+    # 4. YasaklÄ± modül
     try:
         guvenli_calistir("import os; print(os.name)")
         print("4. Yasakli modul: âŒ (engellenemedi)")
@@ -375,7 +375,7 @@ def _test() -> None:
     sonuc = guvenli_calistir("print('x' * 10000)", max_chars=100)
     print(f"7. Cikti siniri: {'âœ…' if 'sinir' in sonuc else 'âŒ'}")
 
-    # 8. Ä°zin verilen modÃ¼l
+    # 8. Ä°zin verilen modül
     sonuc = guvenli_calistir("import math; print(math.pi)")
     print(f"8. Izinli modul: {'âœ…' if '3.14' in sonuc else 'âŒ'}")
 

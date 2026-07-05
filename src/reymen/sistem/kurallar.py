@@ -1,5 +1,5 @@
-﻿# -*- coding: utf-8 -*-
-"""kurallar.py â€” ReYMeN Kural/Ä°zin YÃ¶netim Motoru (Rules Engine).
+# -*- coding: utf-8 -*-
+"""kurallar.py â€” ReYMeN Kural/Ä°zin Yönetim Motoru (Rules Engine).
 
 Policy katmani: mevcut guvenlik/ modullerinin uzerine ek bir kontrol
 katmani saglar. Her aksiyon (dosya erisimi, ag cagrisi, komut calistirma,

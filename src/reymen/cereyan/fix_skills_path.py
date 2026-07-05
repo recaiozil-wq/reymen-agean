@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """fix_skills_path.py â€” Skills dizin karmasasini temizle.
 
 TUM skills dizinlerini tek bir merkezi dizine yonlendirir:

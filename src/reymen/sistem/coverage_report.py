@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """reymen/sistem/coverage_report.py â€” Coverage Rapor Motoru.
 
 Statik analiz + pytest-cov entegrasyonu.
-Zaman bazlÄ± geÃ§miÅŸ tutar ve Web UI'a veri saÄŸlar.
+Zaman bazlÄ± geçmiÅŸ tutar ve Web UI'a veri saÄŸlar.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ HISTORY_FILE = PROJE_KOK / "tests" / "coverage_history.json"
 
 
 def _modul_sayisi() -> int:
-    """reymen altÄ±ndaki .py dosya sayÄ±sÄ± (__init__.py hariÃ§)."""
+    """reymen altÄ±ndaki .py dosya sayÄ±sÄ± (__init__.py hariç)."""
     say = 0
     for root, _dirs, files in os.walk(str(PROJE_KOK / "reymen")):
         if "__pycache__" in root or "venv" in root or "node_modules" in root:
@@ -55,7 +55,7 @@ def _satir_sayisi() -> int:
 
 
 def _sonuc_al(veri: dict) -> dict:
-    """coverage JSON raporundan sonuÃ§ al."""
+    """coverage JSON raporundan sonuç al."""
     try:
         toplam = veri.get("totals", {})
         return {
@@ -71,10 +71,10 @@ def _sonuc_al(veri: dict) -> dict:
 
 
 def calistir(hizli: bool = False) -> dict:
-    """Coverage Ã§alÄ±ÅŸtÄ±r ve sonuÃ§ dÃ¶ndÃ¼r.
+    """Coverage çalÄ±ÅŸtÄ±r ve sonuç döndür.
 
     Args:
-        hizli: True = sadece reymen/ dizini, False = tÃ¼m proje
+        hizli: True = sadece reymen/ dizini, False = tüm proje
 
     Returns:
         {"basari": True, "yuzde": 45.2, "toplam_satir": 1000, ...}
@@ -133,7 +133,7 @@ def calistir(hizli: bool = False) -> dict:
         sonuc = _sonuc_al(veri)
         sonuc["sure"] = sure
 
-        # GeÃ§miÅŸe ekle
+        # GeçmiÅŸe ekle
         _gecmis_ekle(sonuc)
 
         return sonuc
@@ -150,7 +150,7 @@ def statik_analiz() -> dict:
     modul_say = _modul_sayisi()
     satir_say = _satir_sayisi()
 
-    # Import edilebilen modÃ¼ller
+    # Import edilebilen modüller
     import_edilebilen = 0
     import_edilemeyen = 0
     for root, _dirs, files in os.walk(str(PROJE_KOK / "reymen")):
@@ -191,7 +191,7 @@ def statik_analiz() -> dict:
 
 
 def _gecmis_ekle(sonuc: dict) -> None:
-    """Sonucu geÃ§miÅŸ dosyasÄ±na ekle."""
+    """Sonucu geçmiÅŸ dosyasÄ±na ekle."""
     try:
         history = []
         if HISTORY_FILE.exists():
@@ -215,11 +215,11 @@ def _gecmis_ekle(sonuc: dict) -> None:
         with open(HISTORY_FILE, "w") as f:
             json.dump(history, f, indent=2, ensure_ascii=False)
     except Exception as e:
-        logger.debug("GeÃ§miÅŸ kaydedilemedi: %s", e)
+        logger.debug("GeçmiÅŸ kaydedilemedi: %s", e)
 
 
 def gecmis_getir(limit: int = 30) -> list[dict]:
-    """GeÃ§miÅŸ coverage verilerini getir."""
+    """GeçmiÅŸ coverage verilerini getir."""
     if not HISTORY_FILE.exists():
         return []
     try:

@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-"""Streaming API Ã§aÄŸrÄ±sÄ± saÄŸlÄ±k takibi.
+# -*- coding: utf-8 -*-
+"""Streaming API çaÄŸrÄ±sÄ± saÄŸlÄ±k takibi.
 
-Her stream denemesi iÃ§in first-token-time, token hÄ±zÄ±, toplam sÃ¼re ve
-hata bilgisini kaydeder. conversation_loop.py'nin retry dÃ¶ngÃ¼sÃ¼ bu
+Her stream denemesi için first-token-time, token hÄ±zÄ±, toplam süre ve
+hata bilgisini kaydeder. conversation_loop.py'nin retry döngüsü bu
 istatistikleri kullanarak yavaÅŸ/sÄ±kÄ±ÅŸmÄ±ÅŸ stream'leri erken keser.
 
 ReYMeN'in stream_diagnostics.py'sinden adapte edilmiÅŸtir.
@@ -42,14 +42,14 @@ class StreamDenemesi:
 
     @property
     def ilk_token_gecikme(self) -> Optional[float]:
-        """Ä°lk token'a kadar geÃ§en sÃ¼re (saniye)."""
+        """Ä°lk token'a kadar geçen süre (saniye)."""
         if self.ilk_token_zamani is None:
             return None
         return self.ilk_token_zamani - self.baslangic
 
     @property
     def toplam_sure(self) -> float:
-        """Toplam geÃ§en sÃ¼re (saniye); bitmemiÅŸse ÅŸimdiye kadar."""
+        """Toplam geçen süre (saniye); bitmemiÅŸse ÅŸimdiye kadar."""
         bitis = self.bitis or time.monotonic()
         return bitis - self.baslangic
 
@@ -81,7 +81,7 @@ class StreamDenemesi:
 
 
 class StreamSaglikTakibi:
-    """Bir konuÅŸma boyunca tÃ¼m stream denemelerini takip eder.
+    """Bir konuÅŸma boyunca tüm stream denemelerini takip eder.
 
     KullanÄ±m::
 
@@ -114,15 +114,15 @@ class StreamSaglikTakibi:
     def ask_mi(self, deneme: StreamDenemesi) -> bool:
         """Stream'i kesmek gerekiyor mu?
 
-        Ä°lk token Ã§ok geÃ§ geldiyse veya token hÄ±zÄ± Ã§ok dÃ¼ÅŸtÃ¼yse True dÃ¶ner.
+        Ä°lk token çok geç geldiyse veya token hÄ±zÄ± çok düÅŸtüyse True döner.
         """
-        # Ä°lk token henÃ¼z gelmedi ve bekleme sÃ¼resi aÅŸÄ±ldÄ±
+        # Ä°lk token henüz gelmedi ve bekleme süresi aÅŸÄ±ldÄ±
         if deneme.ilk_token_zamani is None:
             gecen = time.monotonic() - deneme.baslangic
             if gecen > self.max_ilk_token_bekleme:
                 return True
 
-        # Token hÄ±zÄ± Ã§ok dÃ¼ÅŸÃ¼k
+        # Token hÄ±zÄ± çok düÅŸük
         hiz = deneme.token_hizi
         if hiz is not None and hiz < self.min_token_hizi:
             return True

@@ -1,4 +1,4 @@
-﻿"""scripts paketi."""
+"""scripts paketi."""
 
 __all__ = [
     "AGENTS_DOSYA",

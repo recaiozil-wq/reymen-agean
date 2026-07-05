@@ -1,10 +1,10 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 api_server.py â€” OpenAI-uyumlu REST API sunucusu.
 
-ReYMeN altyapÃ½sÃ½nÃ½ (Beyin) FastAPI Ã¼zerinden OpenAI uyumlu bir API
+ReYMeN altyapÃ½sÃ½nÃ½ (Beyin) FastAPI üzerinden OpenAI uyumlu bir API
 olarak sunar. Streaming (SSE) ve non-streaming chat completions,
-model listeleme ve saÃ°lÃ½k kontrolÃ¼ endpoint'leri iÃ§erir.
+model listeleme ve saÃ°lÃ½k kontrolü endpoint'leri içerir.
 
 KullanÃ½m:
     python -m reymen.api_server --port 8000
@@ -31,13 +31,13 @@ from typing import Any, AsyncGenerator, Optional
 
 logger = logging.getLogger("reymen.api_server")
 
-# â”€â”€ Proje kÃ¶kÃ¼ (config.yaml ve .env'nin bulunduÃ°u yer) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Proje kökü (config.yaml ve .env'nin bulunduÃ°u yer) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _PROJE_KOKU = Path(__file__).resolve().parent.parent
 _CONFIG_YOLU = _PROJE_KOKU / "config.yaml"
 _ENV_YOLU = _PROJE_KOKU / ".env"
 
 
-# â”€â”€ FastAPI ve Starlette iÃ§e aktar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ FastAPI ve Starlette içe aktar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import StreamingResponse
@@ -70,7 +70,7 @@ class ChatCompletionMessage(BaseModel):
 
 
 class ChatCompletionChoice(BaseModel):
-    """OpenAI yanÃ½t seÃ§eneÃ°i."""
+    """OpenAI yanÃ½t seçeneÃ°i."""
 
     index: int = 0
     message: ChatCompletionMessage
@@ -97,7 +97,7 @@ class ChatCompletionResponse(BaseModel):
 
 
 class ModelPermission(BaseModel):
-    """Model izin Ã¾emasÃ½ (OpenAI uyumluluÃ°u iÃ§in)."""
+    """Model izin Ã¾emasÃ½ (OpenAI uyumluluÃ°u için)."""
 
     id: str = ""
     object: str = "model_permission"
@@ -130,19 +130,19 @@ class ModelList(BaseModel):
     data: list[ModelObject]
 
 
-# â”€â”€ VarsayÃ½lan modeller (Beyin'den Ã§ek) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ VarsayÃ½lan modeller (Beyin'den çek) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.beyin import _VARSAYILAN_MODELLER as _BEYIN_VARSAYILAN_MODELLER
 except ImportError:
     _BEYIN_VARSAYILAN_MODELLER = {}
 
 
-# â”€â”€ Config yÃ¼kleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Config yükleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _config_yukle() -> dict[str, Any]:
-    """config.yaml'i okuyup Beyin iÃ§in uygun formata Ã§evirir.
+    """config.yaml'i okuyup Beyin için uygun formata çevirir.
 
     config.yaml'deki ``fallback_providers`` listesini
-    ``providers`` sÃ¶zlÃ¼Ã°Ã¼ne dÃ¶nÃ¼Ã¾tÃ¼rÃ¼r.
+    ``providers`` sözlüÃ°üne dönüÃ¾türür.
     """
     try:
         import yaml as _yaml
@@ -178,7 +178,7 @@ def _config_yukle() -> dict[str, Any]:
                 "api_key": "",  # runtime'da env'den okunur
             }
 
-    # providers varsa Ã¼stÃ¼ne yaz
+    # providers varsa üstüne yaz
     providers.update(raw.get("providers", {}))
 
     return {
@@ -190,23 +190,23 @@ def _config_yukle() -> dict[str, Any]:
     }
 
 
-# â”€â”€ .env yÃ¼kleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ .env yükleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _env_yukle() -> None:
-    """.env dosyasÃ½nÃ½ ortam deÃ°iÃ¾kenlerine yÃ¼kle."""
+    """.env dosyasÃ½nÃ½ ortam deÃ°iÃ¾kenlerine yükle."""
     try:
         from dotenv import load_dotenv
 
         load_dotenv(_ENV_YOLU, override=True)
-        logger.info(".env yÃ¼klendi: %s", _ENV_YOLU)
+        logger.info(".env yüklendi: %s", _ENV_YOLU)
     except ImportError:
-        logger.debug("python-dotenv yok, .env yÃ¼klenmedi.")
+        logger.debug("python-dotenv yok, .env yüklenmedi.")
     except Exception as e:
-        logger.warning(".env yÃ¼klenirken hata: %s", e)
+        logger.warning(".env yüklenirken hata: %s", e)
 
 
 # â”€â”€ API anahtarÃ½ doÃ°rulayÃ½cÃ½ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _api_key_kontrol(request: Request) -> str | None:
-    """Ãstekten API anahtarÃ½nÃ½ Ã§Ã½kar; doÃ°rulama kapalÃ½ysa None dÃ¶ndÃ¼r.
+    """Ãstekten API anahtarÃ½nÃ½ çÃ½kar; doÃ°rulama kapalÃ½ysa None döndür.
 
     SÃ½rasÃ½yla: Authorization header â†’ X-API-Key header â†’ query param.
     """
@@ -227,12 +227,12 @@ class APIServer:
     """OpenAI-uyumlu REST API sunucusu.
 
     ReYMeN'in :class:`reymen.cereyan.beyin.Beyin` altyapÃ½sÃ½nÃ½
-    FastAPI Ã¼zerinden OpenAI uyumlu bir arayÃ¼zle dÃ½Ã¾arÃ½ya aÃ§ar.
+    FastAPI üzerinden OpenAI uyumlu bir arayüzle dÃ½Ã¾arÃ½ya açar.
 
     Ã–zellikler:
         * GET /v1/models â€” modelleri listele
         * POST /v1/chat/completions â€” chat tamamlama (streaming + non-streaming)
-        * GET /health â€” saÃ°lÃ½k kontrolÃ¼
+        * GET /health â€” saÃ°lÃ½k kontrolü
         * CORS desteÃ°i
         * ÃsteÃ°e baÃ°lÃ½ API anahtarÃ½ korumasÃ½ (Authorization: Bearer)
         * SSE streaming (Server-Sent Events)
@@ -252,7 +252,7 @@ class APIServer:
         """API sunucusunu baÃ¾lat.
 
         Args:
-            host: Dinlenecek aÃ° arayÃ¼zÃ¼.
+            host: Dinlenecek aÃ° arayüzü.
             port: Dinlenecek port.
             api_key_required: True ise .env'deki API_KEY ile koru.
             log_level: Log seviyesi (DEBUG, INFO, WARNING, ERROR).
@@ -260,7 +260,7 @@ class APIServer:
         self.host = host
         self.port = port
         self.api_key_required = api_key_required
-        # .env'yi Ã¶nceden yÃ¼kle ki API_KEY okunabilsin
+        # .env'yi önceden yükle ki API_KEY okunabilsin
         _env_yukle()
         self._api_key = os.environ.get("API_KEY", "")
 
@@ -271,10 +271,10 @@ class APIServer:
             datefmt="%Y-%m-%d %H:%M:%S",
         )
 
-        # Config yÃ¼kle
+        # Config yükle
         self._beyin_config = _config_yukle()
 
-        # Beyin Ã¶rneÃ°i (lazy)
+        # Beyin örneÃ°i (lazy)
         self._beyin: Any = None
 
         # FastAPI uygulamasÃ½
@@ -289,9 +289,9 @@ class APIServer:
         self._kayit_et()
 
     def _beyin_al(self) -> Any:
-        """Beyin Ã¶rneÃ°ini lazy-load ile al.
+        """Beyin örneÃ°ini lazy-load ile al.
 
-        Thread-safe deÃ°ildir; tek thread'li uvicorn iÃ§in yeterlidir.
+        Thread-safe deÃ°ildir; tek thread'li uvicorn için yeterlidir.
         """
         if self._beyin is None:
             try:
@@ -312,7 +312,7 @@ class APIServer:
         """API anahtarÃ½ doÃ°rulamasÃ½ yap (isteÃ°e baÃ°lÃ½).
 
         Raises:
-            HTTPException: Anahtar geÃ§ersiz veya eksikse 401.
+            HTTPException: Anahtar geçersiz veya eksikse 401.
         """
         if not self.api_key_required or not self._api_key:
             return
@@ -327,19 +327,19 @@ class APIServer:
         if gelen != self._api_key:
             raise HTTPException(
                 status_code=HTTP_401_UNAUTHORIZED,
-                detail="API anahtarÃ½ geÃ§ersiz.",
+                detail="API anahtarÃ½ geçersiz.",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
     def _kayit_et(self) -> None:
-        """TÃ¼m endpoint'leri FastAPI uygulamasÃ½na kaydet."""
+        """Tüm endpoint'leri FastAPI uygulamasÃ½na kaydet."""
 
-        # â”€â”€ SaÃ°lÃ½k kontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ SaÃ°lÃ½k kontrolü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         @self.app.get("/health")
         async def health(request: Request) -> dict:
-            """SaÃ°lÃ½k kontrolÃ¼ endpoint'i.
+            """SaÃ°lÃ½k kontrolü endpoint'i.
 
-            Beyin Ã¶rneÃ°inin canlÃ½ olup olmadÃ½Ã°Ã½nÃ½ kontrol eder.
+            Beyin örneÃ°inin canlÃ½ olup olmadÃ½Ã°Ã½nÃ½ kontrol eder.
 
             Returns:
                 {"status": "ok", "provider": ..., "model": ...}
@@ -355,7 +355,7 @@ class APIServer:
             except Exception as e:
                 raise HTTPException(
                     status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"SaÃ°lÃ½k kontrolÃ¼ baÃ¾arÃ½sÃ½z: {e}",
+                    detail=f"SaÃ°lÃ½k kontrolü baÃ¾arÃ½sÃ½z: {e}",
                 )
 
         # â”€â”€ Modelleri listele â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -363,7 +363,7 @@ class APIServer:
         async def list_models(request: Request) -> ModelList:
             """KullanÃ½labilir modelleri listele.
 
-            Config'deki tÃ¼m saÃ°layÃ½cÃ½/modelleri OpenAI formatÃ½nda dÃ¶ndÃ¼rÃ¼r.
+            Config'deki tüm saÃ°layÃ½cÃ½/modelleri OpenAI formatÃ½nda döndürür.
             """
             self._dogrula(request)
             modeller: list[ModelObject] = []
@@ -409,7 +409,7 @@ class APIServer:
             Streaming (SSE) ve non-streaming modlarÃ½ destekler.
 
             Args:
-                body: OpenAI uyumlu istek gÃ¶vdesi.
+                body: OpenAI uyumlu istek gövdesi.
 
             Returns:
                 StreamingResponse (SSE) veya ChatCompletionResponse (JSON).
@@ -417,17 +417,17 @@ class APIServer:
             self._dogrula(request)
             beyin = self._beyin_al()
 
-            # Model/provider seÃ§imi
+            # Model/provider seçimi
             model_adi = body.model or beyin.model
             provider_adi: str | None = None
 
-            # "provider/model" formatÃ½nÃ½ Ã§Ã¶z
+            # "provider/model" formatÃ½nÃ½ çöz
             if "/" in model_adi:
                 parts = model_adi.split("/", 1)
                 provider_adi = parts[0]
                 model_adi = parts[1]
                 logger.debug(
-                    "Ã‡Ã¶zÃ¼mlenen: provider=%s model=%s", provider_adi, model_adi
+                    "Ã‡özümlenen: provider=%s model=%s", provider_adi, model_adi
                 )
 
             # MesajlarÃ½ ayÃ½r: sistem prompt'u ayrÃ½
@@ -452,7 +452,7 @@ class APIServer:
             if body.stream:
 
                 async def _stream_generator() -> AsyncGenerator[str, None]:
-                    """SSE akÃ½Ã¾Ã½ Ã¼retir."""
+                    """SSE akÃ½Ã¾Ã½ üretir."""
                     try:
                         # Ãlk chunk: rol
                         ilk_chunk = {
@@ -576,12 +576,12 @@ class APIServer:
                 logger.error("Chat completions hatasÃ½: %s", e)
                 raise HTTPException(
                     status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"YanÃ½t Ã¼retilemedi: {e}",
+                    detail=f"YanÃ½t üretilemedi: {e}",
                 )
 
     # â”€â”€ CORS middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _cors_ekle(self) -> None:
-        """TÃ¼m origin'lere izin veren CORS middleware'i ekle."""
+        """Tüm origin'lere izin veren CORS middleware'i ekle."""
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],

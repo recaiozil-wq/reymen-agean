@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 email_gateway.py â€” E-posta Gonderme Gateway.
 

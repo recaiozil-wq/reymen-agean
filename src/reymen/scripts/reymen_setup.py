@@ -1,4 +1,4 @@
-﻿"""
+"""
 ReYMeN Otomatik Kurulum ve Fix Scripti
 VSCode terminalde calistir: python reymen_setup.py
 """
@@ -56,7 +56,7 @@ def run(cmd, cwd=None):
 # â”€â”€ PROJE YOLU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE = Path(__file__).resolve().parent.parent.parent
 
-# EÄŸer script proje iÃ§inden Ã§alÄ±ÅŸÄ±yorsa otomatik algÄ±la
+# EÄŸer script proje içinden çalÄ±ÅŸÄ±yorsa otomatik algÄ±la
 if not PROJE.exists():
     PROJE = Path(__file__).parent.resolve()
     warn(f"Varsayilan yol bulunamadi, mevcut dizin kullaniliyor: {PROJE}")

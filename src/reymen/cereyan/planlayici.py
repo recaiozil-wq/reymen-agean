@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 
 logger = logging.getLogger(__name__)
 # -*- coding: utf-8 -*-
@@ -10,7 +10,7 @@ Iyilestirmeler:
 - risk_degerlendirmesi(): riskli adimlar onceden isaretlenir
 """
 
-PLAN_TALIMATI = """Sen bir gorev planlayicisisin. Verilen hedefi yurutÃ¼lebilir
+PLAN_TALIMATI = """Sen bir gorev planlayicisisin. Verilen hedefi yurutülebilir
 alt gorevlere bol. SADECE numarali liste dondur, baska aciklama yazma.
 Hedef basitse tek satir yaz. En fazla 7 adim.
 

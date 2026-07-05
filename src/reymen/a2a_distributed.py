@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-"""ğŸŒ DaÄŸÄ±tÄ±k A2A KonfigÃ¼rasyonu â€” uzak node'larÄ± tanÄ±mla + otomatik baÄŸlan.
+# -*- coding: utf-8 -*-
+"""ğŸŒ DaÄŸÄ±tÄ±k A2A Konfigürasyonu â€” uzak node'larÄ± tanÄ±mla + otomatik baÄŸlan.
 
-Bu modÃ¼l, A2A transport katmanÄ±na konfigÃ¼rasyon dosyasÄ± Ã¼zerinden
-uzak node tanÄ±mlama ve otomatik baÄŸlanma Ã¶zelliÄŸi ekler.
+Bu modül, A2A transport katmanÄ±na konfigürasyon dosyasÄ± üzerinden
+uzak node tanÄ±mlama ve otomatik baÄŸlanma özelliÄŸi ekler.
 
 Kullanim:
     # .ReYMeN/a2a_nodes.json
@@ -34,12 +34,12 @@ PROJE_KOK = Path(__file__).resolve().parent
 A2A_CONFIG_PATH = PROJE_KOK.parent / ".ReYMeN" / "a2a_nodes.json"
 
 # ---------------------------------------------------------------------------
-# DaÄŸÄ±tÄ±k A2A YÃ¶neticisi
+# DaÄŸÄ±tÄ±k A2A Yöneticisi
 # ---------------------------------------------------------------------------
 
 
 class A2ADistributed:
-    """DaÄŸÄ±tÄ±k A2A node yÃ¶neticisi â€” config dosyasÄ± + heartbeat + otomatik baÄŸlan.
+    """DaÄŸÄ±tÄ±k A2A node yöneticisi â€” config dosyasÄ± + heartbeat + otomatik baÄŸlan.
 
     Her N saniyede bir uzak node'larÄ±n health'ini kontrol eder,
     kopan baÄŸlantÄ±larÄ± yeniden kurar.
@@ -112,7 +112,7 @@ class A2ADistributed:
         return False
 
     def oyle_gor(self) -> list[str]:
-        """Config'deki tÃ¼m node'lara baÄŸlan."""
+        """Config'deki tüm node'lara baÄŸlan."""
         sonuclar = []
         nodes = self.oku_config()
         if not nodes:
@@ -151,7 +151,7 @@ class A2ADistributed:
         logger.info("[A2A-DIST] Heartbeat baslatildi (%ds)", interval)
 
     def durdur(self) -> None:
-        """TÃ¼m baÄŸlantÄ±larÄ± kapat."""
+        """Tüm baÄŸlantÄ±larÄ± kapat."""
         self._calisiyor = False
         for name, node in self._nodes.items():
             remote = node.get("remote")
@@ -163,7 +163,7 @@ class A2ADistributed:
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                     )
         self._nodes.clear()
-        logger.info("[A2A-DIST] TÃ¼m baglantilar kapatildi")
+        logger.info("[A2A-DIST] Tüm baglantilar kapatildi")
 
     def durum(self) -> str:
         """BaÄŸlÄ± node'larÄ±n durumu."""
@@ -176,7 +176,7 @@ class A2ADistributed:
         return "\n".join(satirlar)
 
     def mesaj_gonder(self, receiver: str, content: str) -> list[str]:
-        """TÃ¼m baÄŸlÄ± node'lar Ã¼zerinden mesaj gÃ¶nder."""
+        """Tüm baÄŸlÄ± node'lar üzerinden mesaj gönder."""
         sonuclar = []
         for name, node in self._nodes.items():
             remote = node.get("remote")
@@ -194,7 +194,7 @@ _A2A_DIST = None
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a daÄŸÄ±tÄ±k A2A araÃ§larÄ±nÄ± kaydet."""
+    """Motor'a daÄŸÄ±tÄ±k A2A araçlarÄ±nÄ± kaydet."""
     motor._plugin_arac_kaydet(
         "A2A_DIST_BASLAT",
         _dist_baslat,
@@ -228,7 +228,7 @@ def _dist_durum(**kw) -> str:
 
 
 def _dist_gonder(**kw) -> str:
-    """TÃ¼m baÄŸlÄ± node'lara mesaj gÃ¶nder."""
+    """Tüm baÄŸlÄ± node'lara mesaj gönder."""
     args = kw.get("args", [])
     if len(args) < 2:
         return "[A2A-DIST] Kullanim: A2A_DIST_GONDER <receiver> <content>"

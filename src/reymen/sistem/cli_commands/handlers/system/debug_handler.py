@@ -1,4 +1,4 @@
-﻿"""_handle_debug_command handler."""
+"""_handle_debug_command handler."""
 
 
 def _handle_debug_command(cli):

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 yetenek_fabrikasi.py â€” YetenekFabrikasi.
 Yetenek (beceri) olusturma, ogretme, test etme ve silme modulu.

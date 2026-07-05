@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-startup_ekrani.py â€” ReYMeN gÃ¶rkemli baÅŸlangÄ±Ã§ ekranÄ±.
+startup_ekrani.py â€” ReYMeN görkemli baÅŸlangÄ±ç ekranÄ±.
 
 Kullanim:
     from startup_ekrani import gorkem_ekranu, model_sec
@@ -568,7 +568,7 @@ def gorkem_ekranu(
     skill_veri: dict[str, list[str]] | None = None,
 ) -> None:
     """
-    ReYMeN gorkemli baslangiÃ§ ekrani.
+    ReYMeN gorkemli baslangiç ekrani.
     ReYMeN benzeri: logo + kutu icinde skill kategorileri + model/oturum bilgisi.
     """
     if hasattr(sys.stdout, "reconfigure"):

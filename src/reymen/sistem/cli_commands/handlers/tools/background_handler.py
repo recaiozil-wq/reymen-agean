@@ -1,4 +1,4 @@
-﻿"""_handle_background_command handler."""
+"""_handle_background_command handler."""
 
 import logging
 import sys

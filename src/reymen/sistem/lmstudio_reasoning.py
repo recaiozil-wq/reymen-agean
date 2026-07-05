@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """lmstudio_reasoning.py â€” LM Studio Reasoning Adaptoru.
 
 LM Studio'nun reasoning/thinking ozelliklerini kullanmak icin

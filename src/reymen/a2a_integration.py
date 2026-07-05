@@ -1,7 +1,7 @@
-﻿"""A2A entegrasyonu â€” motor + conversation_loop iÃ§in baÄŸlantÄ±.
+"""A2A entegrasyonu â€” motor + conversation_loop için baÄŸlantÄ±.
 
-Bu modÃ¼l, a2a.py'deki altyapÄ±yÄ± kullanarak ReYMeN motoruna
-A2A mesajlaÅŸma araÃ§larÄ±nÄ± ekler.
+Bu modül, a2a.py'deki altyapÄ±yÄ± kullanarak ReYMeN motoruna
+A2A mesajlaÅŸma araçlarÄ±nÄ± ekler.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ _A2A_AGENT = None
 
 
 def _get_broker():
-    """Global A2A Broker singleton'Ä±nÄ± dÃ¶ndÃ¼r."""
+    """Global A2A Broker singleton'Ä±nÄ± döndür."""
     global _A2A_BROKER
     if _A2A_BROKER is None:
         from reymen.a2a import Broker
@@ -28,7 +28,7 @@ def _get_broker():
 
 
 def _get_agent():
-    """Global ReYMeN A2A Agent singleton'Ä±nÄ± dÃ¶ndÃ¼r."""
+    """Global ReYMeN A2A Agent singleton'Ä±nÄ± döndür."""
     global _A2A_AGENT
     if _A2A_AGENT is None:
         from reymen.a2a import Agent
@@ -41,15 +41,15 @@ def _get_agent():
 
 
 def a2a_gonder(receiver: str, content: str, msg_type: str = "text") -> str:
-    """A2A mesajÄ± gÃ¶nder.
+    """A2A mesajÄ± gönder.
 
     Args:
         receiver: Hedef agent ID.
-        content: Mesaj iÃ§eriÄŸi.
+        content: Mesaj içeriÄŸi.
         msg_type: Mesaj tipi (text/task/query/result/error/broadcast).
 
     Returns:
-        GÃ¶nderilen mesaj ID'si.
+        Gönderilen mesaj ID'si.
     """
     from reymen.a2a import MessageType
 
@@ -66,10 +66,10 @@ def a2a_al(timeout: float = 1.0) -> str:
     """Gelen A2A mesajlarÄ±nÄ± kontrol et.
 
     Args:
-        timeout: Maksimum bekleme sÃ¼resi (saniye).
+        timeout: Maksimum bekleme süresi (saniye).
 
     Returns:
-        Mesaj varsa iÃ§eriÄŸi, yoksa "[A2A] Bekleyen mesaj yok".
+        Mesaj varsa içeriÄŸi, yoksa "[A2A] Bekleyen mesaj yok".
     """
     agent = _get_agent()
     msg = agent.receive(timeout=timeout)
@@ -101,7 +101,7 @@ def a2a_agent_kaydet(agent_id: str) -> str:
 
 
 def a2a_durum() -> str:
-    """A2A broker durumunu gÃ¶ster.
+    """A2A broker durumunu göster.
 
     Returns:
         Broker istatistikleri metni.
@@ -117,7 +117,7 @@ def a2a_durum() -> str:
 
 
 def a2a_agent_listele() -> str:
-    """KayÄ±tlÄ± tÃ¼m A2A agent'larÄ±nÄ± listele.
+    """KayÄ±tlÄ± tüm A2A agent'larÄ±nÄ± listele.
 
     Returns:
         Agent listesi.
@@ -136,14 +136,14 @@ def a2a_agent_listele() -> str:
 
 
 def motor_kaydet(motor: Any) -> None:
-    """Motor'a A2A araÃ§larÄ±nÄ± kaydet.
+    """Motor'a A2A araçlarÄ±nÄ± kaydet.
 
     Args:
         motor: Motor instance'Ä± (self).
     """
     import json as _json
 
-    # _a2a_durum iÃ§inde json kullanÄ±lÄ±yor â€” global'e yaz
+    # _a2a_durum içinde json kullanÄ±lÄ±yor â€” global'e yaz
     global json
     json = _json
 
@@ -179,7 +179,7 @@ def motor_kaydet(motor: Any) -> None:
 
 
 class A2ABridge:
-    """conversation_loop iÃ§inde A2A mesajlaÅŸma kÃ¶prÃ¼sÃ¼.
+    """conversation_loop içinde A2A mesajlaÅŸma köprüsü.
 
     KullanÄ±m::
 
@@ -200,7 +200,7 @@ class A2ABridge:
             self.broker.register(agent_id)
 
     def mesaj_gonder(self, receiver: str, content: str, msg_type: str = "text") -> str:
-        """Agent'a mesaj gÃ¶nder."""
+        """Agent'a mesaj gönder."""
         from reymen.a2a import MessageType
 
         try:
@@ -211,7 +211,7 @@ class A2ABridge:
         return f"[A2A] Gonderildi: {msg.id} -> {receiver}"
 
     def mesaj_kontrol(self, timeout: float = 0.1) -> str | None:
-        """Gelen mesaj var mÄ± kontrol et. Varsa iÃ§eriÄŸini dÃ¶ndÃ¼r."""
+        """Gelen mesaj var mÄ± kontrol et. Varsa içeriÄŸini döndür."""
         msg = self.agent.receive(timeout=timeout)
         if msg is None:
             return None

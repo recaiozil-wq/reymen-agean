@@ -1,14 +1,14 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-config_loader.py â€” ReYMeN YapÄ±landÄ±rma YÃ¼kleyici.
+config_loader.py â€” ReYMeN YapÄ±landÄ±rma Yükleyici.
 
 config.yaml dosyasÄ±nÄ± okur, main.py'deki CONFIG dict ile birleÅŸtirir.
-Environment variable'lar her zaman Ã¶nceliklidir.
+Environment variable'lar her zaman önceliklidir.
 
 KullanÄ±m:
     from config_loader import load_config, config_to_dict
     cfg = load_config("config.yaml")
-    CONFIG = config_to_dict(cfg)  # main.py CONFIG formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼r
+    CONFIG = config_to_dict(cfg)  # main.py CONFIG formatÄ±na dönüÅŸtür
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-# --- YAML yÃ¼kleyici (try/except ile) ---
+# --- YAML yükleyici (try/except ile) ---
 try:
     import yaml
 
@@ -33,7 +33,7 @@ except ImportError:
 
 
 def load_yaml_safe(path: Path) -> Optional[Dict[str, Any]]:
-    """YAML dosyasÄ±nÄ± gÃ¼venli ÅŸekilde yÃ¼kle. PyYAML yoksa None."""
+    """YAML dosyasÄ±nÄ± güvenli ÅŸekilde yükle. PyYAML yoksa None."""
     if not _YAML_AVAILABLE:
         return None
     if not path.exists():
@@ -55,7 +55,7 @@ def load_yaml_safe(path: Path) -> Optional[Dict[str, Any]]:
 
 
 def _env_or(value: Any, env_key: str, default: Any = None) -> Any:
-    """Environment variable varsa onu dÃ¶ndÃ¼r, yoksa value."""
+    """Environment variable varsa onu döndür, yoksa value."""
     env_val = os.environ.get(env_key)
     if env_val is not None and env_val.strip() and not env_val.startswith("***"):
         return env_val.strip()
@@ -63,7 +63,7 @@ def _env_or(value: Any, env_key: str, default: Any = None) -> Any:
 
 
 def _resolve_provider_api_key(provider_cfg: Dict[str, Any]) -> Dict[str, Any]:
-    """SaÄŸlayÄ±cÄ± yapÄ±landÄ±rmasÄ±nda env key varsa Ã§Ã¶zÃ¼mle."""
+    """SaÄŸlayÄ±cÄ± yapÄ±landÄ±rmasÄ±nda env key varsa çözümle."""
     cfg = dict(provider_cfg)
     env_key = cfg.pop("api_key_env", None)
     if env_key:
@@ -72,16 +72,16 @@ def _resolve_provider_api_key(provider_cfg: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
-    """config.yaml + env override ile birleÅŸik yapÄ±landÄ±rma dÃ¶ndÃ¼r.
+    """config.yaml + env override ile birleÅŸik yapÄ±landÄ±rma döndür.
 
     Args:
-        config_path: config.yaml yolu. None = proje kÃ¶kÃ¼/config.yaml
+        config_path: config.yaml yolu. None = proje kökü/config.yaml
 
     Returns:
         BirleÅŸik yapÄ±landÄ±rma dict'i (env override uygulanmÄ±ÅŸ)
     """
     if config_path is None:
-        # Proje kÃ¶kÃ¼nÃ¼ bul (config_loader.py'nin bulunduÄŸu dizin)
+        # Proje kökünü bul (config_loader.py'nin bulunduÄŸu dizin)
         config_path = str(Path(__file__).parent / "config.yaml")
 
     yaml_path = Path(config_path)

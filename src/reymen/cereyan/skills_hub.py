@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """skills_hub.py â€” GitHub'dan Skill Indirme.
 
 Uzak GitHub repolarindan skill paketlerini indirir
@@ -54,7 +54,7 @@ def hub_indir(hub_adi: str, kategori: str = "") -> str:
         kategori: Sadece belirli kategori
 
     Returns:
-    Â°YÃ¼klenen skill sayisi
+    Â°Yüklenen skill sayisi
     """
     hub = HUBS.get(hub_adi)
     if not hub:

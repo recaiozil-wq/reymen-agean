@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module â€” UI/Aesthetics (skin, footer, agents, kanban)."""
+"""ReYMeNCLI mixin module â€” UI/Aesthetics (skin, footer, agents, kanban)."""
 
 import logging
 import os

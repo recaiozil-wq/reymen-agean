@@ -1,16 +1,16 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """reymen.plugin â€” Plugin sistemi (lifecycle hooks).
 
 PluginBase:
-    TÃ¼m plugin'lerin tÃ¼retmesi gereken temel sÄ±nÄ±f.
+    Tüm plugin'lerin türetmesi gereken temel sÄ±nÄ±f.
     Ä°steÄŸe baÄŸlÄ± hook metodlarÄ±:
 
-        on_load()                     â€” plugin yÃ¼klendiÄŸinde
+        on_load()                     â€” plugin yüklendiÄŸinde
         on_unload()                   â€” plugin kaldÄ±rÄ±ldÄ±ÄŸÄ±nda
         on_session_start(session_id, user_id) â€” session baÅŸÄ±nda
         on_session_end(session_id, reason)    â€” session sonunda
         on_message(message, context)          â€” kullanÄ±cÄ± mesajÄ± geldiÄŸinde
-        pre_llm_call(messages, context)       â€” LLM Ã§aÄŸrÄ±sÄ± Ã¶ncesi mesajlarÄ± deÄŸiÅŸtir
+        pre_llm_call(messages, context)       â€” LLM çaÄŸrÄ±sÄ± öncesi mesajlarÄ± deÄŸiÅŸtir
         post_llm_call(response, context)      â€” LLM yanÄ±tÄ± geldikten sonra iÅŸle
 """
 
@@ -23,13 +23,13 @@ logger = logging.getLogger(__name__)
 
 
 class PluginBase:
-    """TÃ¼m ReYMeN plugin'leri bu sÄ±nÄ±ftan tÃ¼retilmelidir.
+    """Tüm ReYMeN plugin'leri bu sÄ±nÄ±ftan türetilmelidir.
 
     Ã–zellikler:
         name (str):    Plugin adÄ± (zorunlu).
         version (str): Plugin versiyonu (zorunlu).
 
-    TÃ¼m hook metodlarÄ± *opsiyoneldir* â€” PluginBase varsayÄ±lan no-op
+    Tüm hook metodlarÄ± *opsiyoneldir* â€” PluginBase varsayÄ±lan no-op
     implementasyon saÄŸlar, alt sÄ±nÄ±f sadece ihtiyacÄ± olanlarÄ± override eder.
     """
 
@@ -39,35 +39,35 @@ class PluginBase:
     # â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def on_load(self) -> None:
-        """Plugin yÃ¼klendiÄŸinde bir kere Ã§aÄŸrÄ±lÄ±r."""
+        """Plugin yüklendiÄŸinde bir kere çaÄŸrÄ±lÄ±r."""
         pass
 
     def on_unload(self) -> None:
-        """Plugin kaldÄ±rÄ±ldÄ±ÄŸÄ±nda bir kere Ã§aÄŸrÄ±lÄ±r."""
+        """Plugin kaldÄ±rÄ±ldÄ±ÄŸÄ±nda bir kere çaÄŸrÄ±lÄ±r."""
         pass
 
     # â”€â”€ Session hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def on_session_start(self, session_id: str, user_id: str) -> None:
-        """Yeni bir konuÅŸma oturumu baÅŸladÄ±ÄŸÄ±nda Ã§aÄŸrÄ±lÄ±r."""
+        """Yeni bir konuÅŸma oturumu baÅŸladÄ±ÄŸÄ±nda çaÄŸrÄ±lÄ±r."""
         pass
 
     def on_session_end(self, session_id: str, reason: str) -> None:
-        """KonuÅŸma oturumu sonlandÄ±ÄŸÄ±nda Ã§aÄŸrÄ±lÄ±r.
+        """KonuÅŸma oturumu sonlandÄ±ÄŸÄ±nda çaÄŸrÄ±lÄ±r.
 
         Args:
             session_id: Oturum kimliÄŸi.
-            reason:     Sonlanma sebebi (Ã¶rn. "completed", "error", "cancelled").
+            reason:     Sonlanma sebebi (örn. "completed", "error", "cancelled").
         """
         pass
 
     # â”€â”€ Message hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def on_message(self, message: str, context: dict) -> str:
-        """KullanÄ±cÄ± mesajÄ± iÅŸlenmeden hemen Ã¶nce Ã§aÄŸrÄ±lÄ±r.
+        """KullanÄ±cÄ± mesajÄ± iÅŸlenmeden hemen önce çaÄŸrÄ±lÄ±r.
 
-        DÃ¶nen string mesajÄ±n yerine kullanÄ±lÄ±r. MesajÄ± deÄŸiÅŸtirmeden
-        iletmek iÃ§in orijinal *message* dÃ¶ndÃ¼rÃ¼lmelidir.
+        Dönen string mesajÄ±n yerine kullanÄ±lÄ±r. MesajÄ± deÄŸiÅŸtirmeden
+        iletmek için orijinal *message* döndürülmelidir.
         """
         return message
 
@@ -76,13 +76,13 @@ class PluginBase:
     def pre_llm_call(
         self, messages: List[dict], context: dict
     ) -> Tuple[List[dict], dict]:
-        """LLM Ã§aÄŸrÄ±sÄ±ndan hemen Ã¶nce Ã§aÄŸrÄ±lÄ±r.
+        """LLM çaÄŸrÄ±sÄ±ndan hemen önce çaÄŸrÄ±lÄ±r.
 
-        *messages* ve *context* Ã¼zerinde deÄŸiÅŸiklik yapÄ±p (messages, context)
-        tuple'Ä± olarak dÃ¶ndÃ¼rebilirsiniz.
+        *messages* ve *context* üzerinde deÄŸiÅŸiklik yapÄ±p (messages, context)
+        tuple'Ä± olarak döndürebilirsiniz.
 
         Args:
-            messages: LLM'e gÃ¶nderilecek mesaj listesi.
+            messages: LLM'e gönderilecek mesaj listesi.
             context:  Plugin baÄŸlamÄ± (her plugin kendi anahtarÄ±nda saklanÄ±r).
 
         Returns:
@@ -91,9 +91,9 @@ class PluginBase:
         return messages, context
 
     def post_llm_call(self, response: dict, context: dict) -> Dict[str, Any]:
-        """LLM yanÄ±tÄ± geldikten hemen sonra Ã§aÄŸrÄ±lÄ±r.
+        """LLM yanÄ±tÄ± geldikten hemen sonra çaÄŸrÄ±lÄ±r.
 
-        *response* dict'i Ã¼zerinde deÄŸiÅŸiklik yapÄ±p dÃ¶ndÃ¼rebilirsiniz.
+        *response* dict'i üzerinde deÄŸiÅŸiklik yapÄ±p döndürebilirsiniz.
 
         Args:
             response: LLM'den gelen yanÄ±t dict'i.

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 hafiza_budama.py â€” Otomatik HafÄ±za Budama ve Temizleme.
 
@@ -7,8 +7,8 @@ Ne yapar:
   2. Eski/tekrarlanan/gereksiz entry'leri temizle
   3. Benzer entry'leri birleÅŸtir
   4. ReYMeN SQLite hafÄ±zasÄ±ndaki eski kayÄ±tlarÄ± temizle (TTL)
-  5. .ReYMeN/memories/ iÃ§indeki 7+ gÃ¼nlÃ¼k dosyalarÄ± temizle
-  6. Cron job ile otomatik Ã§alÄ±ÅŸtÄ±rma
+  5. .ReYMeN/memories/ içindeki 7+ günlük dosyalarÄ± temizle
+  6. Cron job ile otomatik çalÄ±ÅŸtÄ±rma
 
 Kullanim:
     python hafiza_budama.py              # Tam budama
@@ -28,11 +28,11 @@ from typing import Any
 
 # â”€â”€ Ayarlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# MEMORY entry yaÅŸam sÃ¼releri (gÃ¼n)
-GUNLUK_GOREV_TTL = 3  # GÃ¼nlÃ¼k gÃ¶rev entry'leri 3 gÃ¼n sonra temizlenir
-HAFIZA_ENTRY_TTL = 14  # Genel hafÄ±za entry'leri 14 gÃ¼n sonra temizlenir
-KURAL_TTL = 90  # KalÄ±cÄ± kurallar 90 gÃ¼n sonra gÃ¶zden geÃ§irilir
-DOSYA_TTL = 7  # .ReYMeN/memories/ dosyalarÄ± 7 gÃ¼n
+# MEMORY entry yaÅŸam süreleri (gün)
+GUNLUK_GOREV_TTL = 3  # Günlük görev entry'leri 3 gün sonra temizlenir
+HAFIZA_ENTRY_TTL = 14  # Genel hafÄ±za entry'leri 14 gün sonra temizlenir
+KURAL_TTL = 90  # KalÄ±cÄ± kurallar 90 gün sonra gözden geçirilir
+DOSYA_TTL = 7  # .ReYMeN/memories/ dosyalarÄ± 7 gün
 
 # Budama eÅŸikleri
 MAX_ENTRY_KARAKTER = 200  # Bir entry max 200 karakter (fazlasÄ± kesilir)
@@ -116,7 +116,7 @@ def _memory_dosyasi_buda(dosya_yolu: Path, dry_run: bool) -> tuple:
     # BirleÅŸtirme
     yeni_entryler = _entryleri_birlestir(yeni_entryler)
 
-    # Yeni iÃ§erik (Â§ ile ayrilmis)
+    # Yeni içerik (Â§ ile ayrilmis)
     yeni_icerik = ("\nÂ§\n".join(yeni_entryler)).strip()
     if yeni_icerik:
         yeni_icerik += "\n"
@@ -138,7 +138,7 @@ def _memory_dosyasi_buda(dosya_yolu: Path, dry_run: bool) -> tuple:
 
 
 def _entryleri_ayir(icerik: str) -> list[str]:
-    """Ä°Ã§eriÄŸi ayrÄ± entry'lere bÃ¶l (Â§ ile ayrilmis)."""
+    """Ä°çeriÄŸi ayrÄ± entry'lere böl (Â§ ile ayrilmis)."""
     entryler = []
     for blok in icerik.strip().split("Â§"):
         blok = blok.strip()
@@ -163,15 +163,15 @@ def _entryleri_temizle(entryler: list[str]) -> list[str]:
         if re.match(r"^[\d\s\-:./,]+$", e):
             continue
 
-        # "test" veya "deneme" iÃ§eren Ã§ok kÄ±sa entry'leri atla
-        if len(e) < 30 and re.search(r"test|deneme|Ã¶rnek|ornek", e, re.IGNORECASE):
+        # "test" veya "deneme" içeren çok kÄ±sa entry'leri atla
+        if len(e) < 30 and re.search(r"test|deneme|örnek|ornek", e, re.IGNORECASE):
             continue
 
-        # Eski tamamlanmÄ±ÅŸ gÃ¶rev kayÄ±tlarÄ±nÄ± temizle
-        # (iÃ§inde "fix:", "dÃ¼zeltildi", "tamamlandÄ±", "gÃ¶rev bitti" varsa
+        # Eski tamamlanmÄ±ÅŸ görev kayÄ±tlarÄ±nÄ± temizle
+        # (içinde "fix:", "düzeltildi", "tamamlandÄ±", "görev bitti" varsa
         #  ve 200 karakterden kÄ±saysa â†’ atlanabilir)
         if len(e) < MAX_ENTRY_KARAKTER and _gorev_entry_mi(e):
-            continue  # Eski gÃ¶rev entry'si, atla
+            continue  # Eski görev entry'si, atla
 
         # Uzun entry'leri kÄ±salt (fazla detayÄ± kes)
         if len(e) > MAX_ENTRY_KARAKTER * 2:
@@ -183,24 +183,24 @@ def _entryleri_temizle(entryler: list[str]) -> list[str]:
 
 
 def _gorev_entry_mi(metin: str) -> bool:
-    """Bir entry'nin eski bir gÃ¶rev kaydÄ± olup olmadÄ±ÄŸÄ±nÄ± kontrol et."""
+    """Bir entry'nin eski bir görev kaydÄ± olup olmadÄ±ÄŸÄ±nÄ± kontrol et."""
     gorev_isaretleri = [
         "fix:",
-        "dÃ¼zeltildi",
+        "düzeltildi",
         "duzeltildi",
         "tamamlandi",
         "tamamlandÄ±",
-        "gÃ¶rev bitti",
+        "görev bitti",
         "gorev bitti",
         "cozuldu",
-        "Ã§Ã¶zÃ¼ldÃ¼",
+        "çözüldü",
         "eklendi",
         "kaldirildi",
         "kaldÄ±rÄ±ldÄ±",
         "guncellendi",
-        "gÃ¼ncellendi",
+        "güncellendi",
         "test gecti",
-        "test geÃ§ti",
+        "test geçti",
         "basarili",
         "baÅŸarÄ±lÄ±",
         "gorev_id",
@@ -236,12 +236,12 @@ def _entryleri_birlestir(entryler: list[str]) -> list[str]:
                 kullanilan.add(j)
 
         if len(benzerler) > 1:
-            # BirleÅŸtir: en kÄ±sa aÃ§Ä±klamayÄ± koru
+            # BirleÅŸtir: en kÄ±sa açÄ±klamayÄ± koru
             en_kisa = min(benzerler, key=len)
-            # Kategori adÄ±nÄ± al (iki nokta Ã¼stÃ¼ste Ã¶ncesi)
+            # Kategori adÄ±nÄ± al (iki nokta üstüste öncesi)
             kategori = en_kisa.split(":")[0] if ":" in en_kisa else ""
             if kategori:
-                # TÃ¼m deÄŸerleri topla
+                # Tüm deÄŸerleri topla
                 degerler = set()
                 for b in benzerler:
                     if ":" in b:
@@ -300,15 +300,15 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
             rapor["toplam"] += sayi
             rapor["koleksiyonlar"][koleksiyon] = {"onceki": sayi, "silinen": 0}
 
-        # 1. Expire zamanÄ± geÃ§miÅŸ kayÄ±tlarÄ± sil
+        # 1. Expire zamanÄ± geçmiÅŸ kayÄ±tlarÄ± sil
         simdi = time.time()
         c.execute(
             "DELETE FROM kayitlar WHERE expire_zaman > 0 AND expire_zaman < ?", (simdi,)
         )
         silinen_expire = c.rowcount
 
-        # 2. KonuÅŸma kayÄ±tlarÄ±: 14 gÃ¼nden eski olanlarÄ± temizle (son 50 kayÄ±t hariÃ§)
-        # Her session iÃ§in son 50 mesajÄ± koru, Ã¶ncesini sil
+        # 2. KonuÅŸma kayÄ±tlarÄ±: 14 günden eski olanlarÄ± temizle (son 50 kayÄ±t hariç)
+        # Her session için son 50 mesajÄ± koru, öncesini sil
         sessions = c.execute(
             "SELECT DISTINCT session_id FROM kayitlar WHERE koleksiyon='konusmalar'"
         ).fetchall()
@@ -338,7 +338,7 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
                     )
                     session_based += c.rowcount
 
-        # 3. Session kayÄ±tlarÄ±nÄ± temizle (bitmiÅŸ ve 14+ gÃ¼nlÃ¼k)
+        # 3. Session kayÄ±tlarÄ±nÄ± temizle (bitmiÅŸ ve 14+ günlük)
         eski_session = c.execute(
             """SELECT s.id FROM sessions s
                WHERE s.bitis > 0 AND s.bitis < ?""",
@@ -354,7 +354,7 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
         if not dry_run:
             conn.commit()
 
-            # Koleksiyon bazÄ±nda gÃ¼ncel sayÄ±lar
+            # Koleksiyon bazÄ±nda güncel sayÄ±lar
             rows = c.execute(
                 "SELECT koleksiyon, COUNT(*) FROM kayitlar GROUP BY koleksiyon"
             ).fetchall()
@@ -384,7 +384,7 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
 
 
 def memory_dosyalarini_temizle(dry_run: bool = False) -> dict:
-    """.ReYMeN/memories/ iÃ§indeki eski dosyalarÄ± temizle.
+    """.ReYMeN/memories/ içindeki eski dosyalarÄ± temizle.
 
     Args:
         dry_run: True = sadece rapor
@@ -399,14 +399,14 @@ def memory_dosyalarini_temizle(dry_run: bool = False) -> dict:
         return rapor
 
     simdi = time.time()
-    kesme = simdi - DOSYA_TTL * 86400  # 7 gÃ¼n
+    kesme = simdi - DOSYA_TTL * 86400  # 7 gün
 
     for f in sorted(mem_dizini.glob("*")):
         if not f.is_file():
             continue
         rapor["toplam"] += 1
 
-        # Gorev loglarÄ± hariÃ§ her ÅŸeyi temizle (gorev_ = her zaman koru)
+        # Gorev loglarÄ± hariç her ÅŸeyi temizle (gorev_ = her zaman koru)
         if f.name.startswith("gorev_"):
             continue
         # session_20260620.md gibi ana session loglarÄ±nÄ± koru
@@ -438,7 +438,7 @@ def memory_dosyalarini_temizle(dry_run: bool = False) -> dict:
 
 
 def buda(dry_run: bool = False) -> dict:
-    """TÃ¼m hafÄ±za sistemlerini buda.
+    """Tüm hafÄ±za sistemlerini buda.
 
     Args:
         dry_run: True = sadece raporla, uygulama
@@ -504,9 +504,9 @@ def buda(dry_run: bool = False) -> dict:
 
 
 def cron_budama_gorevi():
-    """Cron job olarak Ã§aÄŸrÄ±lmak Ã¼zere budama gÃ¶revi.
+    """Cron job olarak çaÄŸrÄ±lmak üzere budama görevi.
 
-    Bu fonksiyon her gÃ¼n Ã§alÄ±ÅŸtÄ±rÄ±lacak ÅŸekilde cronjob'a eklenebilir:
+    Bu fonksiyon her gün çalÄ±ÅŸtÄ±rÄ±lacak ÅŸekilde cronjob'a eklenebilir:
         cronjob(action='create', schedule='0 3 * * *',
                 prompt='Hafiza budama cron gorevini calistir',
                 skills=['reymen-gorev-hafiza'])

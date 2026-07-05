@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """profiles.py â€” Profil yonetimi: bagimsiz ReYMeN profilleri + opsiyonel ReYMeN uyumlulugu."""
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ _REYMEN_PROJE_KOKU = Path(__file__).resolve().parent.parent.parent.parent
 _REYMEN_PROFIL_DIZINI = _REYMEN_PROJE_KOKU / ".ReYMeN" / "profiles"
 _ESKI_PROFIL_DIZINI = Path.home() / ".reymen" / "profiles"
 
-# ReYMeN yoksa baÄŸÄ±msÄ±z Ã§alÄ±ÅŸ â€” kritik baÄŸÄ±mlÄ±lÄ±k kaldÄ±rma
+# ReYMeN yoksa baÄŸÄ±msÄ±z çalÄ±ÅŸ â€” kritik baÄŸÄ±mlÄ±lÄ±k kaldÄ±rma
 _ESKI_PROFIL_MEVCUT = _ESKI_PROFIL_DIZINI.exists()
 
 _VARSAYILAN_PROFIL: dict[str, Any] = {

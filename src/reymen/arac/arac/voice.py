@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-voice.py â€” ReYMeN tool arayÃ¼zÃ¼: Ses (TTS/STT) araÃ§larÄ±.
+voice.py â€” ReYMeN tool arayüzü: Ses (TTS/STT) araçlarÄ±.
 
-Bu modÃ¼l, reymen.arac.voice_engine motorunu ReYMeN'in tool
+Bu modül, reymen.arac.voice_engine motorunu ReYMeN'in tool
 sistemine baÄŸlar. Motor tarafÄ±ndan otomatik kaydedilir.
 
 KullanÄ±m:

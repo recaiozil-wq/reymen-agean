@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """docker_sandbox.py â€” Docker tabanli guvenli kod calistirma sandbox'i.
 
 Subprocess sandbox'in otesinde:

@@ -1,10 +1,10 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-workflow_pipeline.py â€” GÃ¶rev Ã‡Ã¶zÃ¼m Pipeline'Ä±.
+workflow_pipeline.py â€” Görev Ã‡özüm Pipeline'Ä±.
 
 GÃ–REV -> PLANLAMA -> Ã–N DOÄRULAMA -> KOD -> TEST -> GÃ–ZDEN GEÃ‡Ä°RME -> KAYDET
 
-Her aÅŸama broker Ã¼zerinden mesajlaÅŸÄ±r. Consumer thread'lerde Ã§alÄ±ÅŸÄ±r.
+Her aÅŸama broker üzerinden mesajlaÅŸÄ±r. Consumer thread'lerde çalÄ±ÅŸÄ±r.
 Mevcut sistemdeki orchestrator + ogrenme + hata_cozucu'yu birleÅŸtirir.
 """
 
@@ -40,7 +40,7 @@ COKLER_DIR = ROOT / "cozumler"
 
 
 def hata_handler(mesaj: Mesaj) -> None:
-    """HATA mesajÄ± â†’ hata_cozucu'ya yÃ¶nlendir."""
+    """HATA mesajÄ± â†’ hata_cozucu'ya yönlendir."""
     veri = mesaj.veri
     hata = veri.get("hata", "")
     kod = veri.get("kod", "")
@@ -49,13 +49,13 @@ def hata_handler(mesaj: Mesaj) -> None:
 
     logger.info("[Pipeline] HATA handler: %s...", str(hata)[:100])
 
-    # Ã–nce Ã§Ã¶zÃ¼m hafÄ±zasÄ±nda ara
+    # Ã–nce çözüm hafÄ±zasÄ±nda ara
     try:
         from reymen.core.ogrenme import cozum_bul, imza_uret, cozum_kaydet
 
         bulunan = cozum_bul(hata_imza)
         if bulunan:
-            logger.info("[Pipeline] Ã‡Ã¶zÃ¼m hafÄ±zada bulundu: %s", hata_imza[:12])
+            logger.info("[Pipeline] Ã‡özüm hafÄ±zada bulundu: %s", hata_imza[:12])
             broker = get_broker()
             if broker:
                 broker.yayinla_basit(
@@ -67,11 +67,11 @@ def hata_handler(mesaj: Mesaj) -> None:
                 )
             return
     except ImportError:
-        logger.debug("[Pipeline] ogrenme modÃ¼lÃ¼ yok, LLM'e gidilecek")
+        logger.debug("[Pipeline] ogrenme modülü yok, LLM'e gidilecek")
     except Exception as e:
         logger.warning("[Pipeline] HafÄ±za sorgu hatasÄ±: %s", e)
 
-    # HafÄ±zada yoksa â†’ orchestrator'a LLM Ã§Ã¶zÃ¼mÃ¼ iÃ§in yÃ¶nlendir
+    # HafÄ±zada yoksa â†’ orchestrator'a LLM çözümü için yönlendir
     try:
         _coz = None
         try:
@@ -94,7 +94,7 @@ def hata_handler(mesaj: Mesaj) -> None:
                 fix_path.write_text(fix_kod, encoding="utf-8")
                 logger.info("[Pipeline] Fix kaydedildi: %s", fix_path)
 
-                # Ã‡Ã¶zÃ¼mÃ¼ hafÄ±zaya kaydet
+                # Ã‡özümü hafÄ±zaya kaydet
                 try:
                     from reymen.core.ogrenme import cozum_kaydet as _kaydet
 
@@ -132,7 +132,7 @@ def cozum_ara_handler(mesaj: Mesaj) -> None:
 
         bulunan = cozum_bul(hata_imza)
         if bulunan:
-            logger.info("[Pipeline] Ã‡Ã¶zÃ¼m bulundu: %s", hata_imza[:12])
+            logger.info("[Pipeline] Ã‡özüm bulundu: %s", hata_imza[:12])
             broker = get_broker()
             if broker:
                 broker.yayinla_basit(
@@ -161,7 +161,7 @@ def cozum_kaydet_handler(mesaj: Mesaj) -> None:
             kaynak_script=veri.get("kaynak", ""),
             basarili=veri.get("basarili", True),
         )
-        logger.info("[Pipeline] Ã‡Ã¶zÃ¼m hafÄ±zaya kaydedildi")
+        logger.info("[Pipeline] Ã‡özüm hafÄ±zaya kaydedildi")
     except Exception as e:
         logger.warning("[Pipeline] cozum_kaydet hatasÄ±: %s", e)
 
@@ -191,7 +191,7 @@ def gorev_coz_pipeline(
 
     Args:
         broker: MessageBroker instance
-        gorev_tanimi: GÃ¶rev aÃ§Ä±klamasÄ±
+        gorev_tanimi: Görev açÄ±klamasÄ±
         script_path: Varsa mevcut script yolu
 
     Returns:
@@ -226,7 +226,7 @@ def gorev_coz_pipeline(
     logger.info("[Pipeline] ADIM 4/6: TEST")
     test_sonuc = _pipeline_test_et(current_script)
     if not test_sonuc.get("basarili"):
-        # Hata â†’ broker Ã¼zerinden Ã§Ã¶zÃ¼m dÃ¶ngÃ¼sÃ¼
+        # Hata â†’ broker üzerinden çözüm döngüsü
         hata_msg = test_sonuc.get("hata", "bilinmiyor")
         broker.yayinla_basit(
             MesajTipi.HATA,
@@ -240,7 +240,7 @@ def gorev_coz_pipeline(
             kaynak="pipeline",
         )
 
-        # Ã‡Ã¶zÃ¼m bekle (3 saniye)
+        # Ã‡özüm bekle (3 saniye)
         time.sleep(3)
 
         # Fix denenmiÅŸ olabilir, tekrar dene
@@ -292,7 +292,7 @@ def gorev_coz_pipeline(
 
 
 def _pipeline_planla(gorev: str) -> Optional[dict]:
-    """ADIM 1: GÃ¶revi alt adÄ±mlara ayÄ±r."""
+    """ADIM 1: Görevi alt adÄ±mlara ayÄ±r."""
     return {
         "gorev": gorev[:200],
         "adimlar": ["hazirlik", "cozum", "dogrulama"],
@@ -306,7 +306,7 @@ def _pipeline_on_dogrula(plan: dict) -> dict:
 
     eksikler = []
 
-    # Python kontrolÃ¼
+    # Python kontrolü
     if not shutil.which("python"):
         eksikler.append("python")
 
@@ -317,7 +317,7 @@ def _pipeline_on_dogrula(plan: dict) -> dict:
 
 
 def _pipeline_kod_uret(plan: dict, gorev: str) -> Optional[str]:
-    """ADIM 3: LLM ile Python script'i Ã¼ret."""
+    """ADIM 3: LLM ile Python script'i üret."""
     hedef = plan.get("hedef_dosya", "cozum.py")
     hedef_path = str(SCRIPTS_DIR / hedef)
 
@@ -329,28 +329,28 @@ def _pipeline_kod_uret(plan: dict, gorev: str) -> Optional[str]:
         if kod and len(kod) > 10:
             SCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
             Path(hedef_path).write_text(kod, encoding="utf-8")
-            logger.info("[Pipeline] Kod Ã¼retildi: %s (%d byte)", hedef_path, len(kod))
+            logger.info("[Pipeline] Kod üretildi: %s (%d byte)", hedef_path, len(kod))
             return hedef_path
     except Exception as e:
-        logger.warning("[Pipeline] Kod Ã¼retimi baÅŸarÄ±sÄ±z: %s", e)
+        logger.warning("[Pipeline] Kod üretimi baÅŸarÄ±sÄ±z: %s", e)
 
     return None
 
 
 def _pipeline_test_et(script_path: str) -> dict:
-    """ADIM 4: Script'i Ã§alÄ±ÅŸtÄ±r ve doÄŸrula."""
+    """ADIM 4: Script'i çalÄ±ÅŸtÄ±r ve doÄŸrula."""
     path = Path(script_path)
     if not path.exists():
         return {"basarili": False, "hata": "Dosya bulunamadÄ±"}
 
     try:
-        # Syntax kontrolÃ¼
+        # Syntax kontrolü
         compile(path.read_text(encoding="utf-8"), str(path), "exec")
     except SyntaxError as e:
         return {"basarili": False, "hata": f"SyntaxError: {e}"}
 
     try:
-        # Import kontrolÃ¼ (dosya adÄ±nÄ± module olarak dene)
+        # Import kontrolü (dosya adÄ±nÄ± module olarak dene)
         import importlib.util
 
         spec = importlib.util.spec_from_file_location(path.stem, str(path))
@@ -363,7 +363,7 @@ def _pipeline_test_et(script_path: str) -> dict:
 
 
 def _pipeline_gozden_gecir(script_path: str) -> dict:
-    """ADIM 5: Kodu statik analiz ile gÃ¶zden geÃ§ir."""
+    """ADIM 5: Kodu statik analiz ile gözden geçir."""
     path = Path(script_path)
     if not path.exists():
         return {"basarili": False, "uyari": "Dosya yok"}
@@ -375,7 +375,7 @@ def _pipeline_gozden_gecir(script_path: str) -> dict:
     if "except:" in kod and "except Exception" not in kod:
         uyarilar.append("Bare except tespit edildi")
     if len(kod) < 20:
-        uyarilar.append("Kod Ã§ok kÄ±sa")
+        uyarilar.append("Kod çok kÄ±sa")
 
     return {
         "basarili": len(uyarilar) == 0,
@@ -402,7 +402,7 @@ def _pipeline_kaydet(script_path: str, gorev: str, corr_id: str) -> str:
 
 
 def _imza_uret_string(hata_str: str) -> str:
-    """String hata mesajÄ±ndan imza Ã¼ret."""
+    """String hata mesajÄ±ndan imza üret."""
     import hashlib
     import re
 

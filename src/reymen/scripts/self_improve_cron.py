@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 self_improve_cron.py â€” Periyodik self-improvement dongusu.
 

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 ReYMeN Proje Analiz & Rapor Scripti
 KullanÄ±m: python reymen_analiz.py [proje_klasoru]
@@ -145,7 +145,7 @@ def asama1_profil(kok):
     buyuk.sort(reverse=True)
     top8 = buyuk[:8]
 
-    sub("Genel SayaÃ§lar")
+    sub("Genel Sayaçlar")
     row("Python dosyasÄ± (toplam)", str(toplam_py))
     row("Test dosyasÄ±", str(toplam_test))
     row("SKILL.md", str(skill))
@@ -155,8 +155,8 @@ def asama1_profil(kok):
         if py_s[k]:
             row(f"  {k}/", f"{py_s[k]} .py")
 
-    sub("En BÃ¼yÃ¼k 8 Dosya")
-    riskler = {0: "ğŸ”´ KRÄ°TÄ°K", 1: "ğŸŸ  YÃ¼ksek", 2: "ğŸŸ¡ Orta"}
+    sub("En Büyük 8 Dosya")
+    riskler = {0: "ğŸ”´ KRÄ°TÄ°K", 1: "ğŸŸ  Yüksek", 2: "ğŸŸ¡ Orta"}
     for i, (n, yol) in enumerate(top8):
         r = riskler.get(i, "ğŸŸ¢ Ä°yi")
         c = C.RED if i == 0 else (C.YEL if i < 3 else C.RESET)
@@ -244,7 +244,7 @@ def asama2_mimari(kok):
             }
         )
     else:
-        ok("TÃ¼m __init__.py dosyalarÄ±nda __all__ mevcut (veya boÅŸ)")
+        ok("Tüm __init__.py dosyalarÄ±nda __all__ mevcut (veya boÅŸ)")
 
     eski_import = []
     for f in py_files(kok):
@@ -260,7 +260,7 @@ def asama2_mimari(kok):
             {"seviye": "ORTA", "mesaj": "Eski import", "liste": eski_import[:10]}
         )
     else:
-        ok("Import dÃ¼zeni temiz (from reymen.* formatÄ±)")
+        ok("Import düzeni temiz (from reymen.* formatÄ±)")
 
     sure = time.time() - t0
     ok(f"AÅŸama 2 tamamlandÄ± ({sure:.1f}s)")
@@ -435,15 +435,15 @@ def asama4_test(kok):
         gec = int(mp.group(1)) if mp else 0
         basarisiz = int(mf.group(1)) if mf else 0
         if basarisiz == 0:
-            ok(f"{gec} test geÃ§ti, 0 hata âœ…")
+            ok(f"{gec} test geçti, 0 hata âœ…")
         else:
-            err(f"{gec} geÃ§ti, {basarisiz} BAÅARISIZ")
+            err(f"{gec} geçti, {basarisiz} BAÅARISIZ")
             for line in out.splitlines()[:20]:
                 print(f"    {C.RED}{line}{C.RESET}")
     except subprocess.TimeoutExpired:
         warn("pytest timeout (120s)")
 
-    sub("Coverage KontrolÃ¼")
+    sub("Coverage Kontrolü")
     cov = shutil.which("coverage")
     if cov:
         try:
@@ -463,9 +463,9 @@ def asama4_test(kok):
             )
             print(rc.stdout[:2000])
         except Exception as e:
-            warn(f"Coverage Ã§alÄ±ÅŸmadÄ±: {e}")
+            warn(f"Coverage çalÄ±ÅŸmadÄ±: {e}")
     else:
-        warn("coverage yok â€” pip install pytest-cov Ã¶nerilir")
+        warn("coverage yok â€” pip install pytest-cov önerilir")
 
     sure = time.time() - t0
     ok(f"AÅŸama 4 tamamlandÄ± ({sure:.1f}s)")
@@ -524,12 +524,12 @@ def asama5_guvenlik(kok):
     else:
         ok("Hardcoded credential bulunamadÄ± âœ…")
 
-    sub(".gitignore KontrolÃ¼")
+    sub(".gitignore Kontrolü")
     gi = kok / ".gitignore"
     if gi.exists():
         c = gi.read_text(encoding="utf-8", errors="ignore")
         if ".env" in c:
-            ok(".gitignore iÃ§inde .env var âœ…")
+            ok(".gitignore içinde .env var âœ…")
         else:
             warn(".gitignore var ama .env yok!")
     else:
@@ -572,9 +572,9 @@ def asama5_guvenlik(kok):
                     if "Severity" in line or "Issue" in line:
                         print(f"  {C.YEL}{line}{C.RESET}")
         except Exception as e:
-            warn(f"Bandit Ã§alÄ±ÅŸmadÄ±: {e}")
+            warn(f"Bandit çalÄ±ÅŸmadÄ±: {e}")
     else:
-        warn("bandit yok â€” pip install bandit Ã¶nerilir")
+        warn("bandit yok â€” pip install bandit önerilir")
 
     sure = time.time() - t0
     ok(f"AÅŸama 5 tamamlandÄ± ({sure:.1f}s)")
@@ -595,7 +595,7 @@ def asama6_skill_ve_sonuc(kok, profil):
     row("Toplam SKILL.md", str(len(tum_skill)))
     if len(tum_skill) > 100:
         warn(
-            f"{len(tum_skill)} SKILL.md fazla â€” sadece ReYMeN'e Ã¶zgÃ¼ olanlar tutulabilir"
+            f"{len(tum_skill)} SKILL.md fazla â€” sadece ReYMeN'e özgü olanlar tutulabilir"
         )
     else:
         ok("Skill sayÄ±sÄ± makul")
@@ -625,7 +625,7 @@ def asama6_skill_ve_sonuc(kok, profil):
 
     sub("Ã–ncelikli 3 Aksiyon")
     print(f"""
-  {C.BOLD}1. {C.RED}cli.py BÃ–LME{C.RESET} â€” 7 bloka gÃ¶re 7 ayrÄ± .py, cli_main dispatch
+  {C.BOLD}1. {C.RED}cli.py BÃ–LME{C.RESET} â€” 7 bloka göre 7 ayrÄ± .py, cli_main dispatch
   {C.BOLD}2. {C.YEL}TEST COVERAGE{C.RESET} â€” pip install pytest-cov, pytest --cov=reymen
   {C.BOLD}3. {C.BLU}Ã‡Ä°FT PROJE KONSOLÄ°DASYONU{C.RESET} â€” hermes_projesi â†’ ReYMeN-Ajan
 """)
@@ -653,7 +653,7 @@ def main():
         print(f"{C.RED}HATA: {kok} bulunamadÄ±{C.RESET}")
         sys.exit(1)
     print(f"\n{C.BOLD}{C.CYN}ReYMeN Proje Analiz Scripti{C.RESET}")
-    print(f"{C.BLU}Proje kÃ¶kÃ¼: {kok}{C.RESET}")
+    print(f"{C.BLU}Proje kökü: {kok}{C.RESET}")
     tb = time.time()
     p = asama1_profil(kok)
     asama2_mimari(kok)
@@ -662,7 +662,7 @@ def main():
     asama5_guvenlik(kok)
     asama6_skill_ve_sonuc(kok, p)
     raporu_kaydet(kok)
-    print(f"\n{C.BOLD}{C.GRN}Toplam sÃ¼re: {time.time()-tb:.1f}s{C.RESET}\n")
+    print(f"\n{C.BOLD}{C.GRN}Toplam süre: {time.time()-tb:.1f}s{C.RESET}\n")
 
 
 if __name__ == "__main__":

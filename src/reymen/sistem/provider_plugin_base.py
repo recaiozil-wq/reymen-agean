@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 provider_plugin_base.py â€” ReYMeN Provider Plugin Base.
 

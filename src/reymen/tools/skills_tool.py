@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.skills_tool shim â€” ReYMeN skill fonksiyonlarÄ±nÄ± ReYMeN'e yÃ¶nlendirir."""
+"""ReYMeN tools.skills_tool shim â€” ReYMeN skill fonksiyonlarÄ±nÄ± ReYMeN'e yönlendirir."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def set_secret_capture_callback(callback: Optional[Callable]) -> None:
 
 
 def skill_view(name: str) -> str:
-    """ReYMeN skill_view â€” ReYMeN skill_view tool'una yÃ¶nlendirir."""
+    """ReYMeN skill_view â€” ReYMeN skill_view tool'una yönlendirir."""
     import json
 
     try:

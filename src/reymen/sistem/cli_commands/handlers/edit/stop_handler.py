@@ -1,4 +1,4 @@
-﻿"""_handle_stop_command handler."""
+"""_handle_stop_command handler."""
 
 
 def _handle_stop_command(cli):

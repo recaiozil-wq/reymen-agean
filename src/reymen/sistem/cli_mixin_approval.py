@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module."""
+"""ReYMeNCLI mixin module."""
 
 import logging
 import os
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinApproval:
-    """ReYMeNCLI Onay/gÃ¼venlik metotlarÄ±."""
+    """ReYMeNCLI Onay/güvenlik metotlarÄ±."""
 
     def _clarify_callback(self, question, choices):
         """

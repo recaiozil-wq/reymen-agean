@@ -1,6 +1,6 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
-FIX 04 â€” GÃ¼venlik TaramasÄ± (shell=False, credential, SQL, Bandit)
+FIX 04 â€” Güvenlik TaramasÄ± (shell=False, credential, SQL, Bandit)
 """
 
 import sys, json, time, shutil, subprocess, re
@@ -58,7 +58,7 @@ def py_files(kok):
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 04 â€” GÃ¼venlik TaramasÄ±\nKÃ¶k: {kok}")
+    hdr(f"FIX 04 â€” Güvenlik TaramasÄ±\nKök: {kok}")
     t0 = time.time()
     rapor = {
         "tarih": datetime.now().isoformat(),

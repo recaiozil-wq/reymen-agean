@@ -1,4 +1,4 @@
-﻿# src/reymen/core/__init__.py
+# src/reymen/core/__init__.py
 # Import yonlendirme: reymen.core.* -> src.core.*
 # Eski testlerin calismasi icin gerekli (proje yapisindaki degisiklikten sonra)
 

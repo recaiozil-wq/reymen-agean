@@ -1,13 +1,13 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-scan_skills_to_hafiza_v2.py â€” reymen/cereyan/skills/ klasÃ¶rÃ¼ndeki .md dosyalarÄ±nÄ±
+scan_skills_to_hafiza_v2.py â€” reymen/cereyan/skills/ klasöründeki .md dosyalarÄ±nÄ±
 tara, skills_index.db'deki beceriler_meta tablosuyla karÅŸÄ±laÅŸtÄ±r.
   - Eksik olanlarÄ± EKLE (yeni)
-  - Hash deÄŸiÅŸmiÅŸ olanlarÄ± GÃœNCELLE (gÃ¼ncellenmiÅŸ)
+  - Hash deÄŸiÅŸmiÅŸ olanlarÄ± GÃœNCELLE (güncellenmiÅŸ)
   - DeÄŸiÅŸmeyenleri ATLA
 
-Her 6 saatte bir Ã§alÄ±ÅŸacak cron job.
-v2: Ã–nce sadece tarama & karÅŸÄ±laÅŸtÄ±rma yap, raporu gÃ¶ster.
+Her 6 saatte bir çalÄ±ÅŸacak cron job.
+v2: Ã–nce sadece tarama & karÅŸÄ±laÅŸtÄ±rma yap, raporu göster.
 """
 
 import hashlib
@@ -27,13 +27,13 @@ logger = logging.getLogger("scan_skills")
 
 # â”€â”€ Yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ROOT = Path(__file__).parent.parent.resolve()  # reymen/
-SKILLS_DIR = ROOT / "cereyan" / "skills"  # taranacak klasÃ¶r
+SKILLS_DIR = ROOT / "cereyan" / "skills"  # taranacak klasör
 SKILLS_DB = ROOT / "cereyan" / ".ReYMeN" / "skills_index.db"
 OGRENME_DB = ROOT / "hafiza" / "ogrenme.db"  # OnceHafiza ogrenme DB
 
 
 def dosya_hash(dosya_yolu: str) -> str:
-    """Bir dosyanÄ±n SHA256 hash'ini dÃ¶ndÃ¼r (ilk 16 karakter)."""
+    """Bir dosyanÄ±n SHA256 hash'ini döndür (ilk 16 karakter)."""
     h = hashlib.sha256()
     with open(dosya_yolu, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
@@ -55,13 +55,13 @@ def scan_only():
     """Sadece tara ve karÅŸÄ±laÅŸtÄ±r - veritabanÄ±na dokunma."""
     logger.info("=" * 60)
     logger.info("ğŸ” Skills tarama baÅŸlÄ±yor (sadece analiz)...")
-    logger.info("   KlasÃ¶r: %s", SKILLS_DIR)
+    logger.info("   Klasör: %s", SKILLS_DIR)
 
-    # 1) Skills dizinindeki tÃ¼m .md dosyalarÄ±nÄ± bul
+    # 1) Skills dizinindeki tüm .md dosyalarÄ±nÄ± bul
     md_dosyalari = sorted(SKILLS_DIR.rglob("*.md"))
-    logger.info("ğŸ“„ Skills klasÃ¶rÃ¼nde %d .md dosyasÄ± bulundu.", len(md_dosyalari))
+    logger.info("ğŸ“„ Skills klasöründe %d .md dosyasÄ± bulundu.", len(md_dosyalari))
 
-    # 2) Skills DB'deki mevcut meta tablosunu yÃ¼kle
+    # 2) Skills DB'deki mevcut meta tablosunu yükle
     con = sqlite3.connect(str(SKILLS_DB))
     meta_cur = con.execute("SELECT ad, dosya_hash FROM beceriler_meta")
     meta_map = {}
@@ -197,7 +197,7 @@ def apply_updates(yeni_liste, guncel_liste):
                 con.commit()
                 guncellenen += 1
             except Exception as e:
-                logger.warning("âš ï¸  DB gÃ¼ncelleme hatasÄ± (%s): %s", meta_adi, e)
+                logger.warning("âš ï¸  DB güncelleme hatasÄ± (%s): %s", meta_adi, e)
             finally:
                 con.close()
 
@@ -227,7 +227,7 @@ def apply_updates(yeni_liste, guncel_liste):
                 con2.commit()
                 con2.close()
             except Exception as e:
-                logger.warning("âš ï¸  ogrenme.db gÃ¼ncelleme hatasÄ±: %s", e)
+                logger.warning("âš ï¸  ogrenme.db güncelleme hatasÄ±: %s", e)
 
     return yeni_eklenen, guncellenen
 
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     yeni_liste, guncel_liste, atlanan = scan_only()
     print(f"\nTARAMA SONUCU:")
     print(f"  Yeni (eklenecek):  {len(yeni_liste)}")
-    print(f"  GÃ¼ncellenecek:     {len(guncel_liste)}")
+    print(f"  Güncellenecek:     {len(guncel_liste)}")
     print(f"  Atlanan (aynÄ±):    {atlanan}")
 
     if yeni_liste:
@@ -248,26 +248,26 @@ if __name__ == "__main__":
             print(f"    ... ve {len(yeni_liste) - 10} daha")
 
     if guncel_liste:
-        print(f"\n  GÃ¼ncellenen dosyalar (ilk 10):")
+        print(f"\n  Güncellenen dosyalar (ilk 10):")
         for ad, old, new in guncel_liste[:10]:
             print(f"    ğŸ”„ {ad}")
         if len(guncel_liste) > 10:
             print(f"    ... ve {len(guncel_liste) - 10} daha")
 
-    print(f"\n=== AdÄ±m 2: VeritabanÄ± GÃ¼ncellemesi ===")
+    print(f"\n=== AdÄ±m 2: VeritabanÄ± Güncellemesi ===")
     if yeni_liste or guncel_liste:
         yeni_eklenen, guncellenen = apply_updates(yeni_liste, guncel_liste)
         print(f"\nâœ… GÃœNCELLEME TAMAMLANDI:")
         print(f"   Yeni eklenen:  {yeni_eklenen}/{len(yeni_liste)}")
-        print(f"   GÃ¼ncellenen:   {guncellenen}/{len(guncel_liste)}")
+        print(f"   Güncellenen:   {guncellenen}/{len(guncel_liste)}")
     else:
-        print("   HiÃ§bir deÄŸiÅŸiklik yok, gÃ¼ncelleme gerekmiyor.")
+        print("   Hiçbir deÄŸiÅŸiklik yok, güncelleme gerekmiyor.")
 
     print(f"\n{'='*60}")
     print(f"ğŸ“Š Ã–ZET:")
     print(f"   Toplam .md dosyasÄ±:  {len(yeni_liste) + len(guncel_liste) + atlanan}")
     print(f"   Yeni eklenen:        {len(yeni_liste)}")
-    print(f"   GÃ¼ncellenen:         {len(guncel_liste)}")
+    print(f"   Güncellenen:         {len(guncel_liste)}")
     print(f"   Atlanan (deÄŸiÅŸmeyen): {atlanan}")
 
     # Makine formatÄ±

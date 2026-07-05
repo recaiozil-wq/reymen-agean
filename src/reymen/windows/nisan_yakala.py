@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 nisan_yakala.py â€” Ekranda fare altindaki UI elemanini kirpar ve nisan olarak kaydeder.
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 oz_yansima.py â€” FAZ 6: Pasif Surec Refleksiyonu (Idle-Time Reflection).
 

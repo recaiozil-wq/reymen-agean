@@ -1,4 +1,4 @@
-﻿"""cereyan paketi."""
+"""cereyan paketi."""
 
 __all__ = [
     "DB_PATH",

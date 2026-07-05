@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 ğŸ” ReYMeN Auth Middleware â€” JWT-based authorization for Web UI.
 

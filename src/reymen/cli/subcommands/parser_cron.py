@@ -1,4 +1,4 @@
-﻿"""cron parser."""
+"""cron parser."""
 
 from __future__ import annotations
 import argparse

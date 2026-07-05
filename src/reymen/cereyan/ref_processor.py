@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ref_processor.py â€” @file / @url referans islemcisi.
 
 Kullanici mesajindaki @file:path ve @url:https://... pattern'lerini

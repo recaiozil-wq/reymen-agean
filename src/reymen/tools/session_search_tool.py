@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Apache 2.0 â€” ReYMeN Session Search Tool (ReYMeN'ten uyarlanmistir)
 """
 session_search_tool.py â€” ReYMeN Session Search Tool

@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """db_config.py â€” Merkezi VeritabanÄ± Yol Sabitleri.
 
 DB_KONSOLIDASYON_RAPORU.md'de tespit edilen daÄŸÄ±nÄ±klÄ±ÄŸÄ±n (20+ DB dosyasÄ±,
-7 kategori, ~230MB kopya) Ã§Ã¶zÃ¼mÃ¼: tÃ¼m botlarÄ±n ve modÃ¼llerin tek bir
+7 kategori, ~230MB kopya) çözümü: tüm botlarÄ±n ve modüllerin tek bir
 kaynaktan DB yolu okumasÄ±.
 
 KullanÄ±m:
@@ -10,23 +10,23 @@ KullanÄ±m:
 
     conn = sqlite3.connect(DB["analitik"])
 
-Not: Bu dosya sadece YOL tanÄ±mlar, baÄŸlantÄ± aÃ§maz. BaÄŸlantÄ± aÃ§ma/kapama
-sorumluluÄŸu Ã§aÄŸÄ±ran modÃ¼ldedir (Ã¶zellikle thread/async ortamlarda
+Not: Bu dosya sadece YOL tanÄ±mlar, baÄŸlantÄ± açmaz. BaÄŸlantÄ± açma/kapama
+sorumluluÄŸu çaÄŸÄ±ran modüldedir (özellikle thread/async ortamlarda
 sqlite3 baÄŸlantÄ±larÄ±nÄ±n paylaÅŸÄ±lmamasÄ± gerekir).
 """
 
 from pathlib import Path
 
-# â”€â”€ Tek merkez kÃ¶k dizin (rapordaki "Ã–nerilen YapÄ±" ile birebir) â”€â”€â”€â”€â”€â”€
-PROJE_KOK = Path(__file__).resolve().parents[2]  # reymen/sistem/ -> proje kÃ¶kÃ¼
+# â”€â”€ Tek merkez kök dizin (rapordaki "Ã–nerilen YapÄ±" ile birebir) â”€â”€â”€â”€â”€â”€
+PROJE_KOK = Path(__file__).resolve().parents[2]  # reymen/sistem/ -> proje kökü
 DB_KOK = PROJE_KOK / ".ReYMeN" / "db"
 DB_KOK.mkdir(parents=True, exist_ok=True)
 
-# â”€â”€ TÃ¼m botlarÄ±n (Pasa_38, Kiral38, ReYMeN_ReYMeNbot, DiscordBot) â”€â”€â”€â”€â”€
+# â”€â”€ Tüm botlarÄ±n (Pasa_38, Kiral38, ReYMeN_ReYMeNbot, DiscordBot) â”€â”€â”€â”€â”€
 # â”€â”€ ortak kullandÄ±ÄŸÄ± tekil DB yollarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# NOT: DB dedupe (Item 6) sonrasÄ± 25â†’12 DB'ye dÃ¼ÅŸÃ¼rÃ¼ldÃ¼.
+# NOT: DB dedupe (Item 6) sonrasÄ± 25â†’12 DB'ye düÅŸürüldü.
 # Eski daÄŸÄ±nÄ±k DB'ler .old sonekiyle iÅŸaretlendi, kodda hala eski yolu
-# kullanan bÃ¶lÃ¼mler varsa bu sÃ¶zlÃ¼kteki canonical yola yÃ¶nlendirilmelidir.
+# kullanan bölümler varsa bu sözlükteki canonical yola yönlendirilmelidir.
 DB = {
     "session": DB_KOK / "session.db",
     "ogrenmeler": DB_KOK / "ogrenme_merkezi.db",  # OnceHafiza â€” merged
@@ -45,17 +45,17 @@ DB = {
 
 
 def db_yolu(anahtar: str) -> str:
-    """Verilen mantÄ±ksal isim iÃ§in DB dosya yolunu str olarak dÃ¶ner.
+    """Verilen mantÄ±ksal isim için DB dosya yolunu str olarak döner.
 
     Bilinmeyen bir anahtar istenirse KeyError fÄ±rlatÄ±r â€” sessizce yeni bir
-    dosya tÃ¼retmek, raporun tespit ettiÄŸi "kopya DB" sorununu tekrar
-    Ã¼retir, bu yÃ¼zden burada kasÄ±tlÄ± olarak izin verilmiyor.
+    dosya türetmek, raporun tespit ettiÄŸi "kopya DB" sorununu tekrar
+    üretir, bu yüzden burada kasÄ±tlÄ± olarak izin verilmiyor.
     """
     if anahtar not in DB:
         raise KeyError(
             f"'{anahtar}' tanÄ±mlÄ± deÄŸil. Yeni bir DB kategorisi gerekiyorsa "
-            f"Ã¶nce DB_KONSOLIDASYON_RAPORU.md'yi ve bu dosyadaki DB sÃ¶zlÃ¼ÄŸÃ¼nÃ¼ "
-            f"gÃ¼ncelle, koddan doÄŸrudan yol tÃ¼retme."
+            f"önce DB_KONSOLIDASYON_RAPORU.md'yi ve bu dosyadaki DB sözlüÄŸünü "
+            f"güncelle, koddan doÄŸrudan yol türetme."
         )
     return str(DB[anahtar])
 

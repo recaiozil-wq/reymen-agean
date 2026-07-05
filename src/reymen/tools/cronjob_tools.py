@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.cronjob_tools shim â€” ReYMeN cronjob araÃ§larÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.cronjob_tools shim â€” ReYMeN cronjob araçlarÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ def _scan_cron_skill_assembled(skills: list) -> list:
 
 
 def cronjob(*args, **kwargs) -> str:
-    """ReYMeN cronjob â€” cronjob tool'una yÃ¶nlendirir."""
+    """ReYMeN cronjob â€” cronjob tool'una yönlendirir."""
     import json
 
     try:

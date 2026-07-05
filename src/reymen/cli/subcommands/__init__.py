@@ -1,1 +1,1 @@
-﻿"""reymen.cli.subcommands -- parser builder lar."""
+"""reymen.cli.subcommands -- parser builder lar."""

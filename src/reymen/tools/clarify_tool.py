@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.clarify_tool shim â€” ReYMeN clarify fonksiyonlarÄ±nÄ± ReYMeN'e yÃ¶nlendirir."""
+"""ReYMeN tools.clarify_tool shim â€” ReYMeN clarify fonksiyonlarÄ±nÄ± ReYMeN'e yönlendirir."""
 
 from __future__ import annotations
 
@@ -13,10 +13,10 @@ def run(
     secenekler: Optional[List[str]] = None,
     varsayilan: str = "",
 ) -> str:
-    """ReYMeN clarify_tool.run â€” ReYMeN iÃ§in basit implementasyon.
+    """ReYMeN clarify_tool.run â€” ReYMeN için basit implementasyon.
 
-    KullanÄ±cÄ±ya soru sorar ve cevabÄ± dÃ¶ndÃ¼rÃ¼r.
-    Telegram bot iÃ§in direkt input() kullanÄ±r.
+    KullanÄ±cÄ±ya soru sorar ve cevabÄ± döndürür.
+    Telegram bot için direkt input() kullanÄ±r.
     """
     if secenekler:
         secenek_metni = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(secenekler))
@@ -43,6 +43,6 @@ def ask_user(
     choices: Optional[List[str]] = None,
     default: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """ReYMeN ask_user â€” ReYMeN iÃ§in basit implementasyon."""
+    """ReYMeN ask_user â€” ReYMeN için basit implementasyon."""
     result = run(question, choices, default or "")
     return {"result": result, "cancelled": result == "[iptal]"}

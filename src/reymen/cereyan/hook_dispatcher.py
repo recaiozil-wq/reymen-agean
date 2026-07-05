@@ -1,18 +1,18 @@
-﻿# -*- coding: utf-8 -*-
-"""Olay-gÃ¼dÃ¼mlÃ¼ hook dispatcher.
+# -*- coding: utf-8 -*-
+"""Olay-güdümlü hook dispatcher.
 
-ReYMeN'in ``invoke_hook`` sisteminden adapte edilmiÅŸtir. KonuÅŸma dÃ¶ngÃ¼sÃ¼
-belirli noktalarda hook'larÄ± ateÅŸler; yÃ¼klÃ¼ plugin'ler bunlarÄ± dinler.
+ReYMeN'in ``invoke_hook`` sisteminden adapte edilmiÅŸtir. KonuÅŸma döngüsü
+belirli noktalarda hook'larÄ± ateÅŸler; yüklü plugin'ler bunlarÄ± dinler.
 
 Desteklenen hook olaylarÄ±:
     on_session_start    â€” Oturum baÅŸlarken
     on_session_end      â€” Oturum biterken
     on_turn_start       â€” Her tur baÅŸÄ±nda
     on_turn_end         â€” Her tur sonunda
-    on_tool_call        â€” AraÃ§ Ã§aÄŸrÄ±lmadan Ã¶nce
-    on_tool_result      â€” AraÃ§ sonucu alÄ±ndÄ±ktan sonra
+    on_tool_call        â€” Araç çaÄŸrÄ±lmadan önce
+    on_tool_result      â€” Araç sonucu alÄ±ndÄ±ktan sonra
     on_error            â€” Hata oluÅŸtuÄŸunda
-    on_context_compress â€” Context sÄ±kÄ±ÅŸtÄ±rÄ±lmadan Ã¶nce
+    on_context_compress â€” Context sÄ±kÄ±ÅŸtÄ±rÄ±lmadan önce
 """
 
 from __future__ import annotations
@@ -45,15 +45,15 @@ def hook_kaydet(olay: str, callback: Callable) -> None:
     """Bir hook callback'i kaydet.
 
     Args:
-        olay:     Hook olay adÄ± (Ã¶r. "on_session_start").
-        callback: Ã‡aÄŸrÄ±lacak fonksiyon. Kwargs ile Ã§aÄŸrÄ±lÄ±r.
+        olay:     Hook olay adÄ± (ör. "on_session_start").
+        callback: Ã‡aÄŸrÄ±lacak fonksiyon. Kwargs ile çaÄŸrÄ±lÄ±r.
 
     Raises:
         ValueError: Bilinmeyen olay adÄ±.
     """
     if olay not in GECERLI_OLAYLAR:
         raise ValueError(
-            f"Bilinmeyen hook olayÄ±: {olay!r}. GeÃ§erliler: {sorted(GECERLI_OLAYLAR)}"
+            f"Bilinmeyen hook olayÄ±: {olay!r}. Geçerliler: {sorted(GECERLI_OLAYLAR)}"
         )
     if olay not in _HOOK_KAYDI:
         _HOOK_KAYDI[olay] = []
@@ -67,7 +67,7 @@ def hook_kaydet(olay: str, callback: Callable) -> None:
 
 
 def hook_kaldir(olay: str, callback: Callable) -> bool:
-    """KayÄ±tlÄ± bir hook'u kaldÄ±r. BaÅŸarÄ±yla kaldÄ±rÄ±ldÄ±ysa True dÃ¶ner."""
+    """KayÄ±tlÄ± bir hook'u kaldÄ±r. BaÅŸarÄ±yla kaldÄ±rÄ±ldÄ±ysa True döner."""
     if olay in _HOOK_KAYDI and callback in _HOOK_KAYDI[olay]:
         _HOOK_KAYDI[olay].remove(callback)
         return True
@@ -75,14 +75,14 @@ def hook_kaldir(olay: str, callback: Callable) -> bool:
 
 
 def hook_cagir(olay: str, **kwargs: Any) -> List[Any]:
-    """Bir olayÄ±n tÃ¼m kayÄ±tlÄ± hook'larÄ±nÄ± ateÅŸle.
+    """Bir olayÄ±n tüm kayÄ±tlÄ± hook'larÄ±nÄ± ateÅŸle.
 
-    Her hook ayrÄ± try/except ile korunur â€” biri Ã§Ã¶kmesi diÄŸerlerini
+    Her hook ayrÄ± try/except ile korunur â€” biri çökmesi diÄŸerlerini
     durdurmaz. Hata durumunda log.warning yazar ve devam eder.
 
     Args:
         olay:    Hook olay adÄ±.
-        **kwargs: Hook'a iletilecek named argÃ¼manlar.
+        **kwargs: Hook'a iletilecek named argümanlar.
 
     Returns:
         Hook return deÄŸerlerinin listesi (None'lar dahil).
@@ -110,18 +110,18 @@ def hook_cagir(olay: str, **kwargs: Any) -> List[Any]:
     return sonuclar
 
 
-# ReYMeN uyumluluÄŸu iÃ§in alias
+# ReYMeN uyumluluÄŸu için alias
 invoke_hook = hook_cagir
 register_hook = hook_kaydet
 
 
 def tum_hooklari_temizle() -> None:
-    """TÃ¼m kayÄ±tlÄ± hook'larÄ± temizle (test izolasyonu iÃ§in)."""
+    """Tüm kayÄ±tlÄ± hook'larÄ± temizle (test izolasyonu için)."""
     _HOOK_KAYDI.clear()
 
 
 def kayitli_hooklar() -> Dict[str, List[str]]:
-    """KayÄ±tlÄ± hook'larÄ±n okunabilir Ã¶zetini dÃ¶ndÃ¼r."""
+    """KayÄ±tlÄ± hook'larÄ±n okunabilir özetini döndür."""
     return {
         olay: [getattr(cb, "__name__", repr(cb)) for cb in cblar]
         for olay, cblar in _HOOK_KAYDI.items()
@@ -133,7 +133,7 @@ def kayitli_hooklar() -> Dict[str, List[str]]:
 
 
 def hook(olay: str) -> Callable:
-    """Hook kaydÄ± iÃ§in decorator.
+    """Hook kaydÄ± için decorator.
 
     Ã–rnek::
 

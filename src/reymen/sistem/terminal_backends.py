@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 terminal_backends.py â€” TerminalBackend.
 Terminal arka uclari: local, SSH ve Docker.
@@ -367,11 +367,11 @@ class TerminalBackend:
 
 
 class TerminalBackendDispatcher(TerminalBackend):
-    """motor.py'nin beklediÄŸi string dÃ¶ndÃ¼ren komut yÃ¼rÃ¼tÃ¼cÃ¼.
+    """motor.py'nin beklediÄŸi string döndüren komut yürütücü.
 
-    TerminalBackend'i sarmalar; calistir() dict yerine metin dÃ¶ndÃ¼rÃ¼r.
+    TerminalBackend'i sarmalar; calistir() dict yerine metin döndürür.
     mode='docker' verilirse Docker konteynerinde, 'local' verilirse
-    yerel kabukta Ã§alÄ±ÅŸtÄ±rÄ±r.
+    yerel kabukta çalÄ±ÅŸtÄ±rÄ±r.
     """
 
     def __init__(self, mode="local", **kwargs):
@@ -379,7 +379,7 @@ class TerminalBackendDispatcher(TerminalBackend):
         self._mode = mode
 
     def calistir(self, komut, **kwargs):
-        """Komutu Ã§alÄ±ÅŸtÄ±r ve okunabilir metin dÃ¶ndÃ¼r."""
+        """Komutu çalÄ±ÅŸtÄ±r ve okunabilir metin döndür."""
         sonuc = super().calistir(komut, **kwargs)
         cikti = (sonuc.get("cikti") or "").strip()
         hata = (sonuc.get("hata") or "").strip()

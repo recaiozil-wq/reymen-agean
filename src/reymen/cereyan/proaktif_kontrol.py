@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 proaktif_kontrol.py â€” Analyzes missing aspects after each question/answer.
 
@@ -32,25 +32,25 @@ log = logging.getLogger(__name__)
 
 # â”€â”€ Eksik kategorileri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 EKSIK_KATEGORILER = {
-    "tablo": r"(tablo|liste halinde|karÅŸÄ±laÅŸtÄ±r|Ã¶zet tablosu)",
+    "tablo": r"(tablo|liste halinde|karÅŸÄ±laÅŸtÄ±r|özet tablosu)",
     "kaynak": r"(kaynak|referans|link|adres|site)",
-    "ornek": r"(Ã¶rnek|misal|demo|kod Ã¶rneÄŸi)",
-    "nicel_veri": r"(kaÃ§|ne kadar|yÃ¼zde|oran|istatistik|sayÄ±sal)",
+    "ornek": r"(örnek|misal|demo|kod örneÄŸi)",
+    "nicel_veri": r"(kaç|ne kadar|yüzde|oran|istatistik|sayÄ±sal)",
     "edge_case": r"(ya .+? ise|eÄŸer .+? olmazsa|sÄ±nÄ±r durum|istisna)",
     "karsilastirma": r"(fark|karÅŸÄ±laÅŸ|kÄ±yasla|vs|versus|arasÄ±ndaki fark)",
-    "adim_adim": r"(adÄ±m|sÄ±rayla|aÅŸama|nasÄ±l yapÄ±lÄ±r|prosedÃ¼r)",
-    "neden": r"(neden|niÃ§in|sebep|gerekÃ§e|kÃ¶k neden)",
+    "adim_adim": r"(adÄ±m|sÄ±rayla|aÅŸama|nasÄ±l yapÄ±lÄ±r|prosedür)",
+    "neden": r"(neden|niçin|sebep|gerekçe|kök neden)",
     "ne_zaman": r"(ne zaman|hangi durumda|hangi koÅŸulda)",
-    "nerede": r"(nerede|hangi dizin|hangi klasÃ¶r|nereden)",
+    "nerede": r"(nerede|hangi dizin|hangi klasör|nereden)",
 }
 
 # â”€â”€ Cevap kalite kontrol listesi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CEVAP_KALITE_KONTROL = [
-    ("basarisiz_hata", r"(hata|baÅŸarÄ±sÄ±z|Ã§alÄ±ÅŸmadÄ±|bulunamadÄ±|yetki yok)\s", True),
+    ("basarisiz_hata", r"(hata|baÅŸarÄ±sÄ±z|çalÄ±ÅŸmadÄ±|bulunamadÄ±|yetki yok)\s", True),
     ("bos_cevap", r"^$", True),
     ("cok_kisa", r"^\s*\S+\s*$", True),  # tek kelime
     ("kaynak_yok", r"(bence|sanÄ±rÄ±m|muhtemelen|tahminen)", False),
-    ("tavsiye_eksik", r"(tavsiye|Ã¶neri|Ã¶ncelik|en iyi)", False),
+    ("tavsiye_eksik", r"(tavsiye|öneri|öncelik|en iyi)", False),
 ]
 
 
@@ -126,7 +126,7 @@ class ProaktifDenetci:
             if re.search(desen, cevap, re.IGNORECASE):
                 kalite_sorunlari.append(ad)
 
-        # Cevap uzunluÄŸu kontrolÃ¼
+        # Cevap uzunluÄŸu kontrolü
         kelime_sayisi = len(cevap.split())
         if kelime_sayisi < 10 and len(soru.split()) > 3:
             eksikler.append("cok_kisa_cevap")
@@ -177,7 +177,7 @@ class ProaktifDenetci:
                     (eksik,),
                 )
 
-        # DÃ¼ÅŸÃ¼k puanlÄ± cevaplarÄ± kaydet
+        # DüÅŸük puanlÄ± cevaplarÄ± kaydet
         puan = a.get("puan", 100)
         if puan < 60 and analiz:
             with sqlite3.connect(self._db) as vt:
@@ -229,7 +229,7 @@ class ProaktifDenetci:
         lines = [f"ğŸ“Š Toplam analiz: {toplam_analiz}", f"\nEn sÄ±k eksikler:"]
         for kat, sayi in en_sik:
             lines.append(f"  âŒ {kat}: {sayi} kez")
-        return "\n".join(lines) if en_sik else "HenÃ¼z yeterli veri yok."
+        return "\n".join(lines) if en_sik else "Henüz yeterli veri yok."
 
 
 # â”€â”€ conversation_loop entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -258,7 +258,7 @@ def soru_sonrasi_kontrol(soru: str, cevap: str) -> dict:
             analiz.get("puan", 0),
         )
 
-    # Proaktif uyarÄ± kontrolÃ¼
+    # Proaktif uyarÄ± kontrolü
     uyari = denetci.proaktif_uyari(soru)
     if uyari:
         log.info("[PROAKTIF] Uyari: %s", uyari)
@@ -269,7 +269,7 @@ def soru_sonrasi_kontrol(soru: str, cevap: str) -> dict:
 if __name__ == "__main__":
     # Test
     denetci = ProaktifDenetci()
-    test_soru = "Bana Linux komutlarÄ±nÄ± tablo halinde sÄ±rala, Ã¶rneklerle gÃ¶ster"
+    test_soru = "Bana Linux komutlarÄ±nÄ± tablo halinde sÄ±rala, örneklerle göster"
     test_cevap = "ls komutu dizin listeler. cd ile dizin deÄŸiÅŸtirilir."
     analiz = denetci.soru_cevap_analiz(test_soru, test_cevap)
     print(f"Soru: {test_soru}")

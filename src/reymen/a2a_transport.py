@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-"""ğŸŒ A2A Transport â€” HTTP/WebSocket ile aÄŸ Ã¼zerinden mesajlaÅŸma.
+# -*- coding: utf-8 -*-
+"""ğŸŒ A2A Transport â€” HTTP/WebSocket ile aÄŸ üzerinden mesajlaÅŸma.
 
 A2A agent'larÄ±nÄ±n farklÄ± makineler/process'ler arasÄ±nda iletiÅŸim kurmasÄ±nÄ±
-saÄŸlar. Mevcut bellek-iÃ§i Broker'i aÄŸa taÅŸÄ±r.
+saÄŸlar. Mevcut bellek-içi Broker'i aÄŸa taÅŸÄ±r.
 
 Kullanim:
     # Sunucu (Node 1)

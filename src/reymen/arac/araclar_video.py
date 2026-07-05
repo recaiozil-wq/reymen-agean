@@ -1,23 +1,23 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-araclar_video.py â€” Video bilgi ve analiz araÃ§larÄ±.
+araclar_video.py â€” Video bilgi ve analiz araçlarÄ±.
 
-  VIDEO_BILGI   â€” Video metadata (baÅŸlÄ±k, sÃ¼re, Ã§Ã¶zÃ¼nÃ¼rlÃ¼k, yÃ¼kleyen).
-                  Uzak (YouTube vb.) iÃ§in yt-dlp, yerel dosya iÃ§in ffprobe kullanÄ±r.
-  VIDEO_ANALIZ  â€” AltyazÄ± varsa onu, yoksa sesi Whisper ile metne Ã§evirir,
-                  basit bir hÄ±zlÄ± Ã¶zet + transkript dÃ¶ner. AsÄ±l derin Ã¶zet
-                  ReAct ajanÄ±nÄ±n kendi LLM'i tarafÄ±ndan bu metin Ã¼zerinden
-                  yapÄ±lmasÄ± beklenir (araÃ§ burada ham/yarÄ±-iÅŸlenmiÅŸ veri saÄŸlar).
+  VIDEO_BILGI   â€” Video metadata (baÅŸlÄ±k, süre, çözünürlük, yükleyen).
+                  Uzak (YouTube vb.) için yt-dlp, yerel dosya için ffprobe kullanÄ±r.
+  VIDEO_ANALIZ  â€” AltyazÄ± varsa onu, yoksa sesi Whisper ile metne çevirir,
+                  basit bir hÄ±zlÄ± özet + transkript döner. AsÄ±l derin özet
+                  ReAct ajanÄ±nÄ±n kendi LLM'i tarafÄ±ndan bu metin üzerinden
+                  yapÄ±lmasÄ± beklenir (araç burada ham/yarÄ±-iÅŸlenmiÅŸ veri saÄŸlar).
 
-BaÄŸÄ±mlÄ±lÄ±klar (opsiyonel â€” eksikse araÃ§ aÃ§Ä±klayarak degrade eder):
+BaÄŸÄ±mlÄ±lÄ±klar (opsiyonel â€” eksikse araç açÄ±klayarak degrade eder):
     pip install yt-dlp                       # uzak video bilgisi + indirme
-    pip install faster-whisper                # ses â†’ metin (Ã¶ncelikli)
+    pip install faster-whisper                # ses â†’ metin (öncelikli)
     pip install openai-whisper                 # ses â†’ metin (fallback)
-    ffmpeg / ffprobe sistemde kurulu olmalÄ±   # yerel video metadata + ses Ã§Ä±karma
+    ffmpeg / ffprobe sistemde kurulu olmalÄ±   # yerel video metadata + ses çÄ±karma
 
-MEDIA bu modÃ¼lde kullanÄ±lmaz (video dosyasÄ±nÄ±n kendisi gÃ¶nderilmiyor, sadece
-metin/metadata dÃ¶ndÃ¼rÃ¼lÃ¼yor); biÃ§im diÄŸer araÃ§larla tutarlÄ± kalsÄ±n diye
-ileride video MEDIA'sÄ± eklenmek istenirse aynÄ± sÃ¶zleÅŸme izlenebilir:
+MEDIA bu modülde kullanÄ±lmaz (video dosyasÄ±nÄ±n kendisi gönderilmiyor, sadece
+metin/metadata döndürülüyor); biçim diÄŸer araçlarla tutarlÄ± kalsÄ±n diye
+ileride video MEDIA'sÄ± eklenmek istenirse aynÄ± sözleÅŸme izlenebilir:
 
     [MEDIA type="video" src="<url-veya-yol>"]
 """
@@ -37,7 +37,7 @@ _fw_model = None
 _ow_model = None
 
 
-# â”€â”€ Whisper (baÄŸÄ±msÄ±z kopya â€” diÄŸer modÃ¼llere baÄŸÄ±mlÄ± olmamak iÃ§in) â”€â”€
+# â”€â”€ Whisper (baÄŸÄ±msÄ±z kopya â€” diÄŸer modüllere baÄŸÄ±mlÄ± olmamak için) â”€â”€
 
 
 def _faster_whisper_model(model_adi: str = "small"):
@@ -85,7 +85,7 @@ def _whisper_transcribe(dosya_yolu: str, dil: str = "tr") -> str:
         return ""
 
 
-# â”€â”€ AltyazÄ± dosyasÄ± ayrÄ±ÅŸtÄ±rma (vtt/srt â†’ dÃ¼z metin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ AltyazÄ± dosyasÄ± ayrÄ±ÅŸtÄ±rma (vtt/srt â†’ düz metin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _altyazi_dosya_oku(yol: str) -> str:
@@ -103,7 +103,7 @@ def _altyazi_dosya_oku(yol: str) -> str:
         s = re.sub(r"<[^>]+>", "", s)  # vtt etiketleri
         if s:
             satirlar.append(s)
-    # otomatik altyazÄ±larda sÄ±k gÃ¶rÃ¼len ardÄ±ÅŸÄ±k tekrarlarÄ± sil
+    # otomatik altyazÄ±larda sÄ±k görülen ardÄ±ÅŸÄ±k tekrarlarÄ± sil
     temiz = []
     for s in satirlar:
         if not temiz or temiz[-1] != s:
@@ -116,7 +116,7 @@ def _basit_ozet(metin: str, n_cumle: int = 3, maks_uzunluk: int = 400) -> str:
     secim = " ".join(c for c in cumleler[:n_cumle] if c)
     if len(secim) > maks_uzunluk:
         secim = secim[:maks_uzunluk] + "â€¦"
-    return secim or "(Ã¶zet Ã§Ä±karÄ±lamadÄ±)"
+    return secim or "(özet çÄ±karÄ±lamadÄ±)"
 
 
 # â”€â”€ Uzak video (YouTube vb.) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -137,15 +137,15 @@ def _video_bilgi_uzak(url: str) -> str:
         genislik, yukseklik = info.get("width", "?"), info.get("height", "?")
         yukleyen = info.get("uploader", "?")
         return (
-            f"[VIDEO_BILGI]\nBaÅŸlÄ±k: {baslik}\nSÃ¼re: {sure}s\n"
-            f"Ã‡Ã¶zÃ¼nÃ¼rlÃ¼k: {genislik}x{yukseklik}\nYÃ¼kleyen: {yukleyen}\nURL: {url}"
+            f"[VIDEO_BILGI]\nBaÅŸlÄ±k: {baslik}\nSüre: {sure}s\n"
+            f"Ã‡özünürlük: {genislik}x{yukseklik}\nYükleyen: {yukleyen}\nURL: {url}"
         )
     except Exception as e:
         return f"[VIDEO_BILGI] Hata: {e}"
 
 
 def _altyazi_veya_ses_metni_uzak(url: str, dil: str) -> tuple:
-    """Ã–nce altyazÄ± indirmeyi dener; yoksa sesi indirip Whisper ile Ã§evirir."""
+    """Ã–nce altyazÄ± indirmeyi dener; yoksa sesi indirip Whisper ile çevirir."""
     import yt_dlp
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -222,8 +222,8 @@ def _video_bilgi_yerel(yol: str) -> str:
         )
         sure = veri.get("format", {}).get("duration", "?")
         return (
-            f"[VIDEO_BILGI]\nDosya: {yol}\nSÃ¼re: {sure}s\n"
-            f"Ã‡Ã¶zÃ¼nÃ¼rlÃ¼k: {video_akisi.get('width', '?')}x{video_akisi.get('height', '?')}\n"
+            f"[VIDEO_BILGI]\nDosya: {yol}\nSüre: {sure}s\n"
+            f"Ã‡özünürlük: {video_akisi.get('width', '?')}x{video_akisi.get('height', '?')}\n"
             f"Codec: {video_akisi.get('codec_name', '?')}"
         )
     except FileNotFoundError:
@@ -264,11 +264,11 @@ def _yerel_video_ses_metni(yol: str, dil: str) -> tuple:
         return _whisper_transcribe(ses_yolu, dil), "whisper(yerel)"
 
 
-# â”€â”€ Ana araÃ§lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Ana araçlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def video_bilgi(kaynak: str) -> str:
-    """Video metadata dÃ¶ner (baÅŸlÄ±k, sÃ¼re, Ã§Ã¶zÃ¼nÃ¼rlÃ¼k). URL veya yerel dosya yolu kabul eder."""
+    """Video metadata döner (baÅŸlÄ±k, süre, çözünürlük). URL veya yerel dosya yolu kabul eder."""
     if not kaynak or not kaynak.strip():
         return "[VIDEO_BILGI] Hata: kaynak boÅŸ olamaz."
     kaynak = kaynak.strip()
@@ -278,7 +278,7 @@ def video_bilgi(kaynak: str) -> str:
 
 
 def video_analiz(kaynak: str, dil: str = "tr", max_karakter: str = "4000") -> str:
-    """Videodan (altyazÄ± veya Whisper ile) metin Ã§Ä±karÄ±r, hÄ±zlÄ± Ã¶zet + transkript dÃ¶ner."""
+    """Videodan (altyazÄ± veya Whisper ile) metin çÄ±karÄ±r, hÄ±zlÄ± özet + transkript döner."""
     if not kaynak or not kaynak.strip():
         return "[VIDEO_ANALIZ] Hata: kaynak boÅŸ olamaz."
     kaynak = kaynak.strip()
@@ -295,14 +295,14 @@ def video_analiz(kaynak: str, dil: str = "tr", max_karakter: str = "4000") -> st
                 return f"[VIDEO_ANALIZ] Hata: dosya bulunamadÄ±: {kaynak}"
             metin, kaynak_tip = _yerel_video_ses_metni(kaynak, dil)
     except ImportError as e:
-        return f"[VIDEO_ANALIZ] Hata: gerekli kÃ¼tÃ¼phane kurulu deÄŸil ({e})."
+        return f"[VIDEO_ANALIZ] Hata: gerekli kütüphane kurulu deÄŸil ({e})."
     except Exception as e:
         logger.error("[VIDEO_ANALIZ] hata: %s", e)
         return f"[VIDEO_ANALIZ] Hata: {e}"
 
     if not metin or not metin.strip():
         return (
-            f"[VIDEO_ANALIZ] Hata: metin Ã§Ä±karÄ±lamadÄ± (kaynak_tip={kaynak_tip}). "
+            f"[VIDEO_ANALIZ] Hata: metin çÄ±karÄ±lamadÄ± (kaynak_tip={kaynak_tip}). "
             "AltyazÄ± yok ve Whisper baÅŸarÄ±sÄ±z olmuÅŸ olabilir (ffmpeg/yt-dlp/whisper kontrol edin)."
         )
 
@@ -311,8 +311,8 @@ def video_analiz(kaynak: str, dil: str = "tr", max_karakter: str = "4000") -> st
     kisaltilmis = metin[:maks] + ("â€¦" if len(metin) > maks else "")
     return (
         f"[VIDEO_ANALIZ] (kaynak: {kaynak_tip})\n"
-        f"HÄ±zlÄ± Ã¶zet: {hizli_ozet}\n\n"
-        f"Transkript/AltyazÄ± ({len(metin)} karakter, {len(kisaltilmis)} gÃ¶steriliyor):\n{kisaltilmis}"
+        f"HÄ±zlÄ± özet: {hizli_ozet}\n\n"
+        f"Transkript/AltyazÄ± ({len(metin)} karakter, {len(kisaltilmis)} gösteriliyor):\n{kisaltilmis}"
     )
 
 
@@ -326,13 +326,13 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "VIDEO_BILGI",
             video_bilgi,
-            "Video metadata (baÅŸlÄ±k, sÃ¼re, Ã§Ã¶zÃ¼nÃ¼rlÃ¼k) dÃ¶ner. Parametreler: kaynak (url/yol).",
+            "Video metadata (baÅŸlÄ±k, süre, çözünürlük) döner. Parametreler: kaynak (url/yol).",
         )
         motor._plugin_arac_kaydet(
             "VIDEO_ANALIZ",
             video_analiz,
-            "YouTube/yerel videodan altyazÄ± veya Whisper ile metin Ã§Ä±karÄ±r, hÄ±zlÄ± Ã¶zet "
-            "+ transkript dÃ¶ner. Parametreler: kaynak (url/yol), dil, max_karakter.",
+            "YouTube/yerel videodan altyazÄ± veya Whisper ile metin çÄ±karÄ±r, hÄ±zlÄ± özet "
+            "+ transkript döner. Parametreler: kaynak (url/yol), dil, max_karakter.",
         )
     except Exception as e:
         print(f"[AraclarVideo] Motor kayÄ±t hatasÄ±: {e}")

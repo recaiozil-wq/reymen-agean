@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.file_tools shim â€” ReYMeN file tools fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.file_tools shim â€” ReYMeN file tools fonksiyonlarÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

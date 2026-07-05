@@ -1,4 +1,4 @@
-﻿"""
+"""
 _ajan_iletisim.py â€” ReYMeN Inter-Agent v1 Ä°letiÅŸim KanalÄ±
 
 3 ajan (Kali, Windows, CAD) arasÄ±nda JSON mesajlaÅŸma:
@@ -7,7 +7,7 @@ _ajan_iletisim.py â€” ReYMeN Inter-Agent v1 Ä°letiÅŸim KanalÄ±
 - Retry: max 3
 - Heartbeat: 30sn'de bir
 - Circuit breaker: 3 ardÄ±ÅŸÄ±k hata â†’ kalÄ±cÄ± dur
-- Queue: SQLite backend (tÃ¼m ajanlar ortak DB'yi paylaÅŸÄ±r)
+- Queue: SQLite backend (tüm ajanlar ortak DB'yi paylaÅŸÄ±r)
 
 KullanÄ±m:
     from reymen.sistem._ajan_iletisim import AjanIletisim
@@ -26,14 +26,14 @@ import threading
 from datetime import datetime
 from pathlib import Path
 
-# VarsayÄ±lan DB yolu (proje iÃ§i)
+# VarsayÄ±lan DB yolu (proje içi)
 DB_YOLU = Path(__file__).parent.parent / "cereyan" / ".ReYMeN" / "ogrenmeler.db"
 
 # Sabitler
 TIMEOUT_SN = 30
 MAX_RETRY = 3
 HEARTBEAT_ARALIK = 30  # saniye
-HEARTBEAT_TIMEOUT = 90  # 3 kaÃ§Ä±rÄ±lan heartbeat
+HEARTBEAT_TIMEOUT = 90  # 3 kaçÄ±rÄ±lan heartbeat
 CIRCUIT_BREAKER_ESIK = 3
 
 
@@ -93,7 +93,7 @@ class AjanIletisim:
         icerik: dict = None,
     ) -> str:
         """
-        Mesaj gÃ¶nder.
+        Mesaj gönder.
 
         Args:
             gonderen: "kali", "windows", "cad"
@@ -228,7 +228,7 @@ class AjanIletisim:
         return ok
 
     def heartbeat(self, ajan_adi: str) -> None:
-        """AjanÄ±n heartbeat'ini gÃ¼ncelle."""
+        """AjanÄ±n heartbeat'ini güncelle."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -245,7 +245,7 @@ class AjanIletisim:
         conn.close()
 
     def ajan_calistigini_dogrula(self, ajan_adi: str) -> bool:
-        """AjanÄ±n heartbeat'ine gÃ¶re Ã§alÄ±ÅŸÄ±p Ã§alÄ±ÅŸmadÄ±ÄŸÄ±nÄ± kontrol et."""
+        """AjanÄ±n heartbeat'ine göre çalÄ±ÅŸÄ±p çalÄ±ÅŸmadÄ±ÄŸÄ±nÄ± kontrol et."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -259,13 +259,13 @@ class AjanIletisim:
         conn.close()
 
         if not row:
-            return False  # HiÃ§ heartbeat gÃ¶ndermemiÅŸ
+            return False  # Hiç heartbeat göndermemiÅŸ
 
         son_hb = datetime.strptime(row[0][:19], "%Y-%m-%d %H:%M:%S")
         fark = (datetime.now() - son_hb).total_seconds()
 
         if fark > HEARTBEAT_TIMEOUT:
-            return False  # 90sn'den fazla heartbeat yok â†’ Ã§Ã¶kmÃ¼ÅŸ
+            return False  # 90sn'den fazla heartbeat yok â†’ çökmüÅŸ
 
         if row[2]:  # circuit_breaker aktif
             return False
@@ -336,7 +336,7 @@ class AjanIletisim:
         conn.close()
 
     def durum_raporu(self) -> dict:
-        """TÃ¼m ajanlarÄ±n durum raporu."""
+        """Tüm ajanlarÄ±n durum raporu."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
 
@@ -427,7 +427,7 @@ if __name__ == "__main__":
         sonuc = ai.hata_kaydet("kali", f"test hatasi {i+1}")
         print(f"7.{i+1} Kali hata: {sonuc['mesaj']}")
 
-    # 8. Ajan Ã§alÄ±ÅŸÄ±yor mu?
+    # 8. Ajan çalÄ±ÅŸÄ±yor mu?
     print(
         f"\n8. Kali calisiyor mu? {'Evet âœ…' if ai.ajan_calistigini_dogrula('kali') else 'Hayir â›”'}"
     )

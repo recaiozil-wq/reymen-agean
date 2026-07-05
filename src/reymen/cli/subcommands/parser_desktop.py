@@ -1,4 +1,4 @@
-﻿"""desktop parser."""
+"""desktop parser."""
 
 from __future__ import annotations
 import argparse

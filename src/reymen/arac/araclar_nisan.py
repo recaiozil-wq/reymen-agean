@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 araclar_nisan.py â€” 3 asamali hiyerarsik ekran tarayici.
 

@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-memory_manager.py â€” ReYMeN kalÄ±cÄ± hafÄ±za yÃ¶neticisi.
+memory_manager.py â€” ReYMeN kalÄ±cÄ± hafÄ±za yöneticisi.
 
 ReYMeN'teki MEMORY.md + USER.md sisteminin ReYMeN versiyonu.
-Her oturum baÅŸÄ±nda hafÄ±zayÄ± yÃ¼kler, gerektiÄŸinde gÃ¼nceller.
+Her oturum baÅŸÄ±nda hafÄ±zayÄ± yükler, gerektiÄŸinde günceller.
 
 KullanÄ±m:
     >>> from reymen.hafiza.memory_manager import MemoryManager
@@ -25,14 +25,14 @@ USER_LIMIT_CHARS = 50000
 
 
 class MemoryManager:
-    """KalÄ±cÄ± hafÄ±za yÃ¶neticisi.
+    """KalÄ±cÄ± hafÄ±za yöneticisi.
 
-    MEMORY.md: AjanÄ±n kalÄ±cÄ± notlarÄ± (ortam, Ã¶ÄŸrenilen bilgiler).
+    MEMORY.md: AjanÄ±n kalÄ±cÄ± notlarÄ± (ortam, öÄŸrenilen bilgiler).
     USER.md: KullanÄ±cÄ± profili (tercihler, iletiÅŸim tarzÄ±).
     """
 
     def __init__(self, memory_path: str = None, user_path: str = None):
-        """HafÄ±za yÃ¶neticisini baÅŸlat.
+        """HafÄ±za yöneticisini baÅŸlat.
 
         Args:
             memory_path: MEMORY.md tam yolu (None=varsayÄ±lan)
@@ -56,11 +56,11 @@ class MemoryManager:
         }
 
     def kaydet(self, memory_icerik: str = None, user_icerik: str = None) -> bool:
-        """GÃ¼ncellenmiÅŸ hafÄ±zayÄ± dosyaya yaz.
+        """GüncellenmiÅŸ hafÄ±zayÄ± dosyaya yaz.
 
         Args:
-            memory_icerik: MEMORY.md iÃ§in yeni iÃ§erik (None=dokunma)
-            user_icerik: USER.md iÃ§in yeni iÃ§erik (None=dokunma)
+            memory_icerik: MEMORY.md için yeni içerik (None=dokunma)
+            user_icerik: USER.md için yeni içerik (None=dokunma)
 
         Returns:
             BaÅŸarÄ±lÄ± mÄ±?
@@ -76,11 +76,11 @@ class MemoryManager:
             return False
 
     def guncelle(self, hedef: str, anahtar: str, deger: str) -> bool:
-        """HafÄ±zada bir anahtarÄ± gÃ¼ncelle.
+        """HafÄ±zada bir anahtarÄ± güncelle.
 
         Args:
             hedef: "memory" veya "user"
-            anahtar: BaÅŸlÄ±k (Ã¶rn: "KullanÄ±cÄ± Tercihleri")
+            anahtar: BaÅŸlÄ±k (örn: "KullanÄ±cÄ± Tercihleri")
             deger: Yeni deÄŸer
 
         Returns:
@@ -90,7 +90,7 @@ class MemoryManager:
         icerik = self._oku(dosya)
         sinir = MEMORY_LIMIT_CHARS if hedef == "memory" else USER_LIMIT_CHARS
 
-        # AnahtarÄ± bul ve gÃ¼ncelle, yoksa ekle
+        # AnahtarÄ± bul ve güncelle, yoksa ekle
         yeni = self._anahtar_guncelle(icerik, anahtar, deger)
 
         if len(yeni) > sinir:
@@ -126,7 +126,7 @@ class MemoryManager:
         return self._yaz(dosya, yeni)
 
     def ozet(self) -> str:
-        """HafÄ±za Ã¶zeti: karakter sayÄ±sÄ±, doluluk oranÄ±."""
+        """HafÄ±za özeti: karakter sayÄ±sÄ±, doluluk oranÄ±."""
         m_icerik = self._oku(self.memory_path)
         u_icerik = self._oku(self.user_path)
 
@@ -138,7 +138,7 @@ class MemoryManager:
         )
 
     def _oku(self, dosya: Path) -> str:
-        """DosyayÄ± oku, yoksa boÅŸ dÃ¶n."""
+        """DosyayÄ± oku, yoksa boÅŸ dön."""
         try:
             if dosya.exists():
                 return dosya.read_text(encoding="utf-8")
@@ -158,7 +158,7 @@ class MemoryManager:
             return False
 
     def _anahtar_guncelle(self, icerik: str, anahtar: str, deger: str) -> str:
-        """Ä°Ã§erikte bir baÅŸlÄ±k altÄ±ndaki deÄŸeri gÃ¼ncelle."""
+        """Ä°çerikte bir baÅŸlÄ±k altÄ±ndaki deÄŸeri güncelle."""
         satirlar = icerik.split("\n")
         yeni = []
         hedef_baslik = f"## {anahtar}"
@@ -171,7 +171,7 @@ class MemoryManager:
                 bulundu = True
                 yeni.append(satir)
             elif baslik_satiri >= 0 and i > baslik_satiri:
-                # BaÅŸlÄ±ktan sonraki boÅŸ satÄ±r veya iÃ§erik
+                # BaÅŸlÄ±ktan sonraki boÅŸ satÄ±r veya içerik
                 if satir.strip().startswith("##"):
                     # Yeni baÅŸlÄ±k baÅŸladÄ±, eski baÅŸlÄ±ÄŸÄ± atla
                     yeni.append(satir)
@@ -180,12 +180,12 @@ class MemoryManager:
                     yeni.append(deger)
                     bulundu = True
                 else:
-                    # Eski iÃ§eriÄŸi atla
+                    # Eski içeriÄŸi atla
                     continue
             else:
                 yeni.append(satir)
 
-        # BaÅŸlÄ±k hiÃ§ bulunamadÄ±ysa ekle
+        # BaÅŸlÄ±k hiç bulunamadÄ±ysa ekle
         if baslik_satiri == -1 and anahtar:
             yeni.append(f"\n## {anahtar}")
             yeni.append(deger)
@@ -198,7 +198,7 @@ _singleton = None
 
 
 def get_memory() -> MemoryManager:
-    """Tekil MemoryManager Ã¶rneÄŸini dÃ¶ndÃ¼r."""
+    """Tekil MemoryManager örneÄŸini döndür."""
     global _singleton
     if _singleton is None:
         _singleton = MemoryManager()
@@ -206,7 +206,7 @@ def get_memory() -> MemoryManager:
 
 
 def hafiza_yukle() -> dict:
-    """KÄ±sayol: hafÄ±zayÄ± yÃ¼kle."""
+    """KÄ±sayol: hafÄ±zayÄ± yükle."""
     return get_memory().yukle()
 
 
@@ -216,10 +216,10 @@ def hafiza_ekle(hedef: str, metin: str) -> bool:
 
 
 def hafiza_guncelle(hedef: str, anahtar: str, deger: str) -> bool:
-    """KÄ±sayol: hafÄ±zada gÃ¼ncelle."""
+    """KÄ±sayol: hafÄ±zada güncelle."""
     return get_memory().guncelle(hedef, anahtar, deger)
 
 
 def hafiza_ozet() -> str:
-    """KÄ±sayol: hafÄ±za Ã¶zeti."""
+    """KÄ±sayol: hafÄ±za özeti."""
     return get_memory().ozet()

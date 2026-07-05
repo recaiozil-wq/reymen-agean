@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 native_mcp_client.py â€” LEGACY Native MCP Client (Korunuyor).
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 ortak_komut.py â€” 3 bot + ReYMeN Agent ortak yetki/komut merkezi.
 Her degisiklikte otomatik guncellenir. Tum botlar burayi okur.
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # __file__ = .../reymen/sistem/ortak_komut.py -> 4x parent = proje koku
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent.parent
-REYMEN_HOME = Path.home() / ".reymen"
+REYMEN_HOME = Path.home() / ".hermes"
 
 # â”€â”€ Reasoning-Core saÄŸlayÄ±cÄ± adÄ± (config.yaml > fallback_providers'ta aranÄ±r)
 _REASONING_PROVIDER_ADI = "reasoning-core"
@@ -264,13 +264,13 @@ def _analitik_db_hazirla() -> None:
 def _reasoning_core_cagir(
     prompt: str, fallback_providers: list[dict], timeout: int = 60
 ) -> dict:
-    """config.yaml > fallback_providers iÃ§indeki 'reasoning-core' girdisini
+    """config.yaml > fallback_providers içindeki 'reasoning-core' girdisini
     bulup OpenAI-uyumlu chat/completions isteÄŸi atar.
 
     Ornith-1.0 ailesi (bkz. deep-reinforce.com/ornith_1_0.html) yanÄ±tÄ±
-    <think>...</think> bloÄŸuyla aÃ§ar ve sunucu tarafÄ±nda reasoning-parser
-    aÃ§Ä±ksa bunu ayrÄ± bir `reasoning_content` alanÄ±nda dÃ¶ner. Bu fonksiyon
-    her iki durumu da (ayrÄ± alan / metin iÃ§i <think>) destekler.
+    <think>...</think> bloÄŸuyla açar ve sunucu tarafÄ±nda reasoning-parser
+    açÄ±ksa bunu ayrÄ± bir `reasoning_content` alanÄ±nda döner. Bu fonksiyon
+    her iki durumu da (ayrÄ± alan / metin içi <think>) destekler.
     """
     provider_cfg = next(
         (
@@ -282,8 +282,8 @@ def _reasoning_core_cagir(
     )
     if provider_cfg is None:
         raise RuntimeError(
-            "config.yaml > fallback_providers iÃ§inde 'reasoning-core*' ile "
-            "baÅŸlayan bir saÄŸlayÄ±cÄ± bulunamadÄ±. Ã–nce config.yaml'Ä± gÃ¼ncelle."
+            "config.yaml > fallback_providers içinde 'reasoning-core*' ile "
+            "baÅŸlayan bir saÄŸlayÄ±cÄ± bulunamadÄ±. Ã–nce config.yaml'Ä± güncelle."
         )
 
     base_url = provider_cfg["base_url"].rstrip("/")
@@ -334,22 +334,22 @@ def reasoning_loop(
     bot_adi: str,
     fallback_providers: list[dict],
 ) -> dict:
-    """Bir hata oluÅŸtuÄŸunda Ã§aÄŸrÄ±lan otonom akÄ±ÅŸ:
+    """Bir hata oluÅŸtuÄŸunda çaÄŸrÄ±lan otonom akÄ±ÅŸ:
 
-        1) durum_ozeti (DURUM_OKU() Ã§Ä±ktÄ±sÄ±) + hata_metni birlikte
-           Reasoning-Core'a gÃ¶nderilir.
-        2) DÃ¶nen dÃ¼ÅŸÃ¼nce zinciri (CoT) ve Ã§Ã¶zÃ¼m ayrÄ±ÅŸtÄ±rÄ±lÄ±r.
-        3) SonuÃ§ analitik.db > reasoning_log tablosuna yazÄ±lÄ±r.
+        1) durum_ozeti (DURUM_OKU() çÄ±ktÄ±sÄ±) + hata_metni birlikte
+           Reasoning-Core'a gönderilir.
+        2) Dönen düÅŸünce zinciri (CoT) ve çözüm ayrÄ±ÅŸtÄ±rÄ±lÄ±r.
+        3) Sonuç analitik.db > reasoning_log tablosuna yazÄ±lÄ±r.
 
     SOUL.md > 'DURUM_OKU() ZORUNLULUÄU' kuralÄ± gereÄŸi bu fonksiyon
-    durum_ozeti'ni KENDÄ°SÄ° Ã¼retmez â€” Ã§aÄŸÄ±ran taraf (Ã¶r. hata yakalama
-    handler'Ä±) Ã¶nce DURUM_OKU() Ã§aÄŸÄ±rÄ±p sonucu buraya parametre olarak
-    geÃ§irmelidir. Bu fonksiyon durum_ozeti boÅŸsa Ã§alÄ±ÅŸmayÄ± reddeder,
+    durum_ozeti'ni KENDÄ°SÄ° üretmez â€” çaÄŸÄ±ran taraf (ör. hata yakalama
+    handler'Ä±) önce DURUM_OKU() çaÄŸÄ±rÄ±p sonucu buraya parametre olarak
+    geçirmelidir. Bu fonksiyon durum_ozeti boÅŸsa çalÄ±ÅŸmayÄ± reddeder,
     aksi halde kural ihlal edilmiÅŸ olur.
     """
     if not durum_ozeti or not durum_ozeti.strip():
         raise ValueError(
-            "reasoning_loop Ã§aÄŸrÄ±lmadan Ã¶nce DURUM_OKU() Ã§alÄ±ÅŸtÄ±rÄ±lmalÄ± ve "
+            "reasoning_loop çaÄŸrÄ±lmadan önce DURUM_OKU() çalÄ±ÅŸtÄ±rÄ±lmalÄ± ve "
             "sonucu durum_ozeti parametresine verilmeli (SOUL.md kuralÄ±)."
         )
 
@@ -357,8 +357,8 @@ def reasoning_loop(
 
     prompt = (
         "AÅŸaÄŸÄ±da bir yazÄ±lÄ±m sisteminde oluÅŸan hata ve mevcut sistem "
-        "durumu veriliyor. KÃ¶k nedeni adÄ±m adÄ±m analiz et, sonra somut "
-        "bir Ã§Ã¶zÃ¼m Ã¶ner.\n\n"
+        "durumu veriliyor. Kök nedeni adÄ±m adÄ±m analiz et, sonra somut "
+        "bir çözüm öner.\n\n"
         f"--- SÄ°STEM DURUMU (DURUM_OKU) ---\n{durum_ozeti}\n\n"
         f"--- HATA ---\n{hata_metni}\n"
     )
@@ -366,7 +366,7 @@ def reasoning_loop(
     try:
         sonuc = _reasoning_core_cagir(prompt, fallback_providers)
     except Exception as exc:
-        logger.warning("reasoning_loop: Reasoning-Core Ã§aÄŸrÄ±sÄ± baÅŸarÄ±sÄ±z: %s", exc)
+        logger.warning("reasoning_loop: Reasoning-Core çaÄŸrÄ±sÄ± baÅŸarÄ±sÄ±z: %s", exc)
         return {"basarili": False, "hata": str(exc)}
 
     kayit = {
@@ -394,7 +394,7 @@ def reasoning_loop(
         conn.commit()
 
     logger.info(
-        "reasoning_loop: %s botunda hata Ã§Ã¶zÃ¼mÃ¼ %ss iÃ§inde analitik.db'ye kaydedildi.",
+        "reasoning_loop: %s botunda hata çözümü %ss içinde analitik.db'ye kaydedildi.",
         bot_adi,
         kayit["sure_sn"],
     )
@@ -406,7 +406,7 @@ def reasoning_loop(
 if __name__ == "__main__":
     import sys
 
-    # CLI'da sys.path'e proje kÃ¶kÃ¼nÃ¼ ekle (reymen paketini bulmak iÃ§in)
+    # CLI'da sys.path'e proje kökünü ekle (reymen paketini bulmak için)
     # __file__ = .../reymen/sistem/ortak_komut.py -> 4x parent = proje koku
     _cli_kok = Path(__file__).resolve().parent.parent.parent.parent
     if str(_cli_kok) not in sys.path:

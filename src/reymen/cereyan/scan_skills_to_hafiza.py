@@ -1,12 +1,12 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-scan_skills_to_hafiza.py â€” reymen/cereyan/skills/ klasÃ¶rÃ¼ndeki .md dosyalarÄ±nÄ±
+scan_skills_to_hafiza.py â€” reymen/cereyan/skills/ klasöründeki .md dosyalarÄ±nÄ±
 tara, skills_index.db'deki beceriler_meta tablosuyla karÅŸÄ±laÅŸtÄ±r.
   - Eksik olanlarÄ± EKLE (yeni)
-  - Hash deÄŸiÅŸmiÅŸ olanlarÄ± GÃœNCELLE (gÃ¼ncellenmiÅŸ)
+  - Hash deÄŸiÅŸmiÅŸ olanlarÄ± GÃœNCELLE (güncellenmiÅŸ)
   - DeÄŸiÅŸmeyenleri ATLA
 
-Her 6 saatte bir Ã§alÄ±ÅŸacak cron job.
+Her 6 saatte bir çalÄ±ÅŸacak cron job.
 """
 
 import hashlib
@@ -26,13 +26,13 @@ logger = logging.getLogger("scan_skills")
 
 # â”€â”€ Yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ROOT = Path(__file__).parent.parent.resolve()  # reymen/
-SKILLS_DIR = ROOT / "cereyan" / "skills"  # taranacak klasÃ¶r
+SKILLS_DIR = ROOT / "cereyan" / "skills"  # taranacak klasör
 SKILLS_DB = ROOT.parent / ".ReYMeN" / "db" / "skills.db"  # consolidated: skills_index + skill_library
 OGRENME_DB = ROOT.parent / ".ReYMeN" / "db" / "ogrenme_merkezi.db"  # consolidated: ogrenme.db + ogrenmeler.db + proaktif_ogrenme
 
 
 def dosya_hash(dosya_yolu: str) -> str:
-    """Bir dosyanÄ±n SHA256 hash'ini dÃ¶ndÃ¼r (ilk 16 karakter)."""
+    """Bir dosyanÄ±n SHA256 hash'ini döndür (ilk 16 karakter)."""
     h = hashlib.sha256()
     with open(dosya_yolu, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
@@ -42,7 +42,7 @@ def dosya_hash(dosya_yolu: str) -> str:
 
 def kategori_ve_ad(dosya_yolu: str) -> tuple[str, str]:
     """
-    GÃ¶reli yoldan kategori ve dosya adÄ±nÄ± Ã§Ä±kar.
+    Göreli yoldan kategori ve dosya adÄ±nÄ± çÄ±kar.
     Ã–rn: 'AI_ML/agents/agent-project-bootstrap.md' â†’ ('AI_ML/agents', 'agent-project-bootstrap.md')
     """
     rel = os.path.relpath(dosya_yolu, str(SKILLS_DIR))
@@ -56,9 +56,9 @@ def kategori_ve_ad(dosya_yolu: str) -> tuple[str, str]:
 
 def beceriden_aciklama_ve_icerik(icerik: str) -> tuple[str, str]:
     """
-    Markdown iÃ§eriÄŸinden:
+    Markdown içeriÄŸinden:
     - aciklama: ilk satÄ±r (# ile baÅŸlayan baÅŸlÄ±k) veya ilk 200 karakter
-    - icerik: tÃ¼m iÃ§erik
+    - icerik: tüm içerik
     """
     lines = icerik.split("\n")
     baslik = ""
@@ -76,15 +76,15 @@ def scan_skills():
     """Ana tarama fonksiyonu."""
     logger.info("=" * 60)
     logger.info("ğŸ” Skills tarama baÅŸlÄ±yor...")
-    logger.info("   KlasÃ¶r: %s", SKILLS_DIR)
+    logger.info("   Klasör: %s", SKILLS_DIR)
     logger.info("   DB:     %s", SKILLS_DB)
     logger.info("   Ã–ÄŸrenme: %s", OGRENME_DB)
 
-    # 1) Skills dizinindeki tÃ¼m .md dosyalarÄ±nÄ± bul
+    # 1) Skills dizinindeki tüm .md dosyalarÄ±nÄ± bul
     md_dosyalari = sorted(SKILLS_DIR.rglob("*.md"))
-    logger.info("ğŸ“„ Skills klasÃ¶rÃ¼nde %d .md dosyasÄ± bulundu.", len(md_dosyalari))
+    logger.info("ğŸ“„ Skills klasöründe %d .md dosyasÄ± bulundu.", len(md_dosyalari))
 
-    # 2) Skills DB'deki mevcut meta tablosunu yÃ¼kle
+    # 2) Skills DB'deki mevcut meta tablosunu yükle
     con = sqlite3.connect(str(SKILLS_DB))
     con.execute("PRAGMA journal_mode=WAL")
 
@@ -137,7 +137,7 @@ def scan_skills():
     logger.info("=" * 60)
     logger.info("âœ… Tarama tamamlandÄ±!")
     logger.info("   Yeni eklenen:  %d", yeni_sayisi)
-    logger.info("   GÃ¼ncellenen:   %d", guncel_sayisi)
+    logger.info("   Güncellenen:   %d", guncel_sayisi)
     logger.info("   Atlanan (aynÄ±): %d", atlanan_sayisi)
     logger.info("=" * 60)
 
@@ -150,7 +150,7 @@ def _skills_db_ekle(meta_adi: str, dosya_yolu: str, dosya_hash_val: str):
         with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
             icerik = f.read()
     except Exception as e:
-        logger.warning("âš ï¸  Ä°Ã§erik okunamadÄ±: %s â€” %s", dosya_yolu, e)
+        logger.warning("âš ï¸  Ä°çerik okunamadÄ±: %s â€” %s", dosya_yolu, e)
         return
 
     baslik, tam_icerik = beceriden_aciklama_ve_icerik(icerik)
@@ -188,12 +188,12 @@ def _skills_db_ekle(meta_adi: str, dosya_yolu: str, dosya_hash_val: str):
 
 
 def _skills_db_guncelle(meta_adi: str, dosya_yolu: str, dosya_hash_val: str):
-    """Mevcut dosyayÄ± skills_index.db'de gÃ¼ncelle."""
+    """Mevcut dosyayÄ± skills_index.db'de güncelle."""
     try:
         with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
             icerik = f.read()
     except Exception as e:
-        logger.warning("âš ï¸  Ä°Ã§erik okunamadÄ±: %s â€” %s", dosya_yolu, e)
+        logger.warning("âš ï¸  Ä°çerik okunamadÄ±: %s â€” %s", dosya_yolu, e)
         return
 
     baslik, tam_icerik = beceriden_aciklama_ve_icerik(icerik)
@@ -203,12 +203,12 @@ def _skills_db_guncelle(meta_adi: str, dosya_yolu: str, dosya_hash_val: str):
 
     con = sqlite3.connect(str(SKILLS_DB))
     try:
-        # FTS5'te gÃ¼ncelle (ad'a gÃ¶re)
+        # FTS5'te güncelle (ad'a göre)
         con.execute(
             "UPDATE beceriler SET aciklama=?, icerik=?, kaynak=? WHERE ad=?",
             (muhtemel_aciklama, muhtemel_icerik, dosya_yolu, meta_adi),
         )
-        # Meta gÃ¼ncelle
+        # Meta güncelle
         con.execute(
             "UPDATE beceriler_meta SET dosya_hash=?, guncelleme=? WHERE ad=?",
             (dosya_hash_val, su_an, meta_adi),
@@ -226,7 +226,7 @@ def _ogrenme_db_ekle(kategori: str, dosya_adi: str, dosya_yolu: str):
         with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
             icerik = f.read()
     except Exception as e:
-        logger.warning("âš ï¸  ogrenme.db ekleme: iÃ§erik okunamadÄ±: %s", e)
+        logger.warning("âš ï¸  ogrenme.db ekleme: içerik okunamadÄ±: %s", e)
         return
 
     hedef = dosya_adi.replace(".md", "")
@@ -259,13 +259,13 @@ def _ogrenme_db_ekle(kategori: str, dosya_adi: str, dosya_yolu: str):
 
 def _ogrenme_db_guncelle(kategori: str, dosya_adi: str, dosya_yolu: str):
     """
-    GÃ¼ncellenmiÅŸ skill dosyasÄ±nÄ± OnceHafiza ogrenme DB'sinde gÃ¼ncelle.
+    GüncellenmiÅŸ skill dosyasÄ±nÄ± OnceHafiza ogrenme DB'sinde güncelle.
     """
     try:
         with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
             icerik = f.read()
     except Exception as e:
-        logger.warning("âš ï¸  ogrenme.db gÃ¼ncelleme: iÃ§erik okunamadÄ±: %s", e)
+        logger.warning("âš ï¸  ogrenme.db güncelleme: içerik okunamadÄ±: %s", e)
         return
 
     hedef = dosya_adi.replace(".md", "")
@@ -300,7 +300,7 @@ def _ogrenme_db_guncelle(kategori: str, dosya_adi: str, dosya_yolu: str):
             )
         con.commit()
     except Exception as e:
-        logger.warning("âš ï¸  ogrenme.db gÃ¼ncelleme hatasÄ± (%s): %s", hedef, e)
+        logger.warning("âš ï¸  ogrenme.db güncelleme hatasÄ± (%s): %s", hedef, e)
     finally:
         con.close()
 

@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
-"""codex_responses_adapter.py â€” OpenAI Codex / Responses API AdaptÃ¶rÃ¼.
+# -*- coding: utf-8 -*-
+"""codex_responses_adapter.py â€” OpenAI Codex / Responses API Adaptörü.
 
 OpenAI'nin yeni `/v1/responses` endpoint'ini kullanÄ±r (GPT-4o dahil).
 Klasik `/v1/chat/completions`'tan farkÄ±: durum bilgisi saklama, web arama,
-kod yorumlama gibi built-in araÃ§larÄ± destekler.
+kod yorumlama gibi built-in araçlarÄ± destekler.
 ENV: OPENAI_API_KEY
 """
 
@@ -41,7 +41,7 @@ def _responses_istek(veri: dict) -> dict:
 
 
 class CodexResponsesAdapter:
-    """OpenAI Responses API adaptÃ¶rÃ¼ (built-in araÃ§lar destekli)."""
+    """OpenAI Responses API adaptörü (built-in araçlar destekli)."""
 
     def __init__(
         self,
@@ -65,13 +65,13 @@ class CodexResponsesAdapter:
         max_output_tokens: int = 4096,
         sicaklik: float = 0.7,
     ) -> dict:
-        """Responses API Ã§aÄŸrÄ±sÄ±.
+        """Responses API çaÄŸrÄ±sÄ±.
 
         Args:
-            mesajlar:         KonuÅŸma geÃ§miÅŸi
-            araclar:          Built-in araÃ§lar (web_search_preview, code_interpreter, vb.)
-            onceki_yanit_id:  Durum bilgisi devamÄ± iÃ§in Ã¶nceki yanÄ±t ID
-            max_output_tokens: Maks Ã§Ä±ktÄ± token
+            mesajlar:         KonuÅŸma geçmiÅŸi
+            araclar:          Built-in araçlar (web_search_preview, code_interpreter, vb.)
+            onceki_yanit_id:  Durum bilgisi devamÄ± için önceki yanÄ±t ID
+            max_output_tokens: Maks çÄ±ktÄ± token
             sicaklik:         YaratÄ±cÄ±lÄ±k (0-2)
 
         Returns:
@@ -111,7 +111,7 @@ class CodexResponsesAdapter:
 
         Args:
             sistem:           Sistem promptu
-            mesajlar:         KonuÅŸma geÃ§miÅŸi
+            mesajlar:         KonuÅŸma geçmiÅŸi
             web_arama:        Web arama aracÄ± etkin mi
             kod_yorumlayici:  Kod yorumlayÄ±cÄ± aracÄ± etkin mi
 
@@ -133,7 +133,7 @@ class CodexResponsesAdapter:
         if "error" in yanit:
             return f"[Codex Responses]: {yanit['error']}"
 
-        # Responses API Ã§Ä±ktÄ± formatÄ±
+        # Responses API çÄ±ktÄ± formatÄ±
         cikti = yanit.get("output", [])
         if isinstance(cikti, list):
             metin_parcalari = []
@@ -153,7 +153,7 @@ class CodexResponsesAdapter:
         return f"[Codex Responses]: {yanit}"
 
     def kod_calistir(self, kod: str, dil: str = "python") -> str:
-        """Kod yorumlayÄ±cÄ± ile kod Ã§alÄ±ÅŸtÄ±r.
+        """Kod yorumlayÄ±cÄ± ile kod çalÄ±ÅŸtÄ±r.
 
         Args:
             kod:  Ã‡alÄ±ÅŸtÄ±rÄ±lacak kod
@@ -163,11 +163,11 @@ class CodexResponsesAdapter:
             Ã‡Ä±ktÄ± veya hata
         """
         return self.uret(
-            sistem="Sen bir kod Ã§alÄ±ÅŸtÄ±rma asistanÄ±sÄ±n.",
+            sistem="Sen bir kod çalÄ±ÅŸtÄ±rma asistanÄ±sÄ±n.",
             mesajlar=[
                 {
                     "role": "user",
-                    "content": f"Bu {dil} kodunu Ã§alÄ±ÅŸtÄ±r:\n```{dil}\n{kod}\n```",
+                    "content": f"Bu {dil} kodunu çalÄ±ÅŸtÄ±r:\n```{dil}\n{kod}\n```",
                 }
             ],
             kod_yorumlayici=True,

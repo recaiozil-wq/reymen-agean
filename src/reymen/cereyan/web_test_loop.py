@@ -1,15 +1,15 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
-web_test_loop.py â€” WEB â†’ UYGULA â†’ PUANLA â†’ KARAR dÃ¶ngÃ¼sÃ¼.
+web_test_loop.py â€” WEB â†’ UYGULA â†’ PUANLA â†’ KARAR döngüsü.
 
 Ajan web'den yeni bilgi bulur, eski bilgiyle test eder,
 puanlar ve hangisinin daha iyi olduÄŸuna karar verir.
 
 5 TETÄ°KLEYÄ°CÄ°:
 1. HafÄ±za boÅŸ â†’ anÄ±nda web
-2. GÃ¶rev baÅŸarÄ±sÄ±z (2. hata) â†’ web
-3. GÃ¼ven < 0.5 â†’ web
-4. GeÃ§erlilik geÃ§miÅŸ â†’ arka planda web
+2. Görev baÅŸarÄ±sÄ±z (2. hata) â†’ web
+3. Güven < 0.5 â†’ web
+4. Geçerlilik geçmiÅŸ â†’ arka planda web
 5. Ã‡eliÅŸki â†’ web
 """
 
@@ -29,27 +29,27 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class TestSonucu:
-    """Bir yÃ¶ntemin test sonucu."""
+    """Bir yöntemin test sonucu."""
 
     yontem_adi: str
-    hiz_sn: float  # KaÃ§ saniye sÃ¼rdÃ¼? (dÃ¼ÅŸÃ¼k iyi)
+    hiz_sn: float  # Kaç saniye sürdü? (düÅŸük iyi)
     basari: bool  # Hata verdi mi? (True=baÅŸarÄ±lÄ±)
     cikti_dogru: bool  # Ã‡Ä±ktÄ± doÄŸru mu?
-    guvenlik: float  # 0.0-1.0 (1.0=gÃ¼venli)
-    kaynak_guven: float  # KaynaÄŸÄ±n gÃ¼venilirliÄŸi (web veya hafÄ±za)
+    guvenlik: float  # 0.0-1.0 (1.0=güvenli)
+    kaynak_guven: float  # KaynaÄŸÄ±n güvenilirliÄŸi (web veya hafÄ±za)
 
     def puan(self) -> float:
         """Toplam puan [0.0, 1.0]"""
         p = 0.0
-        # HÄ±z: 1sn altÄ± = 1.0, 60sn Ã¼stÃ¼ = 0.0
+        # HÄ±z: 1sn altÄ± = 1.0, 60sn üstü = 0.0
         p += max(0, 1.0 - self.hiz_sn / 60.0) * 0.2
         # BaÅŸarÄ±: hata yoksa 1.0
         p += (1.0 if self.basari else 0.0) * 0.3
         # Ã‡Ä±ktÄ± doÄŸruluÄŸu
         p += (1.0 if self.cikti_dogru else 0.0) * 0.2
-        # GÃ¼venlik
+        # Güvenlik
         p += self.guvenlik * 0.15
-        # Kaynak gÃ¼venilirliÄŸi
+        # Kaynak güvenilirliÄŸi
         p += self.kaynak_guven * 0.15
         return round(p, 4)
 
@@ -100,26 +100,26 @@ ONCELIK_SIRASI = [1, 3, 2, 4, 5]
 def tetikleyici_kontrol(tetik_id: int, **kwargs) -> bool:
     """Belirtilen tetikleyicinin sartini kontrol et."""
     if tetik_id == 1:
-        # Hafiza BoÅŸ: once_hafiza.ara() boÅŸ dÃ¶ndÃ¼ mÃ¼?
+        # Hafiza BoÅŸ: once_hafiza.ara() boÅŸ döndü mü?
         return kwargs.get("hafiza_bos", False)
 
     elif tetik_id == 2:
-        # GÃ¼ven DÃ¼ÅŸÃ¼k: guven_skoru < 0.5
+        # Güven DüÅŸük: guven_skoru < 0.5
         return kwargs.get("guven_skoru", 1.0) < 0.5
 
     elif tetik_id == 3:
-        # GÃ¶rev BaÅŸarÄ±sÄ±z: 2. hatadan sonra
+        # Görev BaÅŸarÄ±sÄ±z: 2. hatadan sonra
         return kwargs.get("basarisiz_deneme_sayisi", 0) >= 2
 
     elif tetik_id == 4:
-        # GeÃ§erlilik SÃ¼resi Doldu
+        # Geçerlilik Süresi Doldu
         gecerlilik = kwargs.get("gecerlilik_tarihi")
         if gecerlilik:
             return str(gecerlilik) < str(date.today())
         return False
 
     elif tetik_id == 5:
-        # Ã‡eliÅŸki: iki farklÄ± bilgi Ã§akÄ±ÅŸÄ±yor
+        # Ã‡eliÅŸki: iki farklÄ± bilgi çakÄ±ÅŸÄ±yor
         return kwargs.get("celiski_var", False)
 
     return False
@@ -172,7 +172,7 @@ def puanla(
     guvenlik: float,
     kaynak_guven: float,
 ) -> TestSonucu:
-    """Bir yÃ¶ntemi puanla ve TestSonucu dÃ¶ndÃ¼r."""
+    """Bir yöntemi puanla ve TestSonucu döndür."""
     return TestSonucu(
         yontem_adi=yontem_adi,
         hiz_sn=hiz_sn,
@@ -196,7 +196,7 @@ class KararSonucu:
 
 
 def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
-    """Ä°ki yÃ¶ntemi karÅŸÄ±laÅŸtÄ±r ve hangisinin kazandÄ±ÄŸÄ±na karar ver."""
+    """Ä°ki yöntemi karÅŸÄ±laÅŸtÄ±r ve hangisinin kazandÄ±ÄŸÄ±na karar ver."""
     eski_puan = eski.puan()
     yeni_puan = yeni.puan()
     fark = abs(eski_puan - yeni_puan)
@@ -211,7 +211,7 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
             eski_korundu=True,
         )
 
-    # Eski baÅŸarÄ±sÄ±z, yeni baÅŸarÄ±lÄ± â†’ yeniye geÃ§
+    # Eski baÅŸarÄ±sÄ±z, yeni baÅŸarÄ±lÄ± â†’ yeniye geç
     if (not eski.basari or not eski.cikti_dogru) and (yeni.basari and yeni.cikti_dogru):
         return KararSonucu(
             kazanan=yeni.yontem_adi,
@@ -221,7 +221,7 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
             eski_korundu=False,
         )
 
-    # Yeni > Eski + 0.2 fark â†’ yeniye geÃ§
+    # Yeni > Eski + 0.2 fark â†’ yeniye geç
     if yeni_puan > eski_puan + 0.2:
         return KararSonucu(
             kazanan=yeni.yontem_adi,
@@ -251,7 +251,7 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
     )
 
 
-# â”€â”€ 5 Tetikleyici SimÃ¼lasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ 5 Tetikleyici Simülasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 SIMULASYON_SENARYOLARI = [
     {
@@ -303,7 +303,7 @@ SIMULASYON_SENARYOLARI = [
 
 
 def tetikleyici_simulasyonu() -> list[dict]:
-    """5 tetikleyiciyi simÃ¼le et ve sonuÃ§larÄ± dÃ¶ndÃ¼r."""
+    """5 tetikleyiciyi simüle et ve sonuçlarÄ± döndür."""
     sonuclar = []
     for senaryo in SIMULASYON_SENARYOLARI:
         tid, bilgi = hangi_tetikleyici(
@@ -331,7 +331,7 @@ def tetikleyici_simulasyonu() -> list[dict]:
     return sonuclar
 
 
-# â”€â”€ Tam DÃ¶ngÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Tam Döngü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def web_test_loop(
@@ -340,12 +340,12 @@ def web_test_loop(
     yeni_yontem: Callable[[], TestSonucu],
 ) -> dict[str, Any]:
     """
-    WEB â†’ UYGULA â†’ PUANLA â†’ KARAR tam dÃ¶ngÃ¼sÃ¼.
+    WEB â†’ UYGULA â†’ PUANLA â†’ KARAR tam döngüsü.
 
     Args:
-        konu: Test edilen konu (Ã¶rn. "nmap UDP tarama")
-        eski_yontem: Eski yÃ¶ntemi Ã§alÄ±ÅŸtÄ±rÄ±p TestSonucu dÃ¶ndÃ¼ren fonksiyon
-        yeni_yontem: Yeni yÃ¶ntemi Ã§alÄ±ÅŸtÄ±rÄ±p TestSonucu dÃ¶ndÃ¼ren fonksiyon
+        konu: Test edilen konu (örn. "nmap UDP tarama")
+        eski_yontem: Eski yöntemi çalÄ±ÅŸtÄ±rÄ±p TestSonucu döndüren fonksiyon
+        yeni_yontem: Yeni yöntemi çalÄ±ÅŸtÄ±rÄ±p TestSonucu döndüren fonksiyon
 
     Returns:
         {
@@ -412,20 +412,20 @@ if __name__ == "__main__":
     print("TEST: nmap icin en hizli UDP tarama yontemi")
     print("=" * 65)
 
-    # Eski yÃ¶ntem: nmap -sU -p 1-1000 (tam UDP tarama, yavaÅŸ)
+    # Eski yöntem: nmap -sU -p 1-1000 (tam UDP tarama, yavaÅŸ)
     eski_yontem = lambda: TestSonucu(
         yontem_adi="nmap -sU tam UDP tarama",
         hiz_sn=45.0,  # yavaÅŸ
         basari=True,
         cikti_dogru=True,
-        guvenlik=1.0,  # nmap gÃ¼venli
+        guvenlik=1.0,  # nmap güvenli
         kaynak_guven=0.9,  # resmi doc
     )
 
-    # Yeni yÃ¶ntem (web'den bulunan): nmap -sU --top-ports 100 (hÄ±zlÄ±)
+    # Yeni yöntem (web'den bulunan): nmap -sU --top-ports 100 (hÄ±zlÄ±)
     yeni_yontem = lambda: TestSonucu(
         yontem_adi="nmap -sU --top-ports 100",
-        hiz_sn=5.0,  # Ã§ok hÄ±zlÄ±
+        hiz_sn=5.0,  # çok hÄ±zlÄ±
         basari=True,
         cikti_dogru=True,  # ilk 100 port yeterli
         guvenlik=1.0,

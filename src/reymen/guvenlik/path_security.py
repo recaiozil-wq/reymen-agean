@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """path_security.py â€” Yol Guvenligi.
 
 Dosya yollarini dogrular, path traversal ve sembolik link

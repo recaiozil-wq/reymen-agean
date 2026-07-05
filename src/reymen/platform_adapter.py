@@ -1,8 +1,8 @@
-﻿"""ğŸŒ Ã‡apraz platform â€” WSL/Kali adapter + path Ã§evirici.
+"""ğŸŒ Ã‡apraz platform â€” WSL/Kali adapter + path çevirici.
 
-Windows â†” WSL/Kali arasÄ±nda yol Ã§evirisi ve komut Ã§alÄ±ÅŸtÄ±rma saÄŸlar.
+Windows â†” WSL/Kali arasÄ±nda yol çevirisi ve komut çalÄ±ÅŸtÄ±rma saÄŸlar.
 WSL kurulu deÄŸilse veya Windows dÄ±ÅŸÄ± platformdaysa ``NativeAdapter``
-kullanÄ±lÄ±r; tÃ¼m metotlar graceful fallback yapar.
+kullanÄ±lÄ±r; tüm metotlar graceful fallback yapar.
 
 Ã–rnek::
 
@@ -40,7 +40,7 @@ __all__ = [
 
 
 # ---------------------------------------------------------------------------
-# YardÄ±mcÄ±: WSL varlÄ±k kontrolÃ¼
+# YardÄ±mcÄ±: WSL varlÄ±k kontrolü
 # ---------------------------------------------------------------------------
 def is_wsl_available() -> bool:
     """``wsl.exe`` bulunuyorsa ve en az bir daÄŸÄ±tÄ±m kuruluysa ``True``."""
@@ -56,13 +56,13 @@ def is_wsl_available() -> bool:
         )
     except (OSError, subprocess.SubprocessError):
         return False
-    # WSL Ã§Ä±ktÄ±sÄ± UTF-16 LE olabilir; gÃ¼venli temizle
+    # WSL çÄ±ktÄ±sÄ± UTF-16 LE olabilir; güvenli temizle
     out = result.stdout.replace("\x00", "").strip()
     return bool(out)
 
 
 def list_wsl_distros() -> list[str]:
-    """Kurulu WSL daÄŸÄ±tÄ±mlarÄ±nÄ±n isim listesini dÃ¶ndÃ¼rÃ¼r."""
+    """Kurulu WSL daÄŸÄ±tÄ±mlarÄ±nÄ±n isim listesini döndürür."""
     if not shutil.which("wsl.exe"):
         return []
     try:
@@ -101,7 +101,7 @@ class PlatformInfo:
 
 
 # ---------------------------------------------------------------------------
-# Adapter arayÃ¼zÃ¼
+# Adapter arayüzü
 # ---------------------------------------------------------------------------
 class PlatformAdapter:
     """Platform adapter temel sÄ±nÄ±fÄ±."""
@@ -111,16 +111,16 @@ class PlatformAdapter:
     def info(self) -> PlatformInfo:
         return PlatformInfo(kind=self.kind, host_os=platform.system())
 
-    # -- Path Ã§eviri --------------------------------------------------------
+    # -- Path çeviri --------------------------------------------------------
     def translate_path(self, path: str | Path) -> str:
-        """Verilen yolu hedef platformun formatÄ±na Ã§evirir."""
+        """Verilen yolu hedef platformun formatÄ±na çevirir."""
         raise NotImplementedError
 
     def translate_path_back(self, path: str | Path) -> str:
-        """Hedef platformdan host platforma yol Ã§evirir."""
+        """Hedef platformdan host platforma yol çevirir."""
         raise NotImplementedError
 
-    # -- Komut Ã§alÄ±ÅŸtÄ±r -----------------------------------------------------
+    # -- Komut çalÄ±ÅŸtÄ±r -----------------------------------------------------
     def run(
         self,
         cmd: Sequence[str] | str,
@@ -130,15 +130,15 @@ class PlatformAdapter:
         timeout: float | None = None,
         check: bool = False,
     ) -> subprocess.CompletedProcess[str]:
-        """Komutu hedef platformda Ã§alÄ±ÅŸtÄ±rÄ±r."""
+        """Komutu hedef platformda çalÄ±ÅŸtÄ±rÄ±r."""
         raise NotImplementedError
 
 
 # ---------------------------------------------------------------------------
-# Native adapter (Windows Ã¼zerinde Windows, Linux Ã¼zerinde Linux)
+# Native adapter (Windows üzerinde Windows, Linux üzerinde Linux)
 # ---------------------------------------------------------------------------
 class NativeAdapter(PlatformAdapter):
-    """AynÄ± iÅŸletim sisteminde Ã§alÄ±ÅŸan yerel adapter."""
+    """AynÄ± iÅŸletim sisteminde çalÄ±ÅŸan yerel adapter."""
 
     kind = "native"
 
@@ -174,7 +174,7 @@ class NativeAdapter(PlatformAdapter):
 # WSL adapter
 # ---------------------------------------------------------------------------
 class WSLAdapter(PlatformAdapter):
-    """Windows Ã¼zerinden WSL'de komut Ã§alÄ±ÅŸtÄ±ran adapter.
+    """Windows üzerinden WSL'de komut çalÄ±ÅŸtÄ±ran adapter.
 
     ``distro`` belirtilmezse varsayÄ±lan WSL daÄŸÄ±tÄ±mÄ± kullanÄ±lÄ±r.
     """
@@ -192,9 +192,9 @@ class WSLAdapter(PlatformAdapter):
             host_os=platform.system(),
         )
 
-    # -- Path Ã§eviri --------------------------------------------------------
+    # -- Path çeviri --------------------------------------------------------
     def translate_path(self, path: str | Path) -> str:
-        """Windows yolunu WSL (Linux) yoluna Ã§evirir.
+        """Windows yolunu WSL (Linux) yoluna çevirir.
 
         - ``C:\\Users\\foo`` -> ``/mnt/c/Users/foo``
         - ``\\\\wsl$\\Ubuntu\\home\\user`` -> ``/home/user``
@@ -213,10 +213,10 @@ class WSLAdapter(PlatformAdapter):
             if len(parts) == 5:
                 return "/" + parts[4].replace("\\", "/")
             elif len(parts) == 4:
-                # Sadece \\wsl$\Distro â€” kÃ¶k
+                # Sadece \\wsl$\Distro â€” kök
                 return "/"
 
-        # SÃ¼rÃ¼cÃ¼ harfi: C:\Users\foo
+        # Sürücü harfi: C:\Users\foo
         if len(s) >= 2 and s[1] == ":":
             drive = s[0].lower()
             rest = s[2:].replace("\\", "/")
@@ -227,7 +227,7 @@ class WSLAdapter(PlatformAdapter):
         return s.replace("\\", "/")
 
     def translate_path_back(self, path: str | Path) -> str:
-        """WSL (Linux) yolunu Windows yoluna Ã§evirir.
+        """WSL (Linux) yolunu Windows yoluna çevirir.
 
         - ``/mnt/c/Users/foo`` -> ``C:\\Users\\foo``
         - ``/home/user`` -> ``\\\\wsl$\\<distro>\\home\\user``
@@ -246,7 +246,7 @@ class WSLAdapter(PlatformAdapter):
         clean = s.lstrip("/").replace("/", "\\")
         return "\\\\wsl$\\" + distro + "\\" + clean
 
-    # -- Komut Ã§alÄ±ÅŸtÄ±r -----------------------------------------------------
+    # -- Komut çalÄ±ÅŸtÄ±r -----------------------------------------------------
     def _wsl_prefix(self) -> list[str]:
         prefix = ["wsl.exe"]
         if self.distro:
@@ -293,7 +293,7 @@ class WSLAdapter(PlatformAdapter):
 
 
 # ---------------------------------------------------------------------------
-# Kali adapter (WSL Ã¼zerinden kali-linux daÄŸÄ±tÄ±mÄ±)
+# Kali adapter (WSL üzerinden kali-linux daÄŸÄ±tÄ±mÄ±)
 # ---------------------------------------------------------------------------
 class KaliAdapter(WSLAdapter):
     """Kali Linux (WSL) adapter."""
@@ -313,7 +313,7 @@ def _default_wsl_distro() -> str | None:
 
 
 def detect(prefer_kali: bool = False) -> PlatformAdapter:
-    """Ã‡alÄ±ÅŸma ortamÄ±na gÃ¶re uygun adapter dÃ¶ndÃ¼rÃ¼r.
+    """Ã‡alÄ±ÅŸma ortamÄ±na göre uygun adapter döndürür.
 
     - Windows + WSL varsa ``WSLAdapter`` (veya ``prefer_kali`` ise
       ``KaliAdapter`` eÄŸer kali-linux kuruluysa)
@@ -333,7 +333,7 @@ def detect(prefer_kali: bool = False) -> PlatformAdapter:
 
 
 # ---------------------------------------------------------------------------
-# ModÃ¼l-seviyesi singleton + kolaylÄ±k fonksiyonlarÄ±
+# Modül-seviyesi singleton + kolaylÄ±k fonksiyonlarÄ±
 # ---------------------------------------------------------------------------
 _singleton: PlatformAdapter | None = None
 
@@ -346,13 +346,13 @@ def _get_adapter() -> PlatformAdapter:
 
 
 def set_adapter(adapter: PlatformAdapter) -> None:
-    """Singleton adapter'Ä± deÄŸiÅŸtirir (testler iÃ§in)."""
+    """Singleton adapter'Ä± deÄŸiÅŸtirir (testler için)."""
     global _singleton
     _singleton = adapter
 
 
 def translate_path(path: str | Path) -> str:
-    """Global adapter Ã¼zerinden yol Ã§evirisi."""
+    """Global adapter üzerinden yol çevirisi."""
     return _get_adapter().translate_path(path)
 
 
@@ -364,5 +364,5 @@ def run(
     timeout: float | None = None,
     check: bool = False,
 ) -> subprocess.CompletedProcess[str]:
-    """Global adapter Ã¼zerinden komut Ã§alÄ±ÅŸtÄ±rÄ±r."""
+    """Global adapter üzerinden komut çalÄ±ÅŸtÄ±rÄ±r."""
     return _get_adapter().run(cmd, cwd=cwd, env=env, timeout=timeout, check=check)

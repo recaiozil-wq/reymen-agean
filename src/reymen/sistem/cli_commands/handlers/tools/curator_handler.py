@@ -1,4 +1,4 @@
-﻿"""_handle_curator_command handler."""
+"""_handle_curator_command handler."""
 
 import logging
 import shlex

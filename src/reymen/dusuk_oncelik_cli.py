@@ -1,4 +1,4 @@
-﻿"""ReYMeN CLI â€” gÃ¶rev 7 Ã¶zellikleri iÃ§in komut satÄ±rÄ± arayÃ¼zÃ¼.
+"""ReYMeN CLI â€” görev 7 özellikleri için komut satÄ±rÄ± arayüzü.
 
 KullanÄ±m::
 
@@ -101,7 +101,7 @@ def _cmd_quality(args: argparse.Namespace) -> int:
         _print_json(suggestions)
     elif args.sub == "reset":
         self_improve.reset_history()
-        print("GeÃ§miÅŸ temizlendi.")
+        print("GeçmiÅŸ temizlendi.")
     else:
         _print_json(self_improve.report())
     return 0
@@ -172,7 +172,7 @@ def _exists(path: str) -> bool:
 
 
 def _cmd_video(args: argparse.Namespace) -> int:
-    """Video araÃ§larÄ± komutlarÄ±."""
+    """Video araçlarÄ± komutlarÄ±."""
     from . import video_tools
 
     if args.sub == "check":
@@ -203,7 +203,7 @@ def _cmd_video(args: argparse.Namespace) -> int:
                 format=args.format,
                 audio_codec=args.audio_codec,
             )
-            print(f"DÃ¶nÃ¼ÅŸtÃ¼rme baÅŸarÄ±lÄ±: {args.output}")
+            print(f"DönüÅŸtürme baÅŸarÄ±lÄ±: {args.output}")
         except video_tools.VideoToolError as e:
             print(f"Hata: {e}", file=sys.stderr)
             return 1
@@ -238,7 +238,7 @@ def _cmd_a2a(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ReYMeN",
-        description="ReYMeN â€” gÃ¶rev 7 dÃ¼ÅŸÃ¼k Ã¶ncelikli Ã¶zellikler CLI",
+        description="ReYMeN â€” görev 7 düÅŸük öncelikli özellikler CLI",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -249,7 +249,7 @@ def build_parser() -> argparse.ArgumentParser:
     # cost
     p_cost = sub.add_parser("cost", help="API maliyet takibi")
     p_cost_sub = p_cost.add_subparsers(dest="sub")
-    p_cost_sub.add_parser("summary", help="Maliyet Ã¶zeti")
+    p_cost_sub.add_parser("summary", help="Maliyet özeti")
     p_log = p_cost_sub.add_parser("log", help="Ham kayÄ±tlar")
     p_log.add_argument("--limit", type=int, default=20)
     p_cost_sub.add_parser("reset", help="KayÄ±tlarÄ± temizle")
@@ -259,7 +259,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_plat = sub.add_parser("platform", help="Platform adapter")
     p_plat_sub = p_plat.add_subparsers(dest="sub")
     p_plat_sub.add_parser("info", help="Platform bilgisi")
-    p_trans = p_plat_sub.add_parser("translate", help="Yol Ã§evirisi")
+    p_trans = p_plat_sub.add_parser("translate", help="Yol çevirisi")
     p_trans.add_argument("path")
     p_plat_sub.add_parser("distros", help="WSL daÄŸÄ±tÄ±mlarÄ±")
     p_plat.add_argument("--kali", action="store_true", help="Kali tercih et")
@@ -269,17 +269,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_qual = sub.add_parser("quality", help="Self-improvement metrikleri")
     p_qual_sub = p_qual.add_subparsers(dest="sub")
     p_qual_sub.add_parser("report", help="Kalite raporu")
-    p_qual_sub.add_parser("history", help="GeÃ§miÅŸ")
-    p_qual_sub.add_parser("improve", help="Ä°yileÅŸtirme Ã¶nerileri")
-    p_qual_sub.add_parser("reset", help="GeÃ§miÅŸi temizle")
+    p_qual_sub.add_parser("history", help="GeçmiÅŸ")
+    p_qual_sub.add_parser("improve", help="Ä°yileÅŸtirme önerileri")
+    p_qual_sub.add_parser("reset", help="GeçmiÅŸi temizle")
     p_qual.set_defaults(func=_cmd_quality, sub="report")
 
     # kanban
     p_kan = sub.add_parser("kanban", help="Kanban panosu")
     p_kan.add_argument("--board", default="kanban.json", help="Pano dosyasÄ±")
     p_kan_sub = p_kan.add_subparsers(dest="sub")
-    p_kan_sub.add_parser("list", help="Pano Ã¶zeti")
-    p_kan_sub.add_parser("show", help="TÃ¼m pano")
+    p_kan_sub.add_parser("list", help="Pano özeti")
+    p_kan_sub.add_parser("show", help="Tüm pano")
     p_kan_sub.add_parser("summary", help="Ã–zet")
     p_add = p_kan_sub.add_parser("add", help="Kart ekle")
     p_add.add_argument("title")
@@ -293,9 +293,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_kan.set_defaults(func=_cmd_kanban, sub="list")
 
     # video
-    p_vid = sub.add_parser("video", help="Video araÃ§larÄ±")
+    p_vid = sub.add_parser("video", help="Video araçlarÄ±")
     p_vid_sub = p_vid.add_subparsers(dest="sub")
-    p_vid_sub.add_parser("check", help="AraÃ§ varlÄ±k kontrolÃ¼")
+    p_vid_sub.add_parser("check", help="Araç varlÄ±k kontrolü")
     p_probe = p_vid_sub.add_parser("probe", help="Medya meta verisi")
     p_probe.add_argument("file")
     p_dl = p_vid_sub.add_parser("download", help="Video indir")
@@ -303,7 +303,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_dl.add_argument("--output-dir", "-o", default=None)
     p_dl.add_argument("--format", "-f", default=None)
     p_dl.add_argument("--audio-only", "-a", action="store_true")
-    p_conv = p_vid_sub.add_parser("convert", help="DÃ¶nÃ¼ÅŸtÃ¼r")
+    p_conv = p_vid_sub.add_parser("convert", help="DönüÅŸtür")
     p_conv.add_argument("input")
     p_conv.add_argument("output")
     p_conv.add_argument("--format", default=None)

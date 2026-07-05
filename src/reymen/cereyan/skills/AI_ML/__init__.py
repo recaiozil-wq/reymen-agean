@@ -1,1 +1,1 @@
-﻿"""AI_ML paketi."""
+"""AI_ML paketi."""

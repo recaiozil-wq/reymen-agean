@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """trajectory.py â€” Adim Gecmisi (Trajectory).
 
 Her turdaki dusunce, eylem ve gozlemi kaydeder.
@@ -61,7 +61,7 @@ class Trajectory:
         return "\n".join(satirlar)
 
     def tool_istatistik(self) -> dict:
-        """AraÃ§ kullanim istatistiklerini dondur (ShareGPT batch format uyumlu).
+        """Araç kullanim istatistiklerini dondur (ShareGPT batch format uyumlu).
 
         Returns:
             {arac_adi: {count, success, failure}, ...}

@@ -1,4 +1,4 @@
-﻿"""TÃ¼m merkez_db'deki SQLite dosyalarÄ±na WAL + busy_timeout uygula."""
+"""Tüm merkez_db'deki SQLite dosyalarÄ±na WAL + busy_timeout uygula."""
 
 import sqlite3, os
 import logging
@@ -31,4 +31,4 @@ for db in sorted(dbs):
     except Exception as e:
         print(f"  âŒ {db:30s} HATA: {e}")
 
-print("\nâœ… TÃ¼m DB'lere WAL + busy_timeout uygulandÄ±")
+print("\nâœ… Tüm DB'lere WAL + busy_timeout uygulandÄ±")

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 security_engine.py â€” SecurityEngine.
 Guvenlik motoru: tarama, risk analizi, raporlama ve duzeltme.

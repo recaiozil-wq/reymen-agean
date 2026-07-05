@@ -1,6 +1,6 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-araclar_dosya_analiz.py â€” PDF, Excel, CSV ve GÃ¶rÃ¼ntÃ¼ analiz araÃ§larÄ±.
+araclar_dosya_analiz.py â€” PDF, Excel, CSV ve Görüntü analiz araçlarÄ±.
 
 Bagimsiz kullanilabilir; opsiyonel kutuphaneler yoksa graceful degrade yapar:
   - PDF: pdfplumber (tercih) veya PyPDF2
@@ -88,11 +88,11 @@ def pdf_oku(dosya_yolu: str) -> str:
                         sayfalar.append(f"[Sayfa {i}]\n{metin.strip()}")
                 tam_metin = "\n\n".join(sayfalar)
                 if not tam_metin.strip():
-                    return "[PDF]: Metin Ã§Ä±karÄ±lamadÄ± (taranmÄ±ÅŸ/gÃ¶rsel PDF olabilir)."
+                    return "[PDF]: Metin çÄ±karÄ±lamadÄ± (taranmÄ±ÅŸ/görsel PDF olabilir)."
                 if len(tam_metin) > MAKS_KARAKTER:
                     tam_metin = (
                         tam_metin[:MAKS_KARAKTER]
-                        + f"\n...[{len(tam_metin)} karakter, ilk {MAKS_KARAKTER} gÃ¶sterildi]"
+                        + f"\n...[{len(tam_metin)} karakter, ilk {MAKS_KARAKTER} gösterildi]"
                     )
                 return f"[PDF â€” {len(pdf.pages)} sayfa]\n{tam_metin}"
         except Exception as e:
@@ -109,14 +109,14 @@ def pdf_oku(dosya_yolu: str) -> str:
                         sayfalar.append(f"[Sayfa {i}]\n{metin.strip()}")
                 tam_metin = "\n\n".join(sayfalar)
                 if not tam_metin.strip():
-                    return "[PDF]: Metin Ã§Ä±karÄ±lamadÄ±."
+                    return "[PDF]: Metin çÄ±karÄ±lamadÄ±."
                 if len(tam_metin) > MAKS_KARAKTER:
                     tam_metin = tam_metin[:MAKS_KARAKTER] + f"\n...[kÄ±rpÄ±ldÄ±]"
                 return f"[PDF â€” {len(okuyucu.pages)} sayfa]\n{tam_metin}"
         except Exception as e:
             return f"[PDF HatasÄ±]: PyPDF2: {e}"
 
-    return "[PDF]: pdfplumber veya PyPDF2 kurulu deÄŸil. 'pip install pdfplumber' Ã§alÄ±ÅŸtÄ±rÄ±n."
+    return "[PDF]: pdfplumber veya PyPDF2 kurulu deÄŸil. 'pip install pdfplumber' çalÄ±ÅŸtÄ±rÄ±n."
 
 
 # â”€â”€ Excel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -154,7 +154,7 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
             if not satirlar:
                 return "[Excel]: BoÅŸ sayfa."
             if len(satirlar) > MAKS_SATIR:
-                ek = f"\n...[toplam {len(satirlar)} satÄ±r, ilk {MAKS_SATIR} gÃ¶sterildi]"
+                ek = f"\n...[toplam {len(satirlar)} satÄ±r, ilk {MAKS_SATIR} gösterildi]"
                 satirlar = satirlar[:MAKS_SATIR]
             else:
                 ek = ""
@@ -179,7 +179,7 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
                 hucre_metinleri = [str(ws.cell_value(r, c)) for c in range(ws.ncols)]
                 satirlar.append("\t".join(hucre_metinleri))
             if len(satirlar) > MAKS_SATIR:
-                ek = f"\n...[toplam {len(satirlar)} satÄ±r, ilk {MAKS_SATIR} gÃ¶sterildi]"
+                ek = f"\n...[toplam {len(satirlar)} satÄ±r, ilk {MAKS_SATIR} gösterildi]"
                 satirlar = satirlar[:MAKS_SATIR]
             else:
                 ek = ""
@@ -188,7 +188,7 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
             return f"[Excel HatasÄ±]: xlrd: {e}"
 
     return (
-        "[Excel]: openpyxl veya xlrd kurulu deÄŸil. 'pip install openpyxl' Ã§alÄ±ÅŸtÄ±rÄ±n."
+        "[Excel]: openpyxl veya xlrd kurulu deÄŸil. 'pip install openpyxl' çalÄ±ÅŸtÄ±rÄ±n."
     )
 
 
@@ -237,21 +237,21 @@ def csv_oku(dosya_yolu: str, ayirici: str = ",") -> str:
         return f"[CSV HatasÄ±]: {e}"
 
 
-# â”€â”€ LLaVA GÃ¶rÃ¼ntÃ¼ Analizi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ LLaVA Görüntü Analizi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def goruntu_analiz(goruntu_yolu: str, soru: str = "") -> str:
     """Goruntu analiz eder (OpenRouter vision uzerinden)."""
     if not os.path.exists(goruntu_yolu):
-        return f"[GÃ¶rÃ¼ntÃ¼ HatasÄ±]: '{goruntu_yolu}' bulunamadÄ±."
+        return f"[Görüntü HatasÄ±]: '{goruntu_yolu}' bulunamadÄ±."
     try:
         from reymen.arac.araclar_goruntu import vision_analiz
 
         return vision_analiz(
-            kaynak=goruntu_yolu, soru=soru or "Bu gÃ¶rselde ne var, detaylÄ± aÃ§Ä±kla."
+            kaynak=goruntu_yolu, soru=soru or "Bu görselde ne var, detaylÄ± açÄ±kla."
         )
     except Exception as e:
-        return f"[GÃ¶rÃ¼ntÃ¼ HatasÄ±]: {e}"
+        return f"[Görüntü HatasÄ±]: {e}"
 
 
 def _goruntu_http(goruntu_yolu: str, prompt: str, onceki_hata: str) -> str:
@@ -292,15 +292,15 @@ def dosya_analiz(dosya_yolu: str, ek_parametre: str = "") -> str:
 
 
 if __name__ == "__main__":
-    print("=== Dosya Analiz AraÃ§larÄ± Testi ===")
+    print("=== Dosya Analiz AraçlarÄ± Testi ===")
     print(f"PDF:   {_PDF_VAR or 'kurulu deÄŸil'}")
     print(f"Excel: {_EXCEL_VAR or 'kurulu deÄŸil'}")
     print(f"CSV:   stdlib (her zaman mevcut)")
     print(
-        f"LLaVA: {'ollama kÃ¼tÃ¼phanesi' if _OLLAMA_LIB_VAR else 'HTTP API'} Ã¼zerinden\n"
+        f"LLaVA: {'ollama kütüphanesi' if _OLLAMA_LIB_VAR else 'HTTP API'} üzerinden\n"
     )
 
-    # CSV testi (stdlib ile her zaman Ã§alÄ±ÅŸÄ±r)
+    # CSV testi (stdlib ile her zaman çalÄ±ÅŸÄ±r)
     import tempfile
 
     tmp = tempfile.NamedTemporaryFile(
@@ -311,5 +311,5 @@ if __name__ == "__main__":
     print(csv_oku(tmp.name))
     os.unlink(tmp.name)
 
-    # GÃ¶rÃ¼ntÃ¼ testi â€” dosya yoksa graceful
+    # Görüntü testi â€” dosya yoksa graceful
     print(goruntu_analiz("olmayan_resim.jpg", "Ne var?"))

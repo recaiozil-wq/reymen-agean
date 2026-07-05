@@ -1,14 +1,14 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 ğŸ” OAuth Sistemi â€” Google, GitHub, Discord OAuth 2.0 Authorization Code Flow.
 
-Bu modÃ¼l, mevcut reymen/guvenlik/oauth2.py Ã¼zerine inÅŸa edilmiÅŸtir:
-  - OAuthSistemi: Ã¼st seviye sÄ±nÄ±f (provider + token yÃ¶netimi)
-  - GoogleOAuthProvider: Gmail, Drive, Calendar API'leri iÃ§in OAuth
+Bu modül, mevcut reymen/guvenlik/oauth2.py üzerine inÅŸa edilmiÅŸtir:
+  - OAuthSistemi: üst seviye sÄ±nÄ±f (provider + token yönetimi)
+  - GoogleOAuthProvider: Gmail, Drive, Calendar API'leri için OAuth
   - GitHubOAuthProvider: repo, user scope'larÄ± ile GitHub OAuth
   - DiscordOAuthProvider: bot token auth (stub / geniÅŸletilmiÅŸ)
   - SQLite token persistence (oauth_tokens.db)
-  - Token yenileme (refresh_token) ve expiry kontrolÃ¼
+  - Token yenileme (refresh_token) ve expiry kontrolü
 
 KullanÄ±m:
     sistem = OAuthSistemi()
@@ -64,7 +64,7 @@ class OAuthToken:
 
     @property
     def is_expired(self) -> bool:
-        """Token sÃ¼resi dolmuÅŸ mu? (60 sn grace)"""
+        """Token süresi dolmuÅŸ mu? (60 sn grace)"""
         return time.time() > self.obtained_at + self.expires_in - 60
 
     @property
@@ -159,7 +159,7 @@ class SQLiteTokenDeposu:
             conn.commit()
 
     def kaydet(self, provider: str, token: OAuthToken) -> None:
-        """Token'Ä± kaydet (varsa gÃ¼ncelle, yoksa ekle)."""
+        """Token'Ä± kaydet (varsa güncelle, yoksa ekle)."""
         with self._baglan() as conn:
             conn.execute(
                 """
@@ -198,7 +198,7 @@ class SQLiteTokenDeposu:
             conn.commit()
 
     def yukle(self, provider: str) -> Optional[OAuthToken]:
-        """Provider'a ait token'Ä± yÃ¼kle."""
+        """Provider'a ait token'Ä± yükle."""
         with self._baglan() as conn:
             row = conn.execute(
                 "SELECT * FROM oauth_tokens WHERE provider = ?", (provider,)
@@ -226,7 +226,7 @@ class SQLiteTokenDeposu:
             conn.commit()
 
     def listele(self) -> list[dict[str, Any]]:
-        """TÃ¼m kayÄ±tlÄ± token'larÄ± listele."""
+        """Tüm kayÄ±tlÄ± token'larÄ± listele."""
         with self._baglan() as conn:
             rows = conn.execute(
                 "SELECT provider, user_id, email, display_name, "
@@ -251,7 +251,7 @@ class SQLiteTokenDeposu:
                         "user_id": row["user_id"],
                         "email": row["email"],
                         "display_name": row["display_name"],
-                        "durum": "geÃ§erli" if not token.is_expired else "sÃ¼resi doldu",
+                        "durum": "geçerli" if not token.is_expired else "süresi doldu",
                         "expires_at": token.expires_at_local,
                         "scope": row["scope"],
                         "updated_at": row["updated_at"],
@@ -260,7 +260,7 @@ class SQLiteTokenDeposu:
             return result
 
     def var_mi(self, provider: str) -> bool:
-        """Provider iÃ§in kayÄ±tlÄ± token var mÄ±?"""
+        """Provider için kayÄ±tlÄ± token var mÄ±?"""
         with self._baglan() as conn:
             row = conn.execute(
                 "SELECT 1 FROM oauth_tokens WHERE provider = ?", (provider,)
@@ -298,7 +298,7 @@ class OAuthProvider(ABC):
         return bool(self.client_id and self.client_secret)
 
     def get_auth_url(self, state: str = "", redirect_uri: str = "") -> str:
-        """KullanÄ±cÄ±yÄ± OAuth onay sayfasÄ±na yÃ¶nlendirecek URL."""
+        """KullanÄ±cÄ±yÄ± OAuth onay sayfasÄ±na yönlendirecek URL."""
         if not redirect_uri:
             redirect_uri = self.redirect_uri
         if not state:
@@ -364,7 +364,7 @@ class OAuthProvider(ABC):
 
     @abstractmethod
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuthToken:
-        """Provider'a Ã¶zel raw yanÄ±tÄ± OAuthToken'a dÃ¶nÃ¼ÅŸtÃ¼r."""
+        """Provider'a özel raw yanÄ±tÄ± OAuthToken'a dönüÅŸtür."""
         ...
 
     def token_from_raw(self, raw: dict[str, Any]) -> OAuthToken:
@@ -423,7 +423,7 @@ class GoogleOAuthProvider(OAuthProvider):
 
     VarsayÄ±lan scope'lar:
       - gmail.modify   (Gmail okuma/yazma)
-      - drive.file     (Drive dosya yÃ¶netimi)
+      - drive.file     (Drive dosya yönetimi)
       - calendar       (Google Calendar)
       - userinfo.email, userinfo.profile
     """
@@ -446,7 +446,7 @@ class GoogleOAuthProvider(OAuthProvider):
         if not self.client_id or not self.client_secret:
             logger.warning(
                 "[OAuth:Google] GOOGLE_CLIENT_ID veya GOOGLE_CLIENT_SECRET "
-                "ortam deÄŸiÅŸkeni bulunamadÄ±. Google giriÅŸi Ã§alÄ±ÅŸmayacak."
+                "ortam deÄŸiÅŸkeni bulunamadÄ±. Google giriÅŸi çalÄ±ÅŸmayacak."
             )
         self.redirect_uri = redirect_uri or os.getenv(
             "GOOGLE_REDIRECT_URI",
@@ -454,7 +454,7 @@ class GoogleOAuthProvider(OAuthProvider):
         )
 
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuthToken:
-        """Google userinfo yanÄ±tÄ±nÄ± OAuthToken'a dÃ¶nÃ¼ÅŸtÃ¼r."""
+        """Google userinfo yanÄ±tÄ±nÄ± OAuthToken'a dönüÅŸtür."""
         token = OAuthToken(provider=self.provider_id)
         token.user_id = raw.get("id", raw.get("sub", ""))
         token.email = raw.get("email", "")
@@ -495,12 +495,12 @@ class GitHubOAuthProvider(OAuthProvider):
       GITHUB_CLIENT_SECRET
 
     VarsayÄ±lan scope'lar:
-      - repo      (Ã¶zel repositoriler dahil tam eriÅŸim)
+      - repo      (özel repositoriler dahil tam eriÅŸim)
       - user      (kullanÄ±cÄ± profili bilgisi)
-      - workflow  (GitHub Actions workflow yÃ¶netimi)
+      - workflow  (GitHub Actions workflow yönetimi)
 
     Not: GitHub OAuth'da refresh_token yoktur; access_token'lar
-    sÃ¼resizdir (expires_in gelmez). Token'Ä± yenilemek iÃ§in
+    süresizdir (expires_in gelmez). Token'Ä± yenilemek için
     kullanÄ±cÄ±nÄ±n yeniden yetkilendirmesi gerekir.
     """
 
@@ -520,7 +520,7 @@ class GitHubOAuthProvider(OAuthProvider):
         if not self.client_id or not self.client_secret:
             logger.warning(
                 "[OAuth:GitHub] GITHUB_CLIENT_ID veya GITHUB_CLIENT_SECRET "
-                "ortam deÄŸiÅŸkeni bulunamadÄ±. GitHub giriÅŸi Ã§alÄ±ÅŸmayacak."
+                "ortam deÄŸiÅŸkeni bulunamadÄ±. GitHub giriÅŸi çalÄ±ÅŸmayacak."
             )
         self.redirect_uri = redirect_uri or os.getenv(
             "GITHUB_REDIRECT_URI",
@@ -545,7 +545,7 @@ class GitHubOAuthProvider(OAuthProvider):
     def exchange_code(self, code: str, redirect_uri: str = "") -> dict[str, Any]:
         """GitHub authorization code ile token al.
 
-        GitHub, yanÄ±tÄ± JSON yerine form-encoded dÃ¶nebilir.
+        GitHub, yanÄ±tÄ± JSON yerine form-encoded dönebilir.
         Accept header ile JSON iste.
         """
         if not redirect_uri:
@@ -617,7 +617,7 @@ class GitHubOAuthProvider(OAuthProvider):
             ) from e
 
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuthToken:
-        """GitHub API yanÄ±tÄ±nÄ± OAuthToken'a dÃ¶nÃ¼ÅŸtÃ¼r."""
+        """GitHub API yanÄ±tÄ±nÄ± OAuthToken'a dönüÅŸtür."""
         token = OAuthToken(provider=self.provider_id)
         token.user_id = str(raw.get("id", ""))
         token.email = raw.get("email", "") or raw.get("login", "")
@@ -628,12 +628,12 @@ class GitHubOAuthProvider(OAuthProvider):
     def token_from_raw(self, raw: dict[str, Any]) -> OAuthToken:
         """GitHub token yanÄ±tÄ±ndan OAuthToken oluÅŸtur.
 
-        GitHub token'larÄ± sÃ¼resizdir, expires_in gelmez.
-        10 yÄ±l (315360000 sn) varsayÄ±lan sÃ¼re.
+        GitHub token'larÄ± süresizdir, expires_in gelmez.
+        10 yÄ±l (315360000 sn) varsayÄ±lan süre.
         """
         token = super().token_from_raw(raw)
         if token.expires_in == 3600 and "expires_in" not in raw:
-            token.expires_in = 315360000  # 10 yÄ±l (pratikte sÃ¼resiz)
+            token.expires_in = 315360000  # 10 yÄ±l (pratikte süresiz)
         try:
             user_raw = self.get_user_info(token.access_token)
             user_info = self.normalize_user_info(user_raw)
@@ -668,7 +668,7 @@ class DiscordOAuthProvider(OAuthProvider):
       - email     (e-posta adresi)
       - guilds    (sunucu listesi)
 
-    Bot token auth iÃ§in DISCORD_BOT_TOKEN env var'Ä± kullanÄ±lÄ±r.
+    Bot token auth için DISCORD_BOT_TOKEN env var'Ä± kullanÄ±lÄ±r.
     """
 
     provider_id = "discord"
@@ -687,7 +687,7 @@ class DiscordOAuthProvider(OAuthProvider):
         if not self.client_id or not self.client_secret:
             logger.warning(
                 "[OAuth:Discord] DISCORD_CLIENT_ID veya DISCORD_CLIENT_SECRET "
-                "ortam deÄŸiÅŸkeni bulunamadÄ±. Discord giriÅŸi Ã§alÄ±ÅŸmayacak."
+                "ortam deÄŸiÅŸkeni bulunamadÄ±. Discord giriÅŸi çalÄ±ÅŸmayacak."
             )
         self.redirect_uri = redirect_uri or os.getenv(
             "DISCORD_REDIRECT_URI",
@@ -710,7 +710,7 @@ class DiscordOAuthProvider(OAuthProvider):
         return f"{self.auth_url}?{urllib.parse.urlencode(params)}"
 
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuthToken:
-        """Discord /users/@me yanÄ±tÄ±nÄ± OAuthToken'a dÃ¶nÃ¼ÅŸtÃ¼r."""
+        """Discord /users/@me yanÄ±tÄ±nÄ± OAuthToken'a dönüÅŸtür."""
         token = OAuthToken(provider=self.provider_id)
         avatar_hash = raw.get("avatar", "")
         user_id = str(raw.get("id", ""))
@@ -747,12 +747,12 @@ class DiscordOAuthProvider(OAuthProvider):
 
 
 # ---------------------------------------------------------------------------
-# OAuthSistemi â€” Ã¼st seviye OAuth yÃ¶neticisi
+# OAuthSistemi â€” üst seviye OAuth yöneticisi
 # ---------------------------------------------------------------------------
 
 
 class OAuthSistemi:
-    """OAuth 2.0 sistemi â€” tÃ¼m provider'larÄ± ve token yÃ¶netimini birleÅŸtirir.
+    """OAuth 2.0 sistemi â€” tüm provider'larÄ± ve token yönetimini birleÅŸtirir.
 
     KullanÄ±m:
         sistem = OAuthSistemi()
@@ -800,7 +800,7 @@ class OAuthSistemi:
         return self._discord
 
     def provider(self, ad: str) -> OAuthProvider:
-        """Provider adÄ±na gÃ¶re provider dÃ¶ndÃ¼r."""
+        """Provider adÄ±na göre provider döndür."""
         provider_map = {
             "google": self._google,
             "github": self._github,
@@ -815,7 +815,7 @@ class OAuthSistemi:
             )
         return p
 
-    # â”€â”€ Token YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Token Yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def token_kaydet(self, provider: str, token: OAuthToken) -> None:
         """Token'Ä± SQLite deposuna kaydet."""
@@ -829,7 +829,7 @@ class OAuthSistemi:
         )
 
     def token_yukle(self, provider: str) -> Optional[OAuthToken]:
-        """Token'Ä± SQLite deposundan yÃ¼kle."""
+        """Token'Ä± SQLite deposundan yükle."""
         return self._depo.yukle(provider)
 
     def token_sil(self, provider: str) -> None:
@@ -838,9 +838,9 @@ class OAuthSistemi:
         logger.info("[OAuthSistemi] Token silindi: %s", provider)
 
     def token_durum(self, provider: str) -> dict[str, Any]:
-        """Provider iÃ§in token durumunu dÃ¶ndÃ¼r.
+        """Provider için token durumunu döndür.
 
-        DÃ¶nen:
+        Dönen:
             {
                 "provider": "google",
                 "var_mi": True,
@@ -882,12 +882,12 @@ class OAuthSistemi:
         eski = self._depo.yukle(provider)
         if eski is None:
             logger.warning(
-                "[OAuthSistemi] Token yenileme: %s iÃ§in token bulunamadÄ±", provider
+                "[OAuthSistemi] Token yenileme: %s için token bulunamadÄ±", provider
             )
             return None
         if not eski.refresh_token:
             logger.warning(
-                "[OAuthSistemi] Token yenileme: %s iÃ§in refresh_token yok", provider
+                "[OAuthSistemi] Token yenileme: %s için refresh_token yok", provider
             )
             return None
 
@@ -917,14 +917,14 @@ class OAuthSistemi:
             return None
 
     def token_listele(self) -> list[dict[str, Any]]:
-        """TÃ¼m kayÄ±tlÄ± token'larÄ± listele."""
+        """Tüm kayÄ±tlÄ± token'larÄ± listele."""
         return self._depo.listele()
 
     def giris_yap(self, provider: str) -> Optional[str]:
-        """Provider iÃ§in auth URL'si dÃ¶ndÃ¼r.
+        """Provider için auth URL'si döndür.
 
         Returns:
-            Auth URL (kullanÄ±cÄ±nÄ±n tarayÄ±cÄ±da aÃ§masÄ± gereken)
+            Auth URL (kullanÄ±cÄ±nÄ±n tarayÄ±cÄ±da açmasÄ± gereken)
             veya None (provider hazÄ±r deÄŸilse)
         """
         p = self.provider(provider)
@@ -957,7 +957,7 @@ class OAuthSistemi:
             return None
 
     def cikis_yap(self, provider: str) -> bool:
-        """Provider'dan Ã§Ä±kÄ±ÅŸ yap (token'Ä± sil).
+        """Provider'dan çÄ±kÄ±ÅŸ yap (token'Ä± sil).
 
         Returns:
             True baÅŸarÄ±lÄ±, False token yoksa
@@ -967,13 +967,13 @@ class OAuthSistemi:
             self._depo.sil(provider)
             logger.info("[OAuthSistemi] Ã‡Ä±kÄ±ÅŸ yapÄ±ldÄ±: %s", provider)
             return True
-        logger.warning("[OAuthSistemi] Ã‡Ä±kÄ±ÅŸ: %s iÃ§in token bulunamadÄ±", provider)
+        logger.warning("[OAuthSistemi] Ã‡Ä±kÄ±ÅŸ: %s için token bulunamadÄ±", provider)
         return False
 
     def gecerli_token(self, provider: str) -> Optional[OAuthToken]:
-        """GeÃ§erli (sÃ¼resi dolmamÄ±ÅŸ) token'Ä± dÃ¶ndÃ¼r.
+        """Geçerli (süresi dolmamÄ±ÅŸ) token'Ä± döndür.
 
-        SÃ¼resi dolmuÅŸsa ve refresh_token varsa otomatik yenile.
+        Süresi dolmuÅŸsa ve refresh_token varsa otomatik yenile.
         """
         token = self._depo.yukle(provider)
         if token is None:
@@ -981,11 +981,11 @@ class OAuthSistemi:
         if token.is_expired:
             if token.refresh_token:
                 logger.info(
-                    "[OAuthSistemi] Token sÃ¼resi dolmuÅŸ, yenileniyor: %s", provider
+                    "[OAuthSistemi] Token süresi dolmuÅŸ, yenileniyor: %s", provider
                 )
                 return self.token_yenile(provider)
             logger.warning(
-                "[OAuthSistemi] Token sÃ¼resi dolmuÅŸ, refresh_token yok: %s", provider
+                "[OAuthSistemi] Token süresi dolmuÅŸ, refresh_token yok: %s", provider
             )
             return None
         return token

@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-gozlem.py â€” Katman 5: LLM Ã‡aÄŸrÄ± GÃ¶zlem ve Maliyet Takibi
+gozlem.py â€” Katman 5: LLM Ã‡aÄŸrÄ± Gözlem ve Maliyet Takibi
 
-Her LLM Ã§aÄŸrÄ±sÄ±nÄ±n token, sÃ¼re, maliyet bilgilerini task_id bazlÄ± kaydeder.
-Ã‡oklu alt ajan sisteminde maliyetin sessizce patlamasÄ±nÄ± Ã¶nler.
+Her LLM çaÄŸrÄ±sÄ±nÄ±n token, süre, maliyet bilgilerini task_id bazlÄ± kaydeder.
+Ã‡oklu alt ajan sisteminde maliyetin sessizce patlamasÄ±nÄ± önler.
 
 KullanÄ±m:
     from gozlem import gozlemci
@@ -30,13 +30,13 @@ ROOT = Path(__file__).parent.resolve()
 GOZLEM_DIZINI = ROOT / ".alt_ajan_gozlem"
 DISK_LOG_LIMIT = 10000  # En fazla 10K satÄ±r
 TOKEN_BASINA_MALIYET = {
-    # $/1K token (girdi / Ã§Ä±ktÄ±) â€” yaklaÅŸÄ±k fiyatlar
+    # $/1K token (girdi / çÄ±ktÄ±) â€” yaklaÅŸÄ±k fiyatlar
     "deepseek": (0.0005, 0.0020),
     "openai": (0.00015, 0.0006),
     "anthropic": (0.00025, 0.00125),
     "groq": (0.0001, 0.0001),
-    "lmstudio": (0.0, 0.0),  # Yerel, Ã¼cretsiz
-    "ollama": (0.0, 0.0),  # Yerel, Ã¼cretsiz
+    "lmstudio": (0.0, 0.0),  # Yerel, ücretsiz
+    "ollama": (0.0, 0.0),  # Yerel, ücretsiz
 }
 VARSAYILAN_MALIYET = (0.001, 0.003)  # Tahmini ortalama
 
@@ -56,7 +56,7 @@ class GozlemKaydi:
 
 
 class Gozlemci:
-    """LLM Ã§aÄŸrÄ±larÄ±nÄ± gÃ¶zlemler, maliyeti hesaplar, diske loglar."""
+    """LLM çaÄŸrÄ±larÄ±nÄ± gözlemler, maliyeti hesaplar, diske loglar."""
 
     def __init__(self):
         self._kayitlar: list[GozlemKaydi] = []
@@ -75,12 +75,12 @@ class Gozlemci:
         cikti_token: int = 0,
         notlar: str = "",
     ) -> None:
-        """Bir LLM Ã§aÄŸrÄ±sÄ±nÄ± kaydeder.
+        """Bir LLM çaÄŸrÄ±sÄ±nÄ± kaydeder.
 
         Args:
             task_id: Hangi task'a ait
-            sure_sn: Ã‡aÄŸrÄ± sÃ¼resi (saniye)
-            cevap: LLM yanÄ±tÄ± (opsiyonel, token sayÄ±sÄ± iÃ§in)
+            sure_sn: Ã‡aÄŸrÄ± süresi (saniye)
+            cevap: LLM yanÄ±tÄ± (opsiyonel, token sayÄ±sÄ± için)
             basarili: BaÅŸarÄ±lÄ± mÄ±?
             girdi_token: Girdi token sayÄ±sÄ± (biliniyorsa)
             cikti_token: Ã‡Ä±ktÄ± token sayÄ±sÄ± (biliniyorsa)
@@ -125,7 +125,7 @@ class Gozlemci:
         try:
             with open(log_dosyasi, "a", encoding="utf-8") as f:
                 f.write(satir)
-            # Log Ã§ok bÃ¼yÃ¼dÃ¼yse kÄ±rp
+            # Log çok büyüdüyse kÄ±rp
             if log_dosyasi.stat().st_size > DISK_LOG_LIMIT * 80:
                 self._log_kirp(log_dosyasi)
         except OSError as _gozlem_e127:
@@ -144,7 +144,7 @@ class Gozlemci:
             print(f"[UYARI] gozlem.py:140 - {_gozlem_e139}")
 
     def task_ozet(self, task_id: str) -> dict:
-        """Bir task'Ä±n gÃ¶zlem Ã¶zetini dÃ¶ndÃ¼rÃ¼r."""
+        """Bir task'Ä±n gözlem özetini döndürür."""
         with self._kilit:
             task_kayitlari = [k for k in self._kayitlar if k.task_id == task_id]
             if not task_kayitlari:
@@ -168,7 +168,7 @@ class Gozlemci:
             }
 
     def genel_ozet(self) -> dict:
-        """TÃ¼m gÃ¶zlemlerin Ã¶zetini dÃ¶ndÃ¼rÃ¼r."""
+        """Tüm gözlemlerin özetini döndürür."""
         with self._kilit:
             if not self._kayitlar:
                 return {"toplam_cagri": 0, "aktif_task": 0, "tahmini_maliyet_usd": 0}
@@ -198,7 +198,7 @@ class Gozlemci:
             }
 
     def temizle(self):
-        """TÃ¼m kayÄ±tlarÄ± temizle."""
+        """Tüm kayÄ±tlarÄ± temizle."""
         with self._kilit:
             self._kayitlar.clear()
             self._task_sayac.clear()
@@ -227,7 +227,7 @@ if __name__ == "__main__":
         f"[OK] Genel ozet: {genel['toplam_cagri']} cagri, ${genel['tahmini_maliyet_usd']:.6f}"
     )
 
-    # Disk log kontrolÃ¼
+    # Disk log kontrolü
     log_path = GOZLEM_DIZINI / "gozlem_log.txt"
     if log_path.exists():
         satir_sayisi = len(log_path.read_text(encoding="utf-8").splitlines())

@@ -1,23 +1,23 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 skill_iyilestirici.py â€” ReYMeN Skill Ä°yileÅŸtirme/Optimizasyon Sistemi.
 
-KullanÄ±m desenlerinden yola Ã§Ä±karak skill'leri otomatik iyileÅŸtirir
-(tÄ±pkÄ± ReYMeN'in otomatik skill optimizasyonu gibi).
+KullanÄım desenlerinden yola Ã§Äıkarak skill'leri otomatik iyileÅŸtirir
+(tÄıpkÄı ReYMeN'in otomatik skill optimizasyonu gibi).
 
 Ã–zellikler:
-- skills/ dizinindeki SKILL.md dosyalarÄ±nÄ± tarar
-- Hangi skill'lerin kullanÄ±ldÄ±ÄŸÄ±nÄ±, ne sÄ±klÄ±kta ve baÅŸarÄ± oranÄ±nÄ± takip eder
-- DÃ¼ÅŸÃ¼k performanslÄ± skill'leri (sÄ±k kullanÄ±lan ama dÃ¼ÅŸÃ¼k baÅŸarÄ±) tespit eder
+- skills/ dizinindeki SKILL.md dosyalarÄınÄı tarar
+- Hangi skill'lerin kullanÄıldÄıÄŸÄınÄı, ne sÄıklÄıkta ve baÅŸarÄı oranÄınÄı takip eder
+- DÃ¼ÅŸÃ¼k performanslÄı skill'leri (sÄık kullanÄılan ama dÃ¼ÅŸÃ¼k baÅŸarÄı) tespit eder
 - Ä°yileÅŸtirme Ã¶nerileri Ã¼retir (Ã¶rnek ekleme, hata dÃ¼zeltme, benzer skill'leri birleÅŸtirme)
 - Otomatik iyileÅŸtirme uygulayabilir
-- SQLite ile kalÄ±cÄ± depolama: skills/improvements.db
+- SQLite ile kalÄıcÄı depolama: skills/improvements.db
 
-KullanÄ±m:
+KullanÄım:
     from reymen.scripts.skill_iyilestirici import SkillIyilestirici
 
     si = SkillIyilestirici()
-    si.skill_kullanimi_kaydet("skill-adÄ±", basarili=True)
+    si.skill_kullanimi_kaydet("skill-adÄı", basarili=True)
     adaylar = si.iyilestirme_adaylari_bul()
     si.otomatik_iyilestir()
     print(si.rapor_uret())
@@ -62,16 +62,16 @@ def _skills_dizini() -> Path:
 
 
 def _db_yolu() -> Path:
-    """VeritabanÄ± yolunu dÃ¶ndÃ¼r."""
+    """VeritabanÄı yolunu dÃ¶ndÃ¼r."""
     return _skills_dizini() / "improvements.db"
 
 
-# â”€â”€ Veri yapÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Veri yapÄılarÄı â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
 class SkillBilgisi:
-    """Bir SKILL.md dosyasÄ±ndan ayrÄ±ÅŸtÄ±rÄ±lmÄ±ÅŸ bilgi."""
+    """Bir SKILL.md dosyasÄından ayrÄıÅŸtÄırÄılmÄıÅŸ bilgi."""
 
     dosya_yolu: str
     ad: str
@@ -86,7 +86,7 @@ class SkillBilgisi:
 
 @dataclass
 class KullanimKaydi:
-    """Bir skill'in kullanÄ±m kaydÄ±."""
+    """Bir skill'in kullanÄım kaydÄı."""
 
     skill_adi: str
     kullanim_sayisi: int = 0
@@ -121,11 +121,11 @@ class IyilestirmeRaporu:
     ozet: str = ""
 
 
-# â”€â”€ VeritabanÄ± yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ VeritabanÄı yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class _VT:
-    """SQLite veritabanÄ± yÃ¶neticisi (iÃ§ sÄ±nÄ±f)."""
+    """SQLite veritabanÄı yÃ¶neticisi (iÃ§ sÄınÄıf)."""
 
     def __init__(self, db_yolu: Path):
         self._db_yolu = db_yolu
@@ -188,15 +188,15 @@ class _VT:
             """)
 
 
-# â”€â”€ Skill ayrÄ±ÅŸtÄ±rÄ±cÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Skill ayrÄıÅŸtÄırÄıcÄı â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
-class _SkillAyrÄ±stÄ±rÄ±cÄ±:
-    """SKILL.md dosyalarÄ±nÄ± ayrÄ±ÅŸtÄ±rÄ±r."""
+class _SkillAyrÄıstÄırÄıcÄı:
+    """SKILL.md dosyalarÄınÄı ayrÄıÅŸtÄırÄır."""
 
     @staticmethod
     def YAML_meta_ayristir(icerik: str) -> dict:
-        """YAML frontmatter'Ä±nÄ± ayrÄ±ÅŸtÄ±r (--- ... ---)."""
+        """YAML frontmatter'ÄınÄı ayrÄıÅŸtÄır (--- ... ---)."""
         meta = {}
         match = re.match(r"^---\s*\n(.*?)\n---", icerik, re.DOTALL)
         if not match:
@@ -229,10 +229,10 @@ class _SkillAyrÄ±stÄ±rÄ±cÄ±:
 
     @staticmethod
     def dosyadan_oku(dosya_yolu: Path) -> SkillBilgisi | None:
-        """Bir SKILL.md dosyasÄ±nÄ± oku ve SkillBilgisi dÃ¶ndÃ¼r."""
+        """Bir SKILL.md dosyasÄınÄı oku ve SkillBilgisi dÃ¶ndÃ¼r."""
         try:
             icerik = dosya_yolu.read_text("utf-8", errors="replace")
-            meta = _SkillAyrÄ±stÄ±rÄ±cÄ±.YAML_meta_ayristir(icerik)
+            meta = _SkillAyrÄıstÄırÄıcÄı.YAML_meta_ayristir(icerik)
             ad = meta.get("name") or dosya_yolu.stem
             return SkillBilgisi(
                 dosya_yolu=str(dosya_yolu),
@@ -250,25 +250,25 @@ class _SkillAyrÄ±stÄ±rÄ±cÄ±:
             return None
 
 
-# â”€â”€ Ana sÄ±nÄ±f â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Ana sÄınÄıf â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SkillIyilestirici:
     """Skill Ä°yileÅŸtirme/Optimizasyon Sistemi.
 
-    KullanÄ±m desenlerinden yola Ã§Ä±karak skill'leri tarar, izler
+    KullanÄım desenlerinden yola Ã§Äıkarak skill'leri tarar, izler
     ve otomatik iyileÅŸtirir.
     """
 
     def __init__(self, skills_dizini: str | Path | None = None):
         self._skills_dizini = Path(skills_dizini) if skills_dizini else _skills_dizini()
         self._vt = _VT(_db_yolu())
-        self._ayristirici = _SkillAyrÄ±stÄ±rÄ±cÄ±()
+        self._ayristirici = _SkillAyrÄıstÄırÄıcÄı()
 
     # â”€â”€ Genel tarama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def skill_dosyalarini_tara(self) -> list[SkillBilgisi]:
-        """skills/ dizinindeki tÃ¼m SKILL.md dosyalarÄ±nÄ± tara.
+        """skills/ dizinindeki tÃ¼m SKILL.md dosyalarÄınÄı tara.
 
         Returns:
             Tarama sonucu SkillBilgisi listesi.
@@ -288,7 +288,7 @@ class SkillIyilestirici:
         logger.info("%d skill dosyasi tarandi", len(sonuclar))
         return sonuclar
 
-    # â”€â”€ KullanÄ±m kaydÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ KullanÄım kaydÄı â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def skill_kullanimi_kaydet(
         self,
@@ -298,13 +298,13 @@ class SkillIyilestirici:
         kaynak: str = "manual",
         metadata: dict | None = None,
     ) -> None:
-        """Bir skill kullanÄ±mÄ±nÄ± kaydet.
+        """Bir skill kullanÄımÄınÄı kaydet.
 
         Args:
-            skill_adi: Skill adÄ±.
-            basarili: KullanÄ±m baÅŸarÄ±lÄ± mÄ±?
+            skill_adi: Skill adÄı.
+            basarili: KullanÄım baÅŸarÄılÄı mÄı?
             sure_ms: Ä°ÅŸlem sÃ¼resi (milisaniye).
-            kaynak: KullanÄ±m kaynaÄŸÄ± (manual, otomatik, cron vb.).
+            kaynak: KullanÄım kaynaÄŸÄı (manual, otomatik, cron vb.).
             metadata: Ek bilgiler.
         """
         with self._vt._db() as db:
@@ -358,20 +358,20 @@ class SkillIyilestirici:
                 )
         return KullanimKaydi(skill_adi=skill_adi)
 
-    # â”€â”€ Ä°yileÅŸtirme adaylarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Ä°yileÅŸtirme adaylarÄı â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def iyilestirme_adaylari_bul(self) -> list[dict]:
         """Ä°yileÅŸtirilmesi gereken skill'leri tespit et.
 
         Kriterler:
-            1. **DÃ¼ÅŸÃ¼k baÅŸarÄ± oranÄ±**: >= 5 kullanÄ±m ve baÅŸarÄ± oranÄ± < %60
-            2. **SÄ±k kullanÄ±lan ama dÃ¼ÅŸÃ¼k baÅŸarÄ±**: >= 20 kullanÄ±m ve baÅŸarÄ± oranÄ± < %70
-            3. **Eksik metadata**: YAML frontmatter'Ä± eksik skill'ler
-            4. **Benzer skill'ler**: AynÄ± kategori/etiket paylaÅŸan ve birleÅŸtirilebilecek skill'ler
-            5. **GÃ¼ncellenmemiÅŸ skill**: 30 gÃ¼nden eski ve hiÃ§ kullanÄ±lmamÄ±ÅŸ
+            1. **DÃ¼ÅŸÃ¼k baÅŸarÄı oranÄı**: >= 5 kullanÄım ve baÅŸarÄı oranÄı < %60
+            2. **SÄık kullanÄılan ama dÃ¼ÅŸÃ¼k baÅŸarÄı**: >= 20 kullanÄım ve baÅŸarÄı oranÄı < %70
+            3. **Eksik metadata**: YAML frontmatter'Äı eksik skill'ler
+            4. **Benzer skill'ler**: AynÄı kategori/etiket paylaÅŸan ve birleÅŸtirilebilecek skill'ler
+            5. **GÃ¼ncellenmemiÅŸ skill**: 30 gÃ¼nden eski ve hiÃ§ kullanÄılmamÄıÅŸ
 
         Returns:
-            Ä°yileÅŸtirme adayÄ± skill listesi (her biri dict).
+            Ä°yileÅŸtirme adayÄı skill listesi (her biri dict).
         """
         adaylar = []
         skills_dir = self._skills_dizini
@@ -384,16 +384,16 @@ class SkillIyilestirici:
             istatistik = self.skill_istatistikleri(s.ad)
             skill_istatistik[s.ad] = istatistik
 
-            # Kriter 1: DÃ¼ÅŸÃ¼k baÅŸarÄ± oranÄ±
+            # Kriter 1: DÃ¼ÅŸÃ¼k baÅŸarÄı oranÄı
             if istatistik.kullanim_sayisi >= 5 and istatistik.basari_orani < 60.0:
                 adaylar.append(
                     {
                         "skill_adi": s.ad,
                         "tur": "dusuk_basari",
                         "aciklama": (
-                            f"BaÅŸarÄ± oranÄ± dÃ¼ÅŸÃ¼k: %{istatistik.basari_orani:.1f} "
-                            f"({istatistik.basarili_sayisi}/{istatistik.kullanim_sayisi} baÅŸarÄ±lÄ±) â€” "
-                            f"hata senaryolarÄ± ve Ã¶rnekler eklenmeli"
+                            f"BaÅŸarÄı oranÄı dÃ¼ÅŸÃ¼k: %{istatistik.basari_orani:.1f} "
+                            f"({istatistik.basarili_sayisi}/{istatistik.kullanim_sayisi} baÅŸarÄılÄı) â€” "
+                            f"hata senaryolarÄı ve Ã¶rnekler eklenmeli"
                         ),
                         "oncelik": 9,
                         "veri": {
@@ -404,15 +404,15 @@ class SkillIyilestirici:
                     }
                 )
 
-            # Kriter 2: SÄ±k kullanÄ±lan ama dÃ¼ÅŸÃ¼k baÅŸarÄ±
+            # Kriter 2: SÄık kullanÄılan ama dÃ¼ÅŸÃ¼k baÅŸarÄı
             elif istatistik.kullanim_sayisi >= 20 and istatistik.basari_orani < 70.0:
                 adaylar.append(
                     {
                         "skill_adi": s.ad,
                         "tur": "sik_kullanilan_dusuk_basari",
                         "aciklama": (
-                            f"SÄ±k kullanÄ±lÄ±yor ({istatistik.kullanim_sayisi} kez) ama "
-                            f"baÅŸarÄ± oranÄ± dÃ¼ÅŸÃ¼k: %{istatistik.basari_orani:.1f} â€” "
+                            f"SÄık kullanÄılÄıyor ({istatistik.kullanim_sayisi} kez) ama "
+                            f"baÅŸarÄı oranÄı dÃ¼ÅŸÃ¼k: %{istatistik.basari_orani:.1f} â€” "
                             f"pitfall'lar dÃ¼zeltilmeli, daha net talimatlar eklenmeli"
                         ),
                         "oncelik": 8,
@@ -437,7 +437,7 @@ class SkillIyilestirici:
                     }
                 )
 
-        # Kriter 4: Benzer skill'ler (kategori bazlÄ± gruplama)
+        # Kriter 4: Benzer skill'ler (kategori bazlÄı gruplama)
         for s1 in tum_skilller:
             for s2 in tum_skilller:
                 if s1.ad >= s2.ad:
@@ -461,7 +461,7 @@ class SkillIyilestirici:
                         }
                     )
 
-        # Kriter 5: GÃ¼ncellenmemiÅŸ / hiÃ§ kullanÄ±lmamÄ±ÅŸ skill
+        # Kriter 5: GÃ¼ncellenmemiÅŸ / hiÃ§ kullanÄılmamÄıÅŸ skill
         simdi = time.time()
         for s in tum_skilller:
             istatistik = skill_istatistik.get(s.ad, KullanimKaydi(skill_adi=s.ad))
@@ -475,7 +475,7 @@ class SkillIyilestirici:
                         "tur": "kullanilmayan",
                         "aciklama": (
                             f"30 gÃ¼nden eski ({int((simdi - s.son_degisiklik) / 86400)} gÃ¼n) "
-                            f"ve hiÃ§ kullanÄ±lmamÄ±ÅŸ â€” gÃ¶zden geÃ§irilmeli veya kaldÄ±rÄ±lmalÄ±"
+                            f"ve hiÃ§ kullanÄılmamÄıÅŸ â€” gÃ¶zden geÃ§irilmeli veya kaldÄırÄılmalÄı"
                         ),
                         "oncelik": 3,
                         "veri": {
@@ -484,7 +484,7 @@ class SkillIyilestirici:
                     }
                 )
 
-        # Ã–nerileri veritabanÄ±na kaydet
+        # Ã–nerileri veritabanÄına kaydet
         self._oneri_kaydet(adaylar)
         logger.info("%d iyilestirme adayi bulundu", len(adaylar))
         return adaylar
@@ -492,15 +492,15 @@ class SkillIyilestirici:
     # â”€â”€ Otomatik iyileÅŸtirme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def otomatik_iyilestir(self) -> int:
-        """Ä°yileÅŸtirme adaylarÄ±na otomatik dÃ¼zeltmeler uygula.
+        """Ä°yileÅŸtirme adaylarÄına otomatik dÃ¼zeltmeler uygula.
 
-        YapÄ±lanlar:
-        - Eksik metadata varsa YAML frontmatter'Ä±nÄ± ekler
+        YapÄılanlar:
+        - Eksik metadata varsa YAML frontmatter'ÄınÄı ekler
         - Benzer skill'ler iÃ§in birleÅŸtirme notu ekler
-        - DÃ¼ÅŸÃ¼k baÅŸarÄ±lÄ± skill'lere hata senaryosu bÃ¶lÃ¼mÃ¼ ekler
+        - DÃ¼ÅŸÃ¼k baÅŸarÄılÄı skill'lere hata senaryosu bÃ¶lÃ¼mÃ¼ ekler
 
         Returns:
-            Ä°yileÅŸtirilen skill sayÄ±sÄ±.
+            Ä°yileÅŸtirilen skill sayÄısÄı.
         """
         adaylar = self.iyilestirme_adaylari_bul()
         iyilestirilen = 0
@@ -521,7 +521,7 @@ class SkillIyilestirici:
                 if self._kullanilmayan_notu_ekle(skill_adi):
                     iyilestirilen += 1
 
-        # Ä°yileÅŸtirmeleri uygulandÄ± olarak iÅŸaretle
+        # Ä°yileÅŸtirmeleri uygulandÄı olarak iÅŸaretle
         with self._vt._db() as db:
             db.execute(
                 "UPDATE iyilestirme_onerileri SET uygulandi = 1 WHERE uygulandi = 0"
@@ -533,10 +533,10 @@ class SkillIyilestirici:
     # â”€â”€ Rapor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def rapor_uret(self) -> str:
-        """KapsamlÄ± iyileÅŸtirme raporu Ã¼ret.
+        """KapsamlÄı iyileÅŸtirme raporu Ã¼ret.
 
         Returns:
-            Ä°nsan tarafÄ±ndan okunabilir rapor metni.
+            Ä°nsan tarafÄından okunabilir rapor metni.
         """
         # TÃ¼m skill'leri tara
         tum_skilller = self.skill_dosyalarini_tara()
@@ -559,7 +559,7 @@ class SkillIyilestirici:
                 }
             )
 
-        # Ä°yileÅŸtirme adaylarÄ±
+        # Ä°yileÅŸtirme adaylarÄı
         adaylar = self.iyilestirme_adaylari_bul()
         uygulanan = 0
         with self._vt._db() as db:
@@ -568,7 +568,7 @@ class SkillIyilestirici:
             ).fetchone()
             uygulanan = row["sayi"] if row else 0
 
-        # Genel baÅŸarÄ± oranÄ±
+        # Genel baÅŸarÄı oranÄı
         genel_basari = 0.0
         if toplam_kullanim > 0:
             genel_basari = round(basarili_toplam / toplam_kullanim * 100, 1)
@@ -583,15 +583,15 @@ class SkillIyilestirici:
             "",
             "â”€â”€ GENEL DURUM â”€â”€",
             f"  Taranan skill      : {len(tum_skilller)}",
-            f"  Toplam kullanÄ±m    : {toplam_kullanim}",
-            f"  Genel baÅŸarÄ± oranÄ± : %{genel_basari}",
-            f"  Ä°yileÅŸtirme adayÄ±  : {len(adaylar)}",
+            f"  Toplam kullanÄım    : {toplam_kullanim}",
+            f"  Genel baÅŸarÄı oranÄı : %{genel_basari}",
+            f"  Ä°yileÅŸtirme adayÄı  : {len(adaylar)}",
             f"  Uygulanan iyileÅŸt. : {uygulanan}",
             "",
             "â”€â”€ SKILL DETAYLARI â”€â”€",
         ]
 
-        # Skill detaylarÄ±nÄ± sÄ±rala (en Ã§ok kullanÄ±lan -> en az)
+        # Skill detaylarÄınÄı sÄırala (en Ã§ok kullanÄılan -> en az)
         skill_detaylari.sort(key=lambda x: x["kullanim"], reverse=True)
         for sd in skill_detaylari[:20]:  # Ä°lk 20
             basari_gostergesi = (
@@ -604,8 +604,8 @@ class SkillIyilestirici:
                 f"(v{sd['versiyon']}, {sd['kategori'] or 'kategorisiz'})"
             )
             satirlar.append(
-                f"     KullanÄ±m: {sd['kullanim']} kez, "
-                f"BaÅŸarÄ±: %{sd['basari_orani']}, "
+                f"     KullanÄım: {sd['kullanim']} kez, "
+                f"BaÅŸarÄı: %{sd['basari_orani']}, "
                 f"SÃ¼re: {sd['ortalama_sure_ms']}ms"
             )
 
@@ -616,7 +616,7 @@ class SkillIyilestirici:
                     "â”€â”€ Ä°YÄ°LEÅTÄ°RME Ã–NERÄ°LERÄ° â”€â”€",
                 ]
             )
-            # Ã–nceliÄŸe gÃ¶re sÄ±rala
+            # Ã–nceliÄŸe gÃ¶re sÄırala
             adaylar.sort(key=lambda x: x["oncelik"], reverse=True)
             for i, aday in enumerate(adaylar[:10], 1):  # Ä°lk 10
                 tur_ikonlari = {
@@ -650,7 +650,7 @@ class SkillIyilestirici:
             ]
         )
 
-        # Raporu veritabanÄ±na kaydet
+        # Raporu veritabanÄına kaydet
         rapor_metni = "\n".join(satirlar)
         with self._vt._db() as db:
             db.execute(
@@ -665,10 +665,10 @@ class SkillIyilestirici:
 
         return rapor_metni
 
-    # â”€â”€ Ä°Ã§ yardÄ±mcÄ±lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Ä°Ã§ yardÄımcÄılar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _skill_bilgisini_kaydet(self, bilgi: SkillBilgisi) -> None:
-        """Skill bilgisini veritabanÄ±na kaydet/gÃ¼ncelle."""
+        """Skill bilgisini veritabanÄına kaydet/gÃ¼ncelle."""
         with self._vt._db() as db:
             db.execute(
                 """INSERT OR REPLACE INTO skill_bilgisi
@@ -691,10 +691,10 @@ class SkillIyilestirici:
             )
 
     def _eksik_meta_kontrol(self, bilgi: SkillBilgisi) -> list[str]:
-        """Skill'de eksik metadata alanlarÄ±nÄ± bul."""
+        """Skill'de eksik metadata alanlarÄınÄı bul."""
         eksik = []
         if not bilgi.aciklama:
-            eksik.append("description/aÃ§Ä±klama")
+            eksik.append("description/aÃ§Äıklama")
         if not bilgi.kategori:
             eksik.append("category/kategori")
         if not bilgi.tetikleyiciler:
@@ -702,7 +702,7 @@ class SkillIyilestirici:
         return eksik
 
     def _benzerlik_skoru(self, s1: SkillBilgisi, s2: SkillBilgisi) -> float:
-        """Ä°ki skill arasÄ±ndaki benzerlik skoru (0.0-1.0)."""
+        """Ä°ki skill arasÄındaki benzerlik skoru (0.0-1.0)."""
         puan = 0.0
         toplam = 0.0
 
@@ -727,7 +727,7 @@ class SkillIyilestirici:
             if s1_set & s2_set:
                 puan += len(s1_set & s2_set) / max(len(s1_set | s2_set), 1)
 
-        # Ä°sim benzerliÄŸi (anahtar kelime ortaklÄ±ÄŸÄ±)
+        # Ä°sim benzerliÄŸi (anahtar kelime ortaklÄıÄŸÄı)
         if s1.ad and s2.ad:
             s1_kelime = set(s1.ad.lower().replace("-", " ").replace("_", " ").split())
             s2_kelime = set(s2.ad.lower().replace("-", " ").replace("_", " ").split())
@@ -738,7 +738,7 @@ class SkillIyilestirici:
         return puan / max(toplam, 1)
 
     def _oneri_kaydet(self, adaylar: list[dict]) -> None:
-        """Ä°yileÅŸtirme Ã¶nerilerini veritabanÄ±na kaydet."""
+        """Ä°yileÅŸtirme Ã¶nerilerini veritabanÄına kaydet."""
         simdi = time.time()
         with self._vt._db() as db:
             for aday in adaylar:
@@ -758,15 +758,15 @@ class SkillIyilestirici:
     def _meta_iyilestir(self, skill_adi: str) -> bool:
         """Skill'e eksik YAML metadata ekle."""
         try:
-            # Skill dosyasÄ±nÄ± bul
+            # Skill dosyasÄınÄı bul
             skills_dir = self._skills_dizini
             for dosya in skills_dir.glob("*.md"):
                 bilgi = self._ayristirici.dosyadan_oku(dosya)
                 if bilgi and bilgi.ad == skill_adi:
                     icerik = dosya.read_text("utf-8", errors="replace")
-                    meta = _SkillAyrÄ±stÄ±rÄ±cÄ±.YAML_meta_ayristir(icerik)
+                    meta = _SkillAyrÄıstÄırÄıcÄı.YAML_meta_ayristir(icerik)
 
-                    # Eksik alanlarÄ± tespit et
+                    # Eksik alanlarÄı tespit et
                     eklenecek = []
                     if not meta.get("name"):
                         eklenecek.append(f"name: {bilgi.ad}")
@@ -780,9 +780,9 @@ class SkillIyilestirici:
                     if not eklenecek:
                         return False
 
-                    # Var olan YAML frontmatter'Ä±na ekle veya yeni oluÅŸtur
+                    # Var olan YAML frontmatter'Äına ekle veya yeni oluÅŸtur
                     if re.match(r"^---\s*\n.*?\n---", icerik, re.DOTALL):
-                        # Mevcut frontmatter'Ä± gÃ¼ncelle
+                        # Mevcut frontmatter'Äı gÃ¼ncelle
                         def _ekle_meta(m):
                             blok = m.group(0)
                             # Son ---'den Ã¶nce ekle
@@ -811,7 +811,7 @@ class SkillIyilestirici:
         return False
 
     def _hata_senaryosu_ekle(self, skill_adi: str, veri: dict) -> bool:
-        """DÃ¼ÅŸÃ¼k baÅŸarÄ±lÄ± skill'e hata senaryosu bÃ¶lÃ¼mÃ¼ ekle."""
+        """DÃ¼ÅŸÃ¼k baÅŸarÄılÄı skill'e hata senaryosu bÃ¶lÃ¼mÃ¼ ekle."""
         try:
             skills_dir = self._skills_dizini
             for dosya in skills_dir.glob("*.md"):
@@ -819,29 +819,29 @@ class SkillIyilestirici:
                 if bilgi and bilgi.ad == skill_adi:
                     icerik = dosya.read_text("utf-8", errors="replace")
 
-                    # Zaten hata senaryosu var mÄ±?
-                    if "## Hata SenaryolarÄ±" in icerik or "## Pitfall" in icerik:
+                    # Zaten hata senaryosu var mÄı?
+                    if "## Hata SenaryolarÄı" in icerik or "## Pitfall" in icerik:
                         return False
 
-                    # BaÅŸarÄ± oranÄ± bilgisi
+                    # BaÅŸarÄı oranÄı bilgisi
                     basari = veri.get("basari_orani", 0)
                     kullanim = veri.get("kullanim", 0)
 
                     hata_bloku = (
                         "\n\n"
-                        "## âš ï¸ Hata SenaryolarÄ±\n"
+                        "## âš ï¸ Hata SenaryolarÄı\n"
                         "\n"
-                        f"> Bu skill %{basari:.1f} baÅŸarÄ± oranÄ±na sahip "
-                        f"({kullanim} kullanÄ±m). AÅŸaÄŸÄ±daki hata senaryolarÄ± gÃ¶zden geÃ§irilmeli.\n"
+                        f"> Bu skill %{basari:.1f} baÅŸarÄı oranÄına sahip "
+                        f"({kullanim} kullanÄım). AÅŸaÄŸÄıdaki hata senaryolarÄı gÃ¶zden geÃ§irilmeli.\n"
                         "\n"
                         "### Bilinen Hatalar\n"
-                        "- **Hata 1**: AÃ§Ä±klama eklenmeli\n"
-                        "- **Hata 2**: AÃ§Ä±klama eklenmeli\n"
+                        "- **Hata 1**: AÃ§Äıklama eklenmeli\n"
+                        "- **Hata 2**: AÃ§Äıklama eklenmeli\n"
                         "\n"
                         "### Ã‡Ã¶zÃ¼m Ã–nerileri\n"
-                        "- KullanÄ±m talimatlarÄ± netleÅŸtirilmeli\n"
-                        "- Beklenen Ã§Ä±ktÄ± formatÄ± belirtilmeli\n"
-                        "- SÄ±nÄ±r durumlar (edge cases) belgelenmeli\n"
+                        "- KullanÄım talimatlarÄı netleÅŸtirilmeli\n"
+                        "- Beklenen Ã§ÄıktÄı formatÄı belirtilmeli\n"
+                        "- SÄınÄır durumlar (edge cases) belgelenmeli\n"
                     )
 
                     yeni_icerik = icerik.rstrip() + hata_bloku
@@ -858,7 +858,7 @@ class SkillIyilestirici:
         return False
 
     def _kullanilmayan_notu_ekle(self, skill_adi: str) -> bool:
-        """KullanÄ±lmayan skill'e gÃ¶zden geÃ§irme notu ekle."""
+        """KullanÄılmayan skill'e gÃ¶zden geÃ§irme notu ekle."""
         try:
             skills_dir = self._skills_dizini
             for dosya in skills_dir.glob("*.md"):
@@ -875,7 +875,7 @@ class SkillIyilestirici:
                         "# GÃ–ZDEN GEÃ‡Ä°R\n"
                         "\n"
                         "> â° Bu skill 30 gÃ¼nden uzun sÃ¼redir gÃ¼ncellenmemiÅŸ "
-                        "ve hiÃ§ kullanÄ±lmamÄ±ÅŸ. KaldÄ±rÄ±labilir veya gÃ¼ncellenebilir.\n"
+                        "ve hiÃ§ kullanÄılmamÄıÅŸ. KaldÄırÄılabilir veya gÃ¼ncellenebilir.\n"
                     )
 
                     yeni_icerik = icerik.rstrip() + not_bloku
@@ -886,10 +886,10 @@ class SkillIyilestirici:
             logger.warning("Kullanilmayan notu ekleme hatasi: %s â€” %s", skill_adi, e)
         return False
 
-    # â”€â”€ Ek yardÄ±mcÄ±lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â”€â”€ Ek yardÄımcÄılar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def en_cok_kullanilan_skilller(self, limit: int = 10) -> list[dict]:
-        """En Ã§ok kullanÄ±lan skill'leri dÃ¶ndÃ¼r."""
+        """En Ã§ok kullanÄılan skill'leri dÃ¶ndÃ¼r."""
         with self._vt._db() as db:
             rows = db.execute(
                 """SELECT skill_adi, COUNT(*) as sayi,
@@ -904,7 +904,7 @@ class SkillIyilestirici:
             return [dict(r) for r in rows]
 
     def son_kullanimlar(self, limit: int = 20) -> list[dict]:
-        """Son kullanÄ±mlarÄ± dÃ¶ndÃ¼r."""
+        """Son kullanÄımlarÄı dÃ¶ndÃ¼r."""
         with self._vt._db() as db:
             rows = db.execute(
                 """SELECT skill_adi, basarili, sure_ms, timestamp, kaynak
@@ -916,7 +916,7 @@ class SkillIyilestirici:
             return [dict(r) for r in rows]
 
     def istatistik_sifirla(self, skill_adi: str | None = None) -> None:
-        """Skill kullanÄ±m istatistiklerini sÄ±fÄ±rla."""
+        """Skill kullanÄım istatistiklerini sÄıfÄırla."""
         with self._vt._db() as db:
             if skill_adi:
                 db.execute(
@@ -930,30 +930,30 @@ class SkillIyilestirici:
             )
 
 
-# â”€â”€ CLI kullanÄ±mÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ CLI kullanÄımÄı â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def main() -> str:
-    """CLI giriÅŸ noktasÄ±.
+    """CLI giriÅŸ noktasÄı.
 
-    KullanÄ±m:
+    KullanÄım:
         python -m reymen.scripts.skill_iyilestirici
     """
     si = SkillIyilestirici()
 
     # 1. Skill'leri tara
-    print("ğŸ“‚ Skill'ler taranÄ±yor...")
+    print("ğŸ“‚ Skill'ler taranÄıyor...")
     skill_sayisi = len(si.skill_dosyalarini_tara())
     print(f"   {skill_sayisi} skill bulundu")
 
-    # 2. Ä°yileÅŸtirme adaylarÄ±nÄ± bul
-    print("\nğŸ” Ä°yileÅŸtirme adaylarÄ± taranÄ±yor...")
+    # 2. Ä°yileÅŸtirme adaylarÄınÄı bul
+    print("\nğŸ” Ä°yileÅŸtirme adaylarÄı taranÄıyor...")
     adaylar = si.iyilestirme_adaylari_bul()
     print(f"   {len(adaylar)} aday bulundu")
 
     # 3. Otomatik iyileÅŸtir
     if adaylar:
-        print("\nğŸ› ï¸  Otomatik iyileÅŸtirme uygulanÄ±yor...")
+        print("\nğŸ› ï¸  Otomatik iyileÅŸtirme uygulanÄıyor...")
         iyilestirilen = si.otomatik_iyilestir()
         print(f"   {iyilestirilen} skill iyileÅŸtirildi")
     else:

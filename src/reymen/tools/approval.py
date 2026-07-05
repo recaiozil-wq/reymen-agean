@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.approval shim â€” ReYMeN onay mekanizmasÄ±nÄ± ReYMeN'e yÃ¶nlendirir."""
+"""ReYMeN tools.approval shim â€” ReYMeN onay mekanizmasÄ±nÄ± ReYMeN'e yönlendirir."""
 
 from __future__ import annotations
 

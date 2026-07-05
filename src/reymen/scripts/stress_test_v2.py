@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ReYMeN Stress Test â€” bagimsiz script"""
 
 import sys, os, json, time, concurrent.futures
@@ -57,7 +57,7 @@ SORULAR = [
     "python ogrenmek",
     "tesekkur ederim",
     "sagol",
-    "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z",
+    "görüÅŸürüz",
     "eyvallah",
     "bilgisayar nedir",
     "internet nasil calisir",

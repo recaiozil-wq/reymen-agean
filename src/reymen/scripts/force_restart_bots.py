@@ -1,4 +1,4 @@
-﻿"""force_restart_bots.py â€” T\u00fcm python process'lerini oldur, botlari temiz baslat."""
+"""force_restart_bots.py â€” T\u00fcm python process'lerini oldur, botlari temiz baslat."""
 
 import os, subprocess, time, json, urllib.request
 

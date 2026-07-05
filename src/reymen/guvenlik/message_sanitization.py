@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """message_sanitization.py â€” Mesaj Temizleme ve Sanitizasyon.
 
 LLM'e gonderilmeden once ve LLM'den gelen yanitlar islenirken

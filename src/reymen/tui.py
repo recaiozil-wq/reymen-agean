@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 tui.py â€” ReYMeN Terminal UI (prompt_toolkit tabanli).
 

@@ -1,4 +1,4 @@
-﻿"""ReYMeN toplu test â€” 30 soru, cevap kalitesi raporu"""
+"""ReYMeN toplu test â€” 30 soru, cevap kalitesi raporu"""
 
 import os, sys, json, time
 from dotenv import load_dotenv

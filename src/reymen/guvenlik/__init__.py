@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-reymen/guvenlik/ â€” ReYMeN GÃ¼venlik Paketi
+reymen/guvenlik/ â€” ReYMeN Güvenlik Paketi
 
-Guardrails, sandbox, gÃ¼venlik denetimleri ve threat detection.
-Auth sistemi (JWT, API key, rol yÃ¶netimi) ve OAuth2 entegrasyonu.
+Guardrails, sandbox, güvenlik denetimleri ve threat detection.
+Auth sistemi (JWT, API key, rol yönetimi) ve OAuth2 entegrasyonu.
 """
 
 # Auth sistemi

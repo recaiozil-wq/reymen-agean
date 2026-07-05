@@ -1,6 +1,6 @@
-﻿"""ReYMeN tools import hook â€” `from tools.xxx import yyy` â†’ `from reymen.tools.xxx import yyy`.
+"""ReYMeN tools import hook â€” `from tools.xxx import yyy` â†’ `from reymen.tools.xxx import yyy`.
 
-Bu modÃ¼l, ReYMeN Agent'in `tools/` paketi yerine ReYMeN'in `reymen/tools/`
+Bu modül, ReYMeN Agent'in `tools/` paketi yerine ReYMeN'in `reymen/tools/`
 shim'lerinin kullanÄ±lmasÄ±nÄ± saÄŸlar.
 
 KullanÄ±m (herhangi bir entry point'te bir kere):
@@ -16,7 +16,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ReYMeN tools modÃ¼llerinin listesi (import hook ile yÃ¶nlendirilecek)
+# ReYMeN tools modüllerinin listesi (import hook ile yönlendirilecek)
 _TOOLS_MODULES = {
     "tools.tts_tool",
     "tools.browser_tool",
@@ -73,14 +73,14 @@ class _ToolsRedirectFinder:
         if fullname == "reymen_cli" or fullname.startswith("reymen_cli."):
             # Ã–nce sys.modules'te var mÄ± kontrol et
             if fullname in sys.modules:
-                return None  # Zaten yÃ¼klÃ¼, normal akÄ±ÅŸa devam et
+                return None  # Zaten yüklü, normal akÄ±ÅŸa devam et
 
             # reymen_cli â†’ ReYMeN_cli, reymen_cli.xxx â†’ ReYMeN_cli.xxx
             alt_name = fullname.replace("reymen_cli", "ReYMeN_cli", 1)
             try:
                 spec = importlib.util.find_spec(alt_name)
                 if spec is not None:
-                    # Alt modÃ¼lleri sys.modules'e kaydet (cycle Ã¶nleme)
+                    # Alt modülleri sys.modules'e kaydet (cycle önleme)
                     actual = importlib.import_module(alt_name)
                     sys.modules[fullname] = actual
                 return spec
@@ -121,5 +121,5 @@ def install() -> None:
     logger.debug("ReYMeN tools import hook installed (%d modules)", len(_TOOLS_MODULES))
 
 
-# ModÃ¼l yÃ¼klendiÄŸinde otomatik kur
+# Modül yüklendiÄŸinde otomatik kur
 install()

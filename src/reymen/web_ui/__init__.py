@@ -1,4 +1,4 @@
-﻿"""ğŸŒ ReYMeN Web UI â€” FastAPI + Jinja2 + HTMX + WebSocket yÃ¶netim paneli.
+"""ğŸŒ ReYMeN Web UI â€” FastAPI + Jinja2 + HTMX + WebSocket yönetim paneli.
 
 Kullanim:
     python -c "from reymen.web_ui import baslat; baslat()"
@@ -26,7 +26,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
 
-# Web UI modÃ¼lleri
+# Web UI modülleri
 from reymen.web_ui.auth import (
     AuthConfig,
     UserManager,
@@ -111,7 +111,7 @@ process_manager = ProcessManager()
 log_streamer = LogStreamer(LOG_DOSYASI)
 
 # ---------------------------------------------------------------------------
-# Middleware â€” auth kontrolÃ¼ (ReYMeN pattern: provider registry + refresh token)
+# Middleware â€” auth kontrolü (ReYMeN pattern: provider registry + refresh token)
 # ---------------------------------------------------------------------------
 
 AUTH_ATLANACAK = {
@@ -186,7 +186,7 @@ async def auth_middleware(request: Request, call_next):
     request.state.role = session.role
     request.state.session = session
 
-    # Role-based API izin kontrolÃ¼
+    # Role-based API izin kontrolü
     if path.startswith("/api/"):
         if request.method in ("POST", "PUT", "DELETE"):
             if session.role not in ("admin", "operator"):
@@ -328,7 +328,7 @@ async def logout(request: Request):
 
 @app.get("/auth/login/{provider}")
 async def oauth_login(provider: str, request: Request, response: Response):
-    """KullanÄ±cÄ±yÄ± OAuth2 provider'Ä±n onay sayfasÄ±na yÃ¶nlendir."""
+    """KullanÄ±cÄ±yÄ± OAuth2 provider'Ä±n onay sayfasÄ±na yönlendir."""
     oauth_provider = oauth2_registry.get(provider)
     if not oauth_provider:
         return HTMLResponse(
@@ -383,7 +383,7 @@ async def oauth_callback(
         if not username:
             username = f"{provider}_{user_info.provider_id}"
 
-        # Local user varsa rolÃ¼nÃ¼ al, yoksa viewer
+        # Local user varsa rolünü al, yoksa viewer
         role = user_manager.get_user_role(username) or "viewer"
 
         # JWT Session oluÅŸtur (web_ui.auth ile uyumlu)
@@ -828,7 +828,7 @@ async def coverage_sayfasi(request: Request):
 
 @app.get("/api/coverage/ozet")
 async def api_coverage_ozet():
-    """Coverage Ã¶zet kartlarÄ± HTML."""
+    """Coverage özet kartlarÄ± HTML."""
     from reymen.sistem.coverage_report import statik_analiz, gecmis_getir
 
     sonuc = statik_analiz()
@@ -844,20 +844,20 @@ async def api_coverage_ozet():
         fark = yuzde - onceki
         trend = f"ğŸ“ˆ +{fark}%" if fark > 0 else f"ğŸ“‰ {fark}%" if fark < 0 else "â¡ï¸ Â±0"
 
-    son = gecmis[-1].get("tarih", "â€”")[:16] if gecmis else "HenÃ¼z yok"
+    son = gecmis[-1].get("tarih", "â€”")[:16] if gecmis else "Henüz yok"
 
     html = [
         '<div class="cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;">',
         f'<div class="card" style="text-align:center;"><h3 style="color:{renk}">{yuzde}%</h3>'
         f'<div class="gri">Kapsama</div><small>{trend}</small></div>',
         f'<div class="card" style="text-align:center;"><h3>{sonuc.get("toplam_modul", 0)}</h3>'
-        f'<div class="gri">ModÃ¼l</div></div>',
+        f'<div class="gri">Modül</div></div>',
         f'<div class="card" style="text-align:center;"><h3>{sonuc.get("toplam_satir", 0):,}</h3>'
         f'<div class="gri">SatÄ±r</div></div>',
         f'<div class="card" style="text-align:center;"><h3>{sonuc.get("import_edilebilen", 0)} / {sonuc.get("import_edilemeyen", 0)}</h3>'
-        f'<div class="gri">Ä°Ã§e Aktarma</div></div>',
+        f'<div class="gri">Ä°çe Aktarma</div></div>',
         f'<div class="card" style="text-align:center;"><h3 style="font-size:1rem;">{son}</h3>'
-        f'<div class="gri">Son Ã–lÃ§Ã¼m</div></div>',
+        f'<div class="gri">Son Ã–lçüm</div></div>',
         "</div>",
     ]
     return HTMLResponse(content="\n".join(html))
@@ -865,19 +865,19 @@ async def api_coverage_ozet():
 
 @app.get("/api/coverage/gecmis")
 async def api_coverage_gecmis():
-    """Coverage geÃ§miÅŸ tablosu HTML."""
+    """Coverage geçmiÅŸ tablosu HTML."""
     from reymen.sistem.coverage_report import gecmis_getir
 
     gecmis = gecmis_getir(30)
 
     if not gecmis:
         return HTMLResponse(
-            content='<div class="gri">HenÃ¼z coverage verisi yok. "Tam Tarama" yapÄ±n.</div>'
+            content='<div class="gri">Henüz coverage verisi yok. "Tam Tarama" yapÄ±n.</div>'
         )
 
     html = ['<table class="table"><thead><tr>']
     html.append(
-        "<th>Tarih</th><th>Coverage</th><th>SatÄ±r</th><th>SÃ¼re</th><th>TÃ¼r</th>"
+        "<th>Tarih</th><th>Coverage</th><th>SatÄ±r</th><th>Süre</th><th>Tür</th>"
     )
     html.append("</tr></thead><tbody>")
 
@@ -900,7 +900,7 @@ async def api_coverage_gecmis():
 
 @app.get("/api/coverage/gecmis-json")
 async def api_coverage_gecmis_json():
-    """Coverage geÃ§miÅŸi JSON (Chart.js iÃ§in)."""
+    """Coverage geçmiÅŸi JSON (Chart.js için)."""
     from reymen.sistem.coverage_report import gecmis_getir
 
     return gecmis_getir(50)
@@ -908,13 +908,13 @@ async def api_coverage_gecmis_json():
 
 @app.post("/api/coverage/calistir")
 async def api_coverage_calistir(hizli: bool = False):
-    """Coverage Ã§alÄ±ÅŸtÄ±r."""
+    """Coverage çalÄ±ÅŸtÄ±r."""
     from reymen.sistem.coverage_report import calistir, statik_analiz
 
     if hizli:
         sonuc = calistir(hizli=True)
     else:
-        # Tam: statik analiz (gÃ¼venilir)
+        # Tam: statik analiz (güvenilir)
         sonuc = statik_analiz()
 
     if sonuc.get("basari"):
@@ -925,8 +925,8 @@ async def api_coverage_calistir(hizli: bool = False):
             f'<div style="font-size:3rem;font-weight:bold;color:{renk};">{yuzde}%</div>',
             "<div>",
             f'<div>Toplam: {sonuc.get("toplam_satir", 0):,} satÄ±r</div>',
-            f'<div>ModÃ¼l: {sonuc.get("toplam_modul", 0)}</div>',
-            f'<div>SÃ¼re: {sonuc.get("sure", 0)}s</div>',
+            f'<div>Modül: {sonuc.get("toplam_modul", 0)}</div>',
+            f'<div>Süre: {sonuc.get("sure", 0)}s</div>',
             "</div></div>",
         ]
         return HTMLResponse(content="\n".join(html))
@@ -958,13 +958,13 @@ async def sistem_sayfasi(request: Request):
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-# API â€” GÃ¶rsel Ãœretim JSON (/api/reymen/media)
+# API â€” Görsel Ãœretim JSON (/api/reymen/media)
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/reymen/media/backends")
 async def api_media_backends():
-    """JSON: KayÄ±tlÄ± gÃ¶rsel Ã¼retim backend'leri."""
+    """JSON: KayÄ±tlÄ± görsel üretim backend'leri."""
     try:
         from reymen.arac.image_gen_engine import image_gen_engine_listele
 
@@ -988,7 +988,7 @@ async def api_media_backends():
 
 @app.post("/api/reymen/media/generate")
 async def api_media_generate(request: Request):
-    """JSON: GÃ¶rsel Ã¼ret."""
+    """JSON: Görsel üret."""
     try:
         data = await request.json()
     except Exception:
@@ -1034,19 +1034,19 @@ async def api_media_generate(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
-# Routes â€” GÃ¶rsel Ãœretim (/media)
+# Routes â€” Görsel Ãœretim (/media)
 # ---------------------------------------------------------------------------
 
 
 @app.get("/media", response_class=HTMLResponse)
 async def media_sayfasi(request: Request):
-    """GÃ¶rsel Ã¼retim sayfasÄ± â€” prompt gir + backend seÃ§."""
+    """Görsel üretim sayfasÄ± â€” prompt gir + backend seç."""
     return templates.TemplateResponse(request, "media.html", {})
 
 
 @app.post("/media/generate")
 async def media_generate(request: Request):
-    """GÃ¶rsel Ã¼retim isteÄŸi â€” image_gen_engine.py resim_olustur() Ã§aÄŸÄ±rÄ±r."""
+    """Görsel üretim isteÄŸi â€” image_gen_engine.py resim_olustur() çaÄŸÄ±rÄ±r."""
     form = await request.form()
     prompt = form.get("prompt", "").strip()
     en = form.get("en", "1024").strip()
@@ -1063,13 +1063,13 @@ async def media_generate(request: Request):
 
         sonuc = resim_olustur(prompt=prompt, en=en, boy=boy, backend=backend)
 
-        # [MEDIA] bloklu sonucu gÃ¼zel gÃ¶ster
+        # [MEDIA] bloklu sonucu güzel göster
         if sonuc.startswith("[RESIM_OLUSTUR") and "Hata" in sonuc:
             css = "alert alert-error"
         elif sonuc.startswith("[RESIM_OLUSTUR") and "Uyari" in sonuc:
             css = "alert alert-warning"
         elif "[MEDIA" in sonuc:
-            # GÃ¶rsel URL'sini Ã§Ä±kar
+            # Görsel URL'sini çÄ±kar
             import re
 
             src_match = re.search(r'src="([^"]+)"', sonuc)
@@ -1077,15 +1077,15 @@ async def media_generate(request: Request):
                 r"\[MEDIA[^\]]*\][\s\S]*?\n(.+?)\n\[/MEDIA\]", sonuc
             )
             media_html = (
-                '<div class="alert alert-success">âœ… GÃ¶rsel baÅŸarÄ±yla Ã¼retildi!</div>'
+                '<div class="alert alert-success">âœ… Görsel baÅŸarÄ±yla üretildi!</div>'
             )
             if src_match:
                 img_url = src_match.group(1)
                 media_html += '<div style="margin-top:1rem;text-align:center;">'
-                media_html += f'<img src="{img_url}" alt="Ãœretilen gÃ¶rsel" style="max-width:100%;max-height:500px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">'
+                media_html += f'<img src="{img_url}" alt="Ãœretilen görsel" style="max-width:100%;max-height:500px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">'
                 media_html += '<div style="margin-top:0.5rem;">'
                 media_html += (
-                    f'<a href="{img_url}" target="_blank" class="btn btn-sm">ğŸ”— AÃ§</a> '
+                    f'<a href="{img_url}" target="_blank" class="btn btn-sm">ğŸ”— Aç</a> '
                 )
                 media_html += f'<button class="btn btn-sm" onclick="navigator.clipboard.writeText(\'{img_url}\')">ğŸ“‹ Kopyala</button>'
                 media_html += "</div></div>"
@@ -1101,9 +1101,9 @@ async def media_generate(request: Request):
         import traceback
 
         tb = traceback.format_exc()
-        logger.exception("[media/generate] GÃ¶rsel Ã¼retim hatasi:")
+        logger.exception("[media/generate] Görsel üretim hatasi:")
         return HTMLResponse(
-            content=f'<div class="alert alert-error">âŒ GÃ¶rsel Ã¼retim hatasÄ±: {e}<br><pre style="font-size:0.75rem;margin-top:0.5rem;">{tb[:500]}</pre></div>'
+            content=f'<div class="alert alert-error">âŒ Görsel üretim hatasÄ±: {e}<br><pre style="font-size:0.75rem;margin-top:0.5rem;">{tb[:500]}</pre></div>'
         )
 
 
@@ -1137,7 +1137,7 @@ async def media_list_backends():
 
 @app.get("/migration", response_class=HTMLResponse)
 async def migration_sayfasi(request: Request):
-    """Alembic migration yÃ¶netim sayfasÄ± (admin)."""
+    """Alembic migration yönetim sayfasÄ± (admin)."""
     if not admin_gerekli(getattr(request.state, "session", None)):
         return HTMLResponse(
             content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
@@ -1147,7 +1147,7 @@ async def migration_sayfasi(request: Request):
 
 
 def _alembic_cmd(*args: str) -> str:
-    """Alembic komutunu subprocess ile Ã§alÄ±ÅŸtÄ±r, HTML Ã§Ä±ktÄ± dÃ¶ndÃ¼r."""
+    """Alembic komutunu subprocess ile çalÄ±ÅŸtÄ±r, HTML çÄ±ktÄ± döndür."""
     import subprocess
 
     cmd = [
@@ -1193,13 +1193,13 @@ async def api_migration_status():
 
 @app.get("/api/migration/history")
 async def api_migration_history():
-    """Migration geÃ§miÅŸi."""
+    """Migration geçmiÅŸi."""
     return HTMLResponse(content=_alembic_cmd("history", "--verbose"))
 
 
 @app.get("/api/migration/check")
 async def api_migration_check():
-    """Bekleyen migrasyon kontrolÃ¼."""
+    """Bekleyen migrasyon kontrolü."""
     cur_result = _alembic_cmd("current")
     heads_result = _alembic_cmd("heads")
     return HTMLResponse(
@@ -1209,7 +1209,7 @@ async def api_migration_check():
 
 @app.post("/api/migration/upgrade")
 async def api_migration_upgrade(request: Request):
-    """Migrasyon yÃ¼kselt. VarsayÄ±lan: head."""
+    """Migrasyon yükselt. VarsayÄ±lan: head."""
     form = await request.form()
     revision = form.get("revision", "head").strip() or "head"
     result = _alembic_cmd("upgrade", revision)
@@ -1274,7 +1274,7 @@ async def api_durum(request: Request):
 
 @app.get("/api/moduller/ozet")
 async def api_moduller_ozet():
-    """ModÃ¼l Ã¶zet bilgisi."""
+    """Modül özet bilgisi."""
     try:
         moduller = modul_tarayici.tara()
         kategoriler = modul_kategorileri(moduller)
@@ -1282,7 +1282,7 @@ async def api_moduller_ozet():
         yuklu = sum(1 for m in moduller if m.yuklu)
         kat_sayisi = len(kategoriler)
         return HTMLResponse(
-            content=f"<div><b>{toplam}</b> modÃ¼l (<b>{yuklu}</b> yÃ¼klÃ¼, <b>{kat_sayisi}</b> kategori)</div>"
+            content=f"<div><b>{toplam}</b> modül (<b>{yuklu}</b> yüklü, <b>{kat_sayisi}</b> kategori)</div>"
         )
     except Exception as e:
         return HTMLResponse(content=f"<div class='tag-no'>Hata: {e}</div>")
@@ -1322,14 +1322,14 @@ async def api_plugins():
         pluginler = yonetici.list_plugins()
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>Plugin sistemi yÃ¼klenemedi: {e}</div>"
+            content=f"<div class='alert alert-error'>Plugin sistemi yüklenemedi: {e}</div>"
         )
 
     if not pluginler:
-        return HTMLResponse(content="<div class='gri'>HenÃ¼z plugin yok</div>")
+        return HTMLResponse(content="<div class='gri'>Henüz plugin yok</div>")
 
     satirlar = [
-        "<table><tr><th>Plugin</th><th>AÃ§Ä±klama</th><th>Durum</th><th>Ä°ÅŸlem</th></tr>"
+        "<table><tr><th>Plugin</th><th>AçÄ±klama</th><th>Durum</th><th>Ä°ÅŸlem</th></tr>"
     ]
     for p in pluginler:
         ad = p.get("ad", p.get("name", "?"))
@@ -1354,7 +1354,7 @@ async def api_plugins():
 
 @app.get("/api/plugins/ozet")
 async def api_plugins_ozet():
-    """Plugin Ã¶zet bilgisi."""
+    """Plugin özet bilgisi."""
     try:
         sys.path.insert(0, str(PROJE_KOK))
         from reymen.sistem.plugin_manager import PluginYoneticisi
@@ -1419,9 +1419,9 @@ async def api_plugin_export(ad: str):
         cikti = PROJE_KOK / f"{ad}.reyplugin"
         sonuc = yonetici.export_plugin(ad, str(cikti))
         if sonuc.startswith("[OK]"):
-            # DosyayÄ± oku ve indirilebilir olarak dÃ¶ndÃ¼r
+            # DosyayÄ± oku ve indirilebilir olarak döndür
             icerik = cikti.read_bytes()
-            cikti.unlink(missing_ok=True)  # geÃ§ici dosyayÄ± temizle
+            cikti.unlink(missing_ok=True)  # geçici dosyayÄ± temizle
             from fastapi.responses import Response
 
             return Response(
@@ -1440,7 +1440,7 @@ async def api_plugin_export(ad: str):
 
 @app.post("/api/plugins/import")
 async def api_plugin_import(request: Request):
-    """.reyplugin paketini iÃ§e aktar (multipart form-data ile dosya yÃ¼kleme)."""
+    """.reyplugin paketini içe aktar (multipart form-data ile dosya yükleme)."""
     try:
         form = await request.form()
         dosya = form.get("dosya")
@@ -1449,7 +1449,7 @@ async def api_plugin_import(request: Request):
                 content="<div class='alert alert-error'>âŒ Dosya gerekli</div>"
             )
 
-        # DosyayÄ± geÃ§ici konuma yaz
+        # DosyayÄ± geçici konuma yaz
         import tempfile
 
         tmp = Path(tempfile.mkdtemp()) / dosya.filename
@@ -1462,7 +1462,7 @@ async def api_plugin_import(request: Request):
         yonetici = PluginYoneticisi(str(PLUGIN_DIZIN))
         sonuc = yonetici.import_plugin(str(tmp))
 
-        # GeÃ§ici dosyayÄ± temizle
+        # Geçici dosyayÄ± temizle
         tmp.unlink(missing_ok=True)
         tmp.parent.rmdir()
 
@@ -1477,7 +1477,7 @@ async def api_plugin_import(request: Request):
 
 
 # ---------------------------------------------------------------------------
-# API â€” KullanÄ±cÄ± YÃ¶netimi
+# API â€” KullanÄ±cÄ± Yönetimi
 # ---------------------------------------------------------------------------
 
 
@@ -1598,11 +1598,11 @@ async def api_gateway():
 
 @app.get("/api/gateway/ozet")
 async def api_gateway_ozet():
-    """Gateway Ã¶zet."""
+    """Gateway özet."""
     tumu = process_manager.tumu()
     calisan = sum(1 for p in tumu if p.get("durum") == "calisiyor")
     return HTMLResponse(
-        content=f"<div><b>{calisan}</b>/<b>{len(tumu)}</b> servis Ã§alÄ±ÅŸÄ±yor</div>"
+        content=f"<div><b>{calisan}</b>/<b>{len(tumu)}</b> servis çalÄ±ÅŸÄ±yor</div>"
     )
 
 
@@ -1674,7 +1674,7 @@ async def api_gateway_baslat():
         durum = process_manager.durum("gateway")
         if durum.get("durum") == "calisiyor":
             return HTMLResponse(
-                content="<div class='alert alert-success'>âœ… Zaten Ã§alÄ±ÅŸÄ±yor</div>"
+                content="<div class='alert alert-success'>âœ… Zaten çalÄ±ÅŸÄ±yor</div>"
             )
         ok = process_manager.baslat(
             "gateway",
@@ -1788,7 +1788,7 @@ async def api_gateway_telegram():
         )
     else:
         satirlar.append(
-            "<div class='flex gri' style='font-size:0.85rem'>Hedef Chat ID: Herkese aÃ§Ä±k</div>"
+            "<div class='flex gri' style='font-size:0.85rem'>Hedef Chat ID: Herkese açÄ±k</div>"
         )
 
     bot_durum = durum.get("durum", "durduruldu")
@@ -1812,7 +1812,7 @@ async def api_gateway_telegram_baslat():
     ok = process_manager.baslat(
         "telegram_bot",
         [sys.executable, str(tg_yolu)],
-        port=0,  # Telegram botu iÃ§in port gerekmez
+        port=0,  # Telegram botu için port gerekmez
         log_dosyasi=PROJE_KOK / "logs" / "telegram_bot.log",
     )
     if ok:
@@ -1833,7 +1833,7 @@ async def api_gateway_telegram_durdur():
 
 @app.post("/api/gateway/telegram/mesaj")
 async def api_gateway_telegram_mesaj(request: Request):
-    """Telegram Ã¼zerinden mesaj gÃ¶nder."""
+    """Telegram üzerinden mesaj gönder."""
     form = await request.form()
     metin = form.get("metin", "").strip()
     hedef = form.get("chat_id", "").strip()
@@ -1862,7 +1862,7 @@ async def api_gateway_telegram_mesaj(request: Request):
             resp = json.loads(r.read())
             if resp.get("ok"):
                 return HTMLResponse(
-                    content=f"<div class='alert alert-success'>âœ… Mesaj gÃ¶nderildi â†’ {chat_id}</div>"
+                    content=f"<div class='alert alert-success'>âœ… Mesaj gönderildi â†’ {chat_id}</div>"
                 )
             return HTMLResponse(
                 content=f"<div class='alert alert-error'>âŒ Telegram hatasÄ±: {resp.get('description', '?')}</div>"
@@ -1875,7 +1875,7 @@ async def api_gateway_telegram_mesaj(request: Request):
 
 @app.post("/api/gateway/test-mesaj")
 async def api_gateway_test_mesaj():
-    """VarsayÄ±lan chat_id'e test mesajÄ± gÃ¶nder."""
+    """VarsayÄ±lan chat_id'e test mesajÄ± gönder."""
     token = _env_oku("TELEGRAM_BOT_TOKEN", "")
     chat_id = _env_oku("TELEGRAM_CHAT_ID", "")
     if not token or not chat_id:
@@ -1896,7 +1896,7 @@ async def api_gateway_test_mesaj():
         )
         with urllib.request.urlopen(req, timeout=10) as r:
             return HTMLResponse(
-                content="<div class='alert alert-success'>âœ… Test mesajÄ± gÃ¶nderildi ğŸ“¨</div>"
+                content="<div class='alert alert-success'>âœ… Test mesajÄ± gönderildi ğŸ“¨</div>"
             )
     except Exception as e:
         return HTMLResponse(
@@ -1964,7 +1964,7 @@ async def api_gateway_discord():
     except urllib.error.HTTPError as e:
         if e.code == 401:
             return HTMLResponse(
-                content="<div class='alert alert-error'>âŒ Token geÃ§ersiz (401)</div>"
+                content="<div class='alert alert-error'>âŒ Token geçersiz (401)</div>"
             )
         return HTMLResponse(
             content=f"<div class='alert alert-error'>âŒ Discord API: {e.code}</div>"
@@ -2022,7 +2022,7 @@ async def api_gateway_discord_durdur():
 
 @app.post("/api/gateway/discord/mesaj")
 async def api_gateway_discord_mesaj(request: Request):
-    """Discord kanalÄ±na REST ile mesaj gÃ¶nder."""
+    """Discord kanalÄ±na REST ile mesaj gönder."""
     form = await request.form()
     kanal_id = form.get("kanal_id", "").strip()
     metin = form.get("metin", "").strip()
@@ -2052,7 +2052,7 @@ async def api_gateway_discord_mesaj(request: Request):
         with urllib.request.urlopen(req, timeout=10) as r:
             resp = json.loads(r.read())
             return HTMLResponse(
-                content=f"<div class='alert alert-success'>âœ… Mesaj gÃ¶nderildi â†’ {kanal_id}</div>"
+                content=f"<div class='alert alert-success'>âœ… Mesaj gönderildi â†’ {kanal_id}</div>"
             )
     except urllib.error.HTTPError as e:
         body = e.read().decode()[:200]
@@ -2085,7 +2085,7 @@ async def api_gateway_sms():
 
     satirlar = [
         f"<div class='flex gri' style='font-size:0.85rem'>Account SID: {'âœ…' if sid else 'âŒ'}</div>",
-        f"<div class='flex gri' style='font-size:0.85rem'>GÃ¶nderen No: {from_num or 'âŒ'}</div>",
+        f"<div class='flex gri' style='font-size:0.85rem'>Gönderen No: {from_num or 'âŒ'}</div>",
     ]
 
     # Bakiye kontrol (opsiyonel)
@@ -2107,7 +2107,7 @@ async def api_gateway_sms():
 
 @app.post("/api/gateway/sms/gonder")
 async def api_gateway_sms_gonder(request: Request):
-    """SMS gÃ¶nder."""
+    """SMS gönder."""
     form = await request.form()
     telefon = form.get("telefon", "").strip()
     mesaj = form.get("mesaj", "").strip()
@@ -2128,7 +2128,7 @@ async def api_gateway_sms_gonder(request: Request):
         sonuc = sms_gonder(telefon, mesaj)
         if sonuc.get("ok"):
             return HTMLResponse(
-                content=f"<div class='alert alert-success'>âœ… SMS gÃ¶nderildi â†’ {telefon} (ID: {sonuc.get('mesaj_id', '?')[:12]}...)</div>"
+                content=f"<div class='alert alert-success'>âœ… SMS gönderildi â†’ {telefon} (ID: {sonuc.get('mesaj_id', '?')[:12]}...)</div>"
             )
         return HTMLResponse(
             content=f"<div class='alert alert-error'>âŒ {sonuc.get('hata', '?')}</div>"
@@ -2151,10 +2151,10 @@ async def api_sandbox():
     """Sandbox listesi HTML tablosu."""
     sandboxlar = sandbox_yoneticisi.listele(limit=30)
     if not sandboxlar:
-        return HTMLResponse(content="<div class='gri'>HenÃ¼z sandbox yok</div>")
+        return HTMLResponse(content="<div class='gri'>Henüz sandbox yok</div>")
 
     satirlar = [
-        "<table><tr><th>ID</th><th>Durum</th><th>Exit</th><th>SÃ¼re</th><th>Ä°ÅŸlem</th></tr>"
+        "<table><tr><th>ID</th><th>Durum</th><th>Exit</th><th>Süre</th><th>Ä°ÅŸlem</th></tr>"
     ]
     for sb in sandboxlar:
         durum = sb["durum"]
@@ -2191,7 +2191,7 @@ async def api_sandbox_detay(sandbox_id: str):
         f"<tr><td>ID</td><td>{r['id']}</td></tr>"
         f"<tr><td>Durum</td><td>{r['durum']}</td></tr>"
         f"<tr><td>Exit Code</td><td>{r['exit_code']}</td></tr>"
-        f"<tr><td>SÃ¼re</td><td>{r['sure_sn']}s</td></tr>"
+        f"<tr><td>Süre</td><td>{r['sure_sn']}s</td></tr>"
         f"<tr><td>Dizin</td><td class='gri'>{r['dizin']}</td></tr>"
         f"<tr><td>Ã‡Ä±ktÄ±</td><td><pre style='max-height:200px'>{r.get('cikti', '')[:1000]}</pre></td></tr>"
     ]
@@ -2205,7 +2205,7 @@ async def api_sandbox_detay(sandbox_id: str):
 
 @app.post("/api/sandbox/calistir")
 async def api_sandbox_calistir(request: Request):
-    """Sandbox'da komut Ã§alÄ±ÅŸtÄ±r."""
+    """Sandbox'da komut çalÄ±ÅŸtÄ±r."""
     form = await request.form()
     dil = form.get("dil", "python")
     kod = form.get("kod", "").strip()
@@ -2252,7 +2252,7 @@ async def api_sandbox_calistir(request: Request):
 
 @app.post("/api/sandbox/temizle")
 async def api_sandbox_temizle():
-    """TÃ¼m sandbox'lari temizle."""
+    """Tüm sandbox'lari temizle."""
     say = sandbox_yoneticisi.temizle_hepsi()
     return HTMLResponse(
         content=f"<div class='alert alert-success'>ğŸ§¹ {say} sandbox temizlendi</div>"
@@ -2260,13 +2260,13 @@ async def api_sandbox_temizle():
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# API â€” Cron YÃ¶netimi
+# API â€” Cron Yönetimi
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @app.get("/cron", response_class=HTMLResponse)
 async def cron_sayfasi(request: Request):
-    """Cron yÃ¶netim sayfasÄ± (admin)."""
+    """Cron yönetim sayfasÄ± (admin)."""
     if not admin_gerekli(getattr(request.state, "session", None)):
         return HTMLResponse(
             content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
@@ -2291,7 +2291,7 @@ async def api_cron_liste():
 
     if not jobs:
         return HTMLResponse(
-            content='<div id="cron-liste"><div class="gri">â° ZamanlanmÄ±ÅŸ gÃ¶rev yok</div></div>'
+            content='<div id="cron-liste"><div class="gri">â° ZamanlanmÄ±ÅŸ görev yok</div></div>'
         )
 
     html = ['<div id="cron-liste">']
@@ -2495,21 +2495,21 @@ async def api_cron_devam(job_id: str):
 
 @app.post("/api/cron/calistir/{job_id}")
 async def api_cron_calistir(job_id: str):
-    """Cron job'u hemen Ã§alÄ±ÅŸtÄ±r."""
+    """Cron job'u hemen çalÄ±ÅŸtÄ±r."""
     return HTMLResponse(
         content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
-        f'<div class="alert alert-info">ğŸ” Komut gÃ¶nderildi (scheduler deÄŸerlendirecek)</div></div>'
+        f'<div class="alert alert-info">ğŸ” Komut gönderildi (scheduler deÄŸerlendirecek)</div></div>'
     )
 
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# API â€” Hata YÃ¶netimi
+# API â€” Hata Yönetimi
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @app.get("/hatalar", response_class=HTMLResponse)
 async def hatalar_sayfasi(request: Request):
-    """Hata yÃ¶netim sayfasÄ±."""
+    """Hata yönetim sayfasÄ±."""
     return templates.TemplateResponse(request, "hatalar.html", {})
 
 
@@ -2579,7 +2579,7 @@ async def api_hatalar_liste(
 
 @app.get("/api/hatalar/ozet")
 async def api_hatalar_ozet():
-    """Hata Ã¶zet kartlarÄ± HTML."""
+    """Hata özet kartlarÄ± HTML."""
     from reymen.sistem.hata_topla import hata_topla
 
     ozet = hata_topla().depo.ozet()
@@ -2602,7 +2602,7 @@ async def api_hatalar_ozet():
 
 @app.post("/api/hatalar/temizle")
 async def api_hatalar_temizle():
-    """TÃ¼m hata kayÄ±tlarÄ±nÄ± temizle."""
+    """Tüm hata kayÄ±tlarÄ±nÄ± temizle."""
     from reymen.sistem.hata_topla import hata_topla
 
     say = hata_topla().depo.temizle()
@@ -2613,7 +2613,7 @@ async def api_hatalar_temizle():
 
 @app.post("/api/hatalar/test-bildirim")
 async def api_hatalar_test_bildirim():
-    """Test bildirimi gÃ¶nder."""
+    """Test bildirimi gönder."""
     from reymen.sistem.hata_topla import hata_topla
 
     kayit = hata_topla().manuel_kaydet(
@@ -2621,11 +2621,11 @@ async def api_hatalar_test_bildirim():
         kaynak="web_ui.test",
         mesaj="Bu bir test hata bildirimidir",
     )
-    # Toast iÃ§in HTML
+    # Toast için HTML
     html = (
         '<div class="toast toast-success" hx-trigger="load delay:3s" '
         'hx-swap="delete" hx-target="closest .toast">'
-        "âœ… Test bildirimi gÃ¶nderildi</div>"
+        "âœ… Test bildirimi gönderildi</div>"
     )
     return HTMLResponse(content=html)
 
@@ -2663,9 +2663,9 @@ async def api_plugin_liste():
         pluginler = yonetici.list_plugins()
         istatistik = yonetici.plugin_sayisi()
         if not pluginler:
-            return HTMLResponse(content="<div class='gri'>HenÃ¼z plugin yok</div>")
+            return HTMLResponse(content="<div class='gri'>Henüz plugin yok</div>")
         satirlar = [
-            "<table><tr><th>#</th><th>Plugin</th><th>TÃ¼r</th><th>Versiyon</th><th>Durum</th><th>AraÃ§</th><th>AÃ§Ä±klama</th></tr>"
+            "<table><tr><th>#</th><th>Plugin</th><th>Tür</th><th>Versiyon</th><th>Durum</th><th>Araç</th><th>AçÄ±klama</th></tr>"
         ]
         for i, p in enumerate(pluginler, 1):
             ad = p.get("name", "?")
@@ -2711,15 +2711,15 @@ async def api_plugin_bilgi(ad: str):
         satirlar = [
             f"<div class='kart'><table>"
             f"<tr><td>AdÄ±</td><td><b>{bilgi.get('adi', '?')}</b></td></tr>"
-            f"<tr><td>KlasÃ¶r</td><td>{bilgi.get('klasor', '?')}</td></tr>"
+            f"<tr><td>Klasör</td><td>{bilgi.get('klasor', '?')}</td></tr>"
             f"<tr><td>Versiyon</td><td>{bilgi.get('versiyon', '-')}</td></tr>"
-            f"<tr><td>TÃ¼r</td><td><span class='tag tag-info'>{bilgi.get('kind', '?')}</span></td></tr>"
-            f"<tr><td>AÃ§Ä±klama</td><td>{bilgi.get('aciklama', '-')}</td></tr>"
+            f"<tr><td>Tür</td><td><span class='tag tag-info'>{bilgi.get('kind', '?')}</span></td></tr>"
+            f"<tr><td>AçÄ±klama</td><td>{bilgi.get('aciklama', '-')}</td></tr>"
             f"<tr><td>Yazar</td><td>{bilgi.get('yazar', '-')}</td></tr>"
             f"<tr><td>Durum</td><td><span class='tag {'tag-yes' if bilgi.get('aktif') else 'tag-no'}'>{'Aktif' if bilgi.get('aktif') else 'Pasif'}</span></td></tr>"
-            f"<tr><td>YÃ¼klÃ¼</td><td>{'âœ…' if bilgi.get('yuklu') else 'âŒ'}</td></tr>"
-            f"<tr><td>KlasÃ¶r Var</td><td>{'âœ…' if bilgi.get('klasor_var') else 'âŒ'}</td></tr>"
-            f"<tr><td>AraÃ§ SayÄ±sÄ±</td><td>{len(bilgi.get('araclar', []))}</td></tr>"
+            f"<tr><td>Yüklü</td><td>{'âœ…' if bilgi.get('yuklu') else 'âŒ'}</td></tr>"
+            f"<tr><td>Klasör Var</td><td>{'âœ…' if bilgi.get('klasor_var') else 'âŒ'}</td></tr>"
+            f"<tr><td>Araç SayÄ±sÄ±</td><td>{len(bilgi.get('araclar', []))}</td></tr>"
             f"</table></div>"
         ]
         return HTMLResponse(content="\n".join(satirlar))
@@ -2763,8 +2763,8 @@ async def api_kalite():
         return HTMLResponse(
             content=f"<div class='flex' style='flex-direction:column;gap:8px'>"
             f"<div><b>Ortalama Skor:</b> {ortalama:.3f}</div>"
-            f"<div><b>GeÃ§me OranÄ±:</b> %{gecme*100:.1f}</div>"
-            f"<div><b>Toplam AdÄ±m:</b> {toplam} (<span class='tag-no'>{dusuk} dÃ¼ÅŸÃ¼k</span>)</div>"
+            f"<div><b>Geçme OranÄ±:</b> %{gecme*100:.1f}</div>"
+            f"<div><b>Toplam AdÄ±m:</b> {toplam} (<span class='tag-no'>{dusuk} düÅŸük</span>)</div>"
             f"<div><b>Not DaÄŸÄ±lÄ±mÄ±:</b> {not_str}</div>"
             f"<hr><div><b>HaftalÄ±k Ä°lerleme:</b></div>{hafta_str}"
             f"{'<hr><div><b>Aktif Hedefler:</b></div>' + hedef_str if hedef_str else ''}"
@@ -2978,7 +2978,7 @@ async def api_kalite_analiz():
 
 @app.get("/api/kalite/ozet")
 async def api_kalite_ozet():
-    """Kalite Ã¶zet bilgisi (dashboard)."""
+    """Kalite özet bilgisi (dashboard)."""
     try:
         from reymen.self_improve import report as si_report
 
@@ -3003,7 +3003,7 @@ async def api_kalite_ozet():
 
 @app.get("/api/maliyet")
 async def api_maliyet():
-    """Cost tracker Ã¶zet HTML."""
+    """Cost tracker özet HTML."""
     try:
         from reymen.cost_tracker import summary as ct_summary
 
@@ -3017,7 +3017,7 @@ async def api_maliyet():
             f"<div><b>ğŸ’µ Toplam Maliyet:</b> ${toplam_maliyet:.6f}</div>"
             f"<div><b>ğŸ“ Toplam Ã‡aÄŸrÄ±:</b> {toplam_cagri}</div>"
             f"<div><b>ğŸ”¤ Toplam Token:</b> {toplam_token:,}</div>"
-            f"<hr><div><b>Modele GÃ¶re:</b></div>"
+            f"<hr><div><b>Modele Göre:</b></div>"
         ]
         if by_model:
             satirlar.append(
@@ -3047,7 +3047,7 @@ async def api_maliyet_detay(n: int = 20):
 
         kayitlar = dump_log(limit=n)
         if not kayitlar:
-            return HTMLResponse(content="<div class='gri'>HenÃ¼z kayÄ±t yok</div>")
+            return HTMLResponse(content="<div class='gri'>Henüz kayÄ±t yok</div>")
         satirlar = [
             "<table><tr><th>#</th><th>Zaman</th><th>Model</th><th>Prompt</th><th>Completion</th><th>Maliyet</th></tr>"
         ]
@@ -3073,7 +3073,7 @@ async def api_maliyet_detay(n: int = 20):
 
 @app.get("/api/maliyet/ozet")
 async def api_maliyet_ozet():
-    """Maliyet Ã¶zet (dashboard)."""
+    """Maliyet özet (dashboard)."""
     try:
         from reymen.cost_tracker import summary as ct_summary
 
@@ -3081,7 +3081,7 @@ async def api_maliyet_ozet():
         toplam = ozet.get("total_cost_usd", 0)
         cagri = ozet.get("total_calls", 0)
         return HTMLResponse(
-            content=f"<div><b>${toplam:.4f}</b> harcama, <b>{cagri}</b> Ã§aÄŸrÄ±</div>"
+            content=f"<div><b>${toplam:.4f}</b> harcama, <b>{cagri}</b> çaÄŸrÄ±</div>"
         )
     except Exception as e:
         return HTMLResponse(content=f"<div class='gri'>Maliyet: {e}</div>")
@@ -3121,7 +3121,7 @@ async def api_kanban():
             f"<div>{'âš ï¸ <b>' + str(geciken) + '</b> geciken kart' if geciken else 'âœ… Geciken kart yok'}</div>"
             f"</div>"
         ]
-        # Kolon Ã¶zeti
+        # Kolon özeti
         for col in board.columns:
             satirlar.append(
                 f"<div><b>{col.name}</b>: {len(col.cards)} kart"
@@ -3130,7 +3130,7 @@ async def api_kanban():
         return HTMLResponse(content="\n".join(satirlar))
     except FileNotFoundError:
         return HTMLResponse(
-            content="<div class='gri'>Kanban panosu henÃ¼z oluÅŸturulmamÄ±ÅŸ. <code>.ReYMeN/board.json</code> dosyasÄ± gerekli.</div>"
+            content="<div class='gri'>Kanban panosu henüz oluÅŸturulmamÄ±ÅŸ. <code>.ReYMeN/board.json</code> dosyasÄ± gerekli.</div>"
         )
     except Exception as e:
         return HTMLResponse(content=f"<div class='alert alert-error'>Kanban: {e}</div>")
@@ -3146,12 +3146,12 @@ async def api_kanban_kartlar():
         board = Board.load(str(PROJE_KOK / ".ReYMeN" / "board.json"))
         tum_kartlar = board.all_cards()
         if not tum_kartlar:
-            return HTMLResponse(content="<div class='gri'>HenÃ¼z kart yok</div>")
+            return HTMLResponse(content="<div class='gri'>Henüz kart yok</div>")
         satirlar = [
             "<table><tr><th>Kart</th><th>Durum</th><th>Ã–ncelik</th><th>Atanan</th><th>Teslim</th></tr>"
         ]
         for c in tum_kartlar[:50]:
-            prio_map = {0: "ğŸ”´ Kritik", 1: "ğŸŸ  YÃ¼ksek", 2: "ğŸŸ¡ Orta", 3: "ğŸŸ¢ DÃ¼ÅŸÃ¼k"}
+            prio_map = {0: "ğŸ”´ Kritik", 1: "ğŸŸ  Yüksek", 2: "ğŸŸ¡ Orta", 3: "ğŸŸ¢ DüÅŸük"}
             durum_map = {
                 "backlog": "ğŸ“¥",
                 "todo": "ğŸ“‹",
@@ -3190,7 +3190,7 @@ async def api_kanban_kartlar():
 
 @app.get("/api/sistem/saglik")
 async def api_sistem_saglik():
-    """Sistem saÄŸlÄ±k kontrolÃ¼ HTML."""
+    """Sistem saÄŸlÄ±k kontrolü HTML."""
     try:
         import platform
         import psutil
@@ -3209,13 +3209,13 @@ async def api_sistem_saglik():
             if p.get("durum") == "calisiyor":
                 calisan += 1
         satirlar.append(
-            f"<tr><td>âš™ï¸ Process</td><td><b>{calisan}/{len(tumu)}</b> Ã§alÄ±ÅŸÄ±yor</td></tr>"
+            f"<tr><td>âš™ï¸ Process</td><td><b>{calisan}/{len(tumu)}</b> çalÄ±ÅŸÄ±yor</td></tr>"
         )
         satirlar.append("</table>")
         return HTMLResponse(content="\n".join(satirlar))
     except ImportError:
         return HTMLResponse(
-            content="<div class='gri'>psutil yÃ¼klÃ¼ deÄŸil. <code>pip install psutil</code> ile kurabilirsiniz.</div>"
+            content="<div class='gri'>psutil yüklü deÄŸil. <code>pip install psutil</code> ile kurabilirsiniz.</div>"
         )
     except Exception as e:
         return HTMLResponse(
@@ -3225,7 +3225,7 @@ async def api_sistem_saglik():
 
 @app.get("/api/sistem/saglik/ozet")
 async def api_sistem_saglik_ozet():
-    """Sistem saÄŸlÄ±k Ã¶zet (dashboard)."""
+    """Sistem saÄŸlÄ±k özet (dashboard)."""
     try:
         import psutil
 
@@ -3258,7 +3258,7 @@ async def api_sistem_bilgi():
             f"<tr><td>ğŸ Python</td><td><b>{sys.version.split()[0]}</b></td></tr>"
             f"<tr><td>ğŸ  Makine</td><td>{platform.node()}</td></tr>"
             f"<tr><td>ğŸ“ MimarÃ®</td><td>{platform.machine()}</td></tr>"
-            f"<tr><td>ğŸ“ Proje KÃ¶kÃ¼</td><td class='gri'>{PROJE_KOK}</td></tr>"
+            f"<tr><td>ğŸ“ Proje Kökü</td><td class='gri'>{PROJE_KOK}</td></tr>"
             f"<tr><td>ğŸ“¦ FastAPI</td><td>{getattr(__import__('fastapi'), '__version__', '?')}</td></tr>"
             f"</table>"
         ]
@@ -3294,7 +3294,7 @@ async def ws_loglar(websocket: WebSocket):
 
 
 # ---------------------------------------------------------------------------
-# BaÅŸlangÄ±Ã§
+# BaÅŸlangÄ±ç
 # ---------------------------------------------------------------------------
 
 
@@ -3304,7 +3304,7 @@ async def startup():
     # Log streamer'Ä± baÅŸlat
     await log_streamer.basla()
 
-    # Log tarama gÃ¶revi
+    # Log tarama görevi
     async def log_tarama_dongusu():
         while True:
             await log_streamer.tara()
@@ -3346,7 +3346,7 @@ async def api_konusmalar(request: Request):
         return JSONResponse({"hata": "Yetkisiz"}, status_code=401)
     konusmalar = _konusma_listele()
     if not konusmalar:
-        return HTMLResponse('<div class="gri">HenÃ¼z konuÅŸma kaydÄ± bulunamadÄ±.</div>')
+        return HTMLResponse('<div class="gri">Henüz konuÅŸma kaydÄ± bulunamadÄ±.</div>')
     html = ""
     for k in konusmalar[:50]:
         html += f"""<div class="conv-item" onclick="konusmaAc('{k.get("id","")}')">
@@ -3480,7 +3480,7 @@ def _konusma_listele() -> list[dict]:
                 __import__("logging").getLogger(__name__).warning(
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )
-    # Son care: .ReYMeN/notes/ klasÃ¶rÃ¼nden .md dosyalari
+    # Son care: .ReYMeN/notes/ klasöründen .md dosyalari
     notes_dir = PROJE_KOK / ".ReYMeN" / "notes"
     if notes_dir.exists():
         konusmalar = []
@@ -3548,19 +3548,19 @@ def _konusma_mesajlari_getir(konusma_id: str) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Delegasyon YÃ¶netimi â€” Routes
+# Delegasyon Yönetimi â€” Routes
 # ---------------------------------------------------------------------------
 
 
 @app.get("/delegasyon", response_class=HTMLResponse)
 async def delegasyon_sayfasi(request: Request):
-    """Delegasyon yÃ¶netim sayfasÄ±."""
+    """Delegasyon yönetim sayfasÄ±."""
     return templates.TemplateResponse(request, "delegation.html", {})
 
 
 @app.get("/api/delegation/status")
 async def api_delegation_status(request: Request, detay: bool = False):
-    """Delegasyon durumunu HTML olarak dÃ¶ndÃ¼rÃ¼r."""
+    """Delegasyon durumunu HTML olarak döndürür."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3571,7 +3571,7 @@ async def api_delegation_status(request: Request, detay: bool = False):
             html = [
                 '<div class="card" style="text-align:center;padding:2rem;">',
                 "<h3>ğŸ§  Delegasyon Sistemi</h3>",
-                '<div class="gri" style="margin:1rem 0;">HenÃ¼z hiÃ§ alt-ajan kaydÄ± yok</div>',
+                '<div class="gri" style="margin:1rem 0;">Henüz hiç alt-ajan kaydÄ± yok</div>',
                 '<div class="flex" style="justify-content:center;gap:1rem;">',
                 "<span>âœ… BaÅŸarÄ±: 0</span>",
                 "<span>âŒ Hata: 0</span>",
@@ -3598,7 +3598,7 @@ async def api_delegation_status(request: Request, detay: bool = False):
             f'<div class="card" style="text-align:center;"><h3>%{stats["success_rate"]}</h3>'
             f'<div class="gri">BaÅŸarÄ± OranÄ±</div></div>',
             f'<div class="card" style="text-align:center;"><h3>{stats["ortalama_sure"]}s</h3>'
-            f'<div class="gri">Ort. SÃ¼re</div></div>',
+            f'<div class="gri">Ort. Süre</div></div>',
             "</div>",
         ]
 
@@ -3608,7 +3608,7 @@ async def api_delegation_status(request: Request, detay: bool = False):
                     '<div class="card" style="margin-top:1rem;">',
                     "<h3>ğŸ“‹ KayÄ±tlar</h3>",
                     '<table class="table"><thead><tr>',
-                    "<th>#</th><th>ID</th><th>Hedef</th><th>Durum</th><th>SÃ¼re</th><th>Ä°ÅŸlem</th>",
+                    "<th>#</th><th>ID</th><th>Hedef</th><th>Durum</th><th>Süre</th><th>Ä°ÅŸlem</th>",
                     "</tr></thead><tbody>",
                 ]
             )
@@ -3644,7 +3644,7 @@ async def api_delegation_status(request: Request, detay: bool = False):
 
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ (reymen.ag.delegation) yÃ¼klenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modülü (reymen.ag.delegation) yüklenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -3654,7 +3654,7 @@ async def api_delegation_status(request: Request, detay: bool = False):
 
 @app.post("/api/delegation/run")
 async def api_delegation_run(request: Request, decompose: bool = False):
-    """Delegasyon gÃ¶revi Ã§alÄ±ÅŸtÄ±r."""
+    """Delegasyon görevi çalÄ±ÅŸtÄ±r."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3675,7 +3675,7 @@ async def api_delegation_run(request: Request, decompose: bool = False):
             hatali = sum(1 for a in agents if a.status == "error")
             html = [
                 f'<div class="alert alert-success">'
-                f"âœ… {len(agents)} alt-gÃ¶rev ayrÄ±ÅŸtÄ±rÄ±ldÄ± ve Ã§alÄ±ÅŸtÄ±rÄ±ldÄ± "
+                f"âœ… {len(agents)} alt-görev ayrÄ±ÅŸtÄ±rÄ±ldÄ± ve çalÄ±ÅŸtÄ±rÄ±ldÄ± "
                 f"(BaÅŸarÄ±lÄ±: {basarili}, HatalÄ±: {hatali})"
                 f"</div>",
             ]
@@ -3709,7 +3709,7 @@ async def api_delegation_run(request: Request, decompose: bool = False):
 
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modülü yüklenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -3744,7 +3744,7 @@ async def api_delegation_cancel(request: Request):
 
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modülü yüklenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -3766,7 +3766,7 @@ async def api_delegation_temizle():
         )
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modülü yüklenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -3776,7 +3776,7 @@ async def api_delegation_temizle():
 
 @app.get("/api/delegation/detay")
 async def api_delegation_detay(id: str = ""):
-    """Alt-ajan detayÄ±nÄ± JSON olarak dÃ¶ndÃ¼r."""
+    """Alt-ajan detayÄ±nÄ± JSON olarak döndür."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3794,7 +3794,7 @@ async def api_delegation_detay(id: str = ""):
         return agent.to_dict()
 
     except ImportError:
-        return JSONResponse({"hata": "Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi"}, status_code=500)
+        return JSONResponse({"hata": "Delegasyon modülü yüklenemedi"}, status_code=500)
     except Exception as e:
         return JSONResponse({"hata": str(e)}, status_code=500)
 
@@ -3820,7 +3820,7 @@ def baslat(port: int = 5000, host: str = "0.0.0.0") -> None:
 
 
 def cli() -> None:
-    """Komut satÄ±rÄ±ndan Ã§alÄ±ÅŸtÄ±rma."""
+    """Komut satÄ±rÄ±ndan çalÄ±ÅŸtÄ±rma."""
     import argparse
 
     parser = argparse.ArgumentParser(description="ReYMeN Web UI v2")
@@ -3841,7 +3841,7 @@ _WEB_UI_THREAD = None
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a Web UI araÃ§larÄ±nÄ± kaydet."""
+    """Motor'a Web UI araçlarÄ±nÄ± kaydet."""
     global _WEB_UI_MOTOR
     _WEB_UI_MOTOR = motor
     motor._plugin_arac_kaydet(

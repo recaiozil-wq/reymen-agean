@@ -1,24 +1,24 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-voice_mode.py â€” Sesli (Push-to-Talk) arayÃ¼z modÃ¼lÃ¼.
+voice_mode.py â€” Sesli (Push-to-Talk) aray¼z mod¼l¼.
 
-Mikrofondan ses kaydeder, faster-whisper ile metne Ã§evirir,
-Beyin (LLM) ile yanÄ±t Ã¼retir, edge-tts ile seslendirir
-ve hoparlÃ¶rden oynatÄ±r.
+Mikrofondan ses kaydeder, faster-whisper ile metne §evirir,
+Beyin (LLM) ile yanit ¼retir, edge-tts ile seslendirir
+ve hoparlsrden oynatir.
 
-KullanÄ±m:
+Kullanim:
     from reymen.cereyan.voice_mode import VoiceMode
 
     vm = VoiceMode(beyin=benim_beyin)
     vm.baslat()         # REPL: dinle / konus / cik
-    vm.dinle_ve_cevapla()  # tek seferlik kaydet->STT->LLM->TTS dÃ¶ngÃ¼sÃ¼
+    vm.dinle_ve_cevapla()  # tek seferlik kaydet->STT->LLM->TTS dsng¼s¼
 
-BaÄŸÄ±mlÄ±lÄ±klar (opsiyonel â€” eksik olanlar graceful degrade yapar):
-    - sounddevice       : mikrofon kaydÄ± + hoparlÃ¶r oynatma
-    - numpy             : ses buffer iÅŸlemleri
+Baimliliklar (opsiyonel â€” eksik olanlar graceful degrade yapar):
+    - sounddevice       : mikrofon kaydi + hoparlsr oynatma
+    - numpy             : ses buffer ilemleri
     - faster-whisper    : yerel STT (CPU/GPU)
-    - edge-tts          : Microsoft Edge TTS (Ã¼cretsiz, Ã§evrimiÃ§i)
-    - pygame            : alternatif ses oynatÄ±cÄ±
+    - edge-tts          : Microsoft Edge TTS (¼cretsiz, §evrimi§i)
+    - pygame            : alternatif ses oynatici
 """
 
 from __future__ import annotations
@@ -39,9 +39,9 @@ from typing import Any, Callable, Generator, Optional
 
 logger = logging.getLogger(__name__)
 
-# â”€â”€ Opsiyonel baÄŸÄ±mlÄ±lÄ±klar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Opsiyonel baimliliklar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# sounddevice â€” mikrofon kaydÄ± ve hoparlÃ¶r oynatma
+# sounddevice â€” mikrofon kaydi ve hoparlsr oynatma
 try:
     import sounddevice as sd
     import numpy as np
@@ -79,7 +79,7 @@ except ImportError:
     edge_tts = None  # type: ignore[assignment]
     _EDGE_TTS_MEVCUT = False
 
-# pygame â€” alternatif ses oynatÄ±cÄ±
+# pygame â€” alternatif ses oynatici
 try:
     import pygame
 
@@ -88,7 +88,7 @@ except ImportError:
     pygame = None  # type: ignore[assignment]
     PYGAME_MEVCUT = False
 
-# ffmpeg/ffplay â€” ses oynatma iÃ§in sistem aracÄ±
+# ffmpeg/ffplay â€” ses oynatma i§in sistem araci
 _FFPLAY_BULUNDU: Optional[str] = None
 for _exe in ("ffplay", "ffplay.exe"):
     try:
@@ -109,7 +109,7 @@ for _exe in ("ffplay", "ffplay.exe"):
 
 
 def _beyin_al() -> Any:
-    """Beyin sÄ±nÄ±fÄ±nÄ± dÃ¶ndÃ¼rÃ¼r; yoksa None."""
+    """Beyin sinifini dsnd¼r¼r; yoksa None."""
     try:
         from reymen.cereyan.beyin import Beyin
 
@@ -118,73 +118,73 @@ def _beyin_al() -> Any:
         return None
 
 
-# â”€â”€ VarsayÄ±lan sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Varsayilan sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-_VARSAYILAN_SES_KAYNAGI: int = 0  # varsayÄ±lan mikrofon
-_VARSAYILAN_ORNEKLEME_HIZI: int = 16000  # Whisper iÃ§in ideal
+_VARSAYILAN_SES_KAYNAGI: int = 0  # varsayilan mikrofon
+_VARSAYILAN_ORNEKLEME_HIZI: int = 16000  # Whisper i§in ideal
 _VARSAYILAN_KANAL_SAYISI: int = 1  # mono
-_VARSAYILAN_KAYIT_SURESI: float = 5.0  # saniye (push-to-talk deÄŸilse)
-_VARSAYILAN_DINLEME_ESIÄI: float = 0.02  # ses seviyesi eÅŸiÄŸi (VAD basit)
-_VARSAYILAN_SESSIZLIK_SURESI: float = 1.5  # VAD iÃ§in sessizlik timeout
+_VARSAYILAN_KAYIT_SURESI: float = 5.0  # saniye (push-to-talk deilse)
+_VARSAYILAN_DINLEME_ESIGI: float = 0.02  # ses seviyesi esigi (VAD basit)
+_VARSAYILAN_SESSIZLIK_SURESI: float = 1.5  # VAD i§in sessizlik timeout
 _VARSAYILAN_DIL: str = "tr"  # STT dili
-_VARSAYILAN_TTS_SESI: str = "tr-TR-AhmetNeural"  # edge-tts TÃ¼rkÃ§e erkek sesi
+_VARSAYILAN_TTS_SESI: str = "tr-TR-AhmetNeural"  # edge-tts T¼rk§e erkek sesi
 
 # VAD (Voice Activity Detection) parametreleri
 _VAD_PENCERE_BOYUTU: int = 1024  # RMS penceresi
-_VAD_SESSIZ_EN_COK: int = 15  # kaÃ§ sessiz pencereden sonra dur
+_VAD_SESSIZ_EN_COK: int = 15  # ka§ sessiz pencereden sonra dur
 
 
-# â”€â”€ Ses verisi taÅŸÄ±yÄ±cÄ±sÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Ses verisi taiyicisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
 class SesKaydi:
-    """KaydedilmiÅŸ ses verisini ve Ã¼stverisini taÅŸÄ±r."""
+    """Kaydedilmi ses verisini ve ¼stverisini tair."""
 
     veri: Optional[Any] = None  # numpy array
     ornekleme_hizi: int = _VARSAYILAN_ORNEKLEME_HIZI
     sure_sn: float = 0.0
     dosya_yolu: Optional[str] = None  # temp wav dosya yolu
-    metin: str = ""  # STT Ã§Ä±ktÄ±sÄ±
+    metin: str = ""  # STT §iktisi
 
 
-# â”€â”€ Durum kodlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Durum kodlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class VoiceModeDurum:
-    """VoiceMode Ã§alÄ±ÅŸma durumlarÄ±."""
+    """VoiceMode §alima durumlari."""
 
     DURDU = "durdu"
-    DÄ°NLÄ°YOR = "dinliyor"
+    DINLIYOR = "dinliyor"
     KONUSUYOR = "konusuyor"
-    Ä°ÅLÄ°YOR = "isliyor"
+    ILIYOR = "isliyor"
     HATA = "hata"
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# VoiceMode Ana SÄ±nÄ±fÄ±
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# VoiceMode Ana Sinifi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class VoiceMode:
-    """Sesli arayÃ¼z yÃ¶neticisi.
+    """Sesli aray¼z ysneticisi.
 
-    Push-to-talk ve otomatik VAD ile ses kaydÄ±, STT, LLM yanÄ±tÄ±
-    ve TTS Ã§Ä±ktÄ±sÄ±nÄ± tek bir dÃ¶ngÃ¼de birleÅŸtirir.
+    Push-to-talk ve otomatik VAD ile ses kaydi, STT, LLM yaniti
+    ve TTS §iktisini tek bir dsng¼de birletirir.
 
     Args:
-        beyin: Beyin instance'Ä± (LLM baÄŸlantÄ±sÄ±). Yoksa sadece
-               kayÄ±t + STT + TTS test edilebilir.
-        config: YapÄ±landÄ±rma sÃ¶zlÃ¼ÄŸÃ¼ (opsiyonel).
+        beyin: Beyin instance'i (LLM balantisi). Yoksa sadece
+               kayit + STT + TTS test edilebilir.
+        config: Yapilandirma sszl¼¼ (opsiyonel).
             Anahtarlar:
                 - kaynak_id: mikrofon cihaz indeksi (int)
-                - ornekleme_hizi: Ã¶rnekleme hÄ±zÄ± (int)
-                - kayit_suresi: maksimum kayÄ±t sÃ¼resi (float)
+                - ornekleme_hizi: srnekleme hizi (int)
+                - kayit_suresi: maksimum kayit s¼resi (float)
                 - dil: STT dil kodu (str)
-                - tts_sesi: edge-tts ses adÄ± (str)
+                - tts_sesi: edge-tts ses adi (str)
                 - stt_backend: "faster_whisper" veya "openai"
-                - tts_backend: "edge_tts" (tek seÃ§enek)
-                - ses_esiÄŸi: VAD ses eÅŸiÄŸi (float)
+                - tts_backend: "edge_tts" (tek se§enek)
+                - ses_esii: VAD ses eii (float)
                 - sessizlik_suresi: VAD timeout (float)
     """
 
@@ -196,7 +196,7 @@ class VoiceMode:
         self.beyin = beyin
         self._cfg = config or {}
 
-        # â”€â”€ Cihaz yapÄ±landÄ±rmasÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ Cihaz yapilandirmasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self.kaynak_id: int = self._cfg.get("kaynak_id", _VARSAYILAN_SES_KAYNAGI)
         self.ornekleme_hizi: int = self._cfg.get(
             "ornekleme_hizi", _VARSAYILAN_ORNEKLEME_HIZI
@@ -206,23 +206,23 @@ class VoiceMode:
             "kayit_suresi", _VARSAYILAN_KAYIT_SURESI
         )
 
-        # â”€â”€ STT yapÄ±landÄ±rmasÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ STT yapilandirmasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self.dil: str = self._cfg.get("dil", _VARSAYILAN_DIL)
         self.stt_backend: str = self._cfg.get("stt_backend", "faster_whisper")
         self._whisper_model: Optional[Any] = None
         self._openai_client: Optional[Any] = None
 
-        # â”€â”€ TTS yapÄ±landÄ±rmasÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ TTS yapilandirmasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self.tts_sesi: str = self._cfg.get("tts_sesi", _VARSAYILAN_TTS_SESI)
         self.tts_backend: str = self._cfg.get("tts_backend", "edge_tts")
 
-        # â”€â”€ VAD yapÄ±landÄ±rmasÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        self.ses_esiÄŸi: float = self._cfg.get("ses_esiÄŸi", _VARSAYILAN_DINLEME_ESIÄI)
+        # â”€â”€ VAD yapilandirmasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        self.ses_esii: float = self._cfg.get("ses_esii", _VARSAYILAN_DINLEME_ESII)
         self.sessizlik_suresi: float = self._cfg.get(
             "sessizlik_suresi", _VARSAYILAN_SESSIZLIK_SURESI
         )
 
-        # â”€â”€ Ã‡alÄ±ÅŸma durumu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ calima durumu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self.durum: str = VoiceModeDurum.DURDU
         self._durdurma_olayi = threading.Event()
         self._kilit = threading.Lock()
@@ -230,7 +230,7 @@ class VoiceMode:
         # â”€â”€ Ses oynatma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self._pygame_ilk = False
 
-        # â”€â”€ Ä°statistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # â”€â”€ Istatistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self.istatistik: dict[str, Any] = {
             "kayit_sayisi": 0,
             "stt_sayisi": 0,
@@ -239,7 +239,7 @@ class VoiceMode:
             "toplam_konusma_suresi": 0.0,
         }
 
-        # BaÅŸlangÄ±Ã§ta kullanÄ±labilirliÄŸi kontrol et
+        # Balangi§ta kullanilabilirlii kontrol et
         self._kullanilabilirlik_kontrol()
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -247,7 +247,7 @@ class VoiceMode:
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _kullanilabilirlik_kontrol(self) -> None:
-        """Mevcut baÄŸÄ±mlÄ±lÄ±klarÄ± raporla."""
+        """Mevcut baimliliklari raporla."""
         eksik: list[str] = []
         if not SD_MEVCUT:
             eksik.append("sounddevice")
@@ -262,12 +262,12 @@ class VoiceMode:
 
         if eksik:
             logger.warning(
-                "[VoiceMode] Eksik baÄŸÄ±mlÄ±lÄ±klar: %s",
+                "[VoiceMode] Eksik baimliliklar: %s",
                 ", ".join(eksik),
             )
 
     def kullanilabilir_mi(self) -> dict[str, bool]:
-        """KullanÄ±labilirlik durumunu sÃ¶zlÃ¼k olarak dÃ¶ndÃ¼rÃ¼r.
+        """Kullanilabilirlik durumunu sszl¼k olarak dsnd¼r¼r.
 
         Returns:
             {
@@ -287,15 +287,15 @@ class VoiceMode:
         }
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # Mikrofon â€” Ses KaydÄ±
+    # Mikrofon â€” Ses Kaydi
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def cihazlari_listele(self) -> list[dict[str, Any]]:
-        """KullanÄ±labilir ses cihazlarÄ±nÄ± listeler.
+        """Kullanilabilir ses cihazlarini listeler.
 
         Returns:
-            Her cihaz iÃ§in {'id': int, 'adi': str, 'kanal': int, 'ornek': int}
-            listesi. sounddevice yoksa boÅŸ liste.
+            Her cihaz i§in {'id': int, 'adi': str, 'kanal': int, 'ornek': int}
+            listesi. sounddevice yoksa bo liste.
         """
         if not SD_MEVCUT:
             logger.warning("[VoiceMode] sounddevice yok, cihaz listelenemez.")
@@ -313,29 +313,29 @@ class VoiceMode:
                 )
             return cihazlar
         except Exception as e:
-            logger.error("[VoiceMode] Cihaz listeleme hatasÄ±: %s", e)
+            logger.error("[VoiceMode] Cihaz listeleme hatasi: %s", e)
             return []
 
     def _vad_ile_kaydet(
         self,
         maks_sure: float = 30.0,
     ) -> Optional[SesKaydi]:
-        """Voice Activity Detection ile konuÅŸma algÄ±layarak kaydeder.
+        """Voice Activity Detection ile konuma algilayarak kaydeder.
 
-        Sessizlik algÄ±landÄ±ÄŸÄ±nda veya maksimum sÃ¼re aÅŸÄ±ldÄ±ÄŸÄ±nda durur.
+        Sessizlik algilandiinda veya maksimum s¼re aildiinda durur.
 
         Args:
-            maks_sure: Maksimum kayÄ±t sÃ¼resi (saniye).
+            maks_sure: Maksimum kayit s¼resi (saniye).
 
         Returns:
-            SesKaydi nesnesi veya baÅŸarÄ±sÄ±zsa None.
+            SesKaydi nesnesi veya baarisizsa None.
         """
         if not SD_MEVCUT:
-            logger.error("[VoiceMode] sounddevice gerekli â€” VAD kaydÄ± yapÄ±lamaz.")
+            logger.error("[VoiceMode] sounddevice gerekli â€” VAD kaydi yapilamaz.")
             return None
 
-        self.durum = VoiceModeDurum.DÄ°NLÄ°YOR
-        print("ğŸ¤ Dinliyor (konuÅŸmayÄ± bÄ±rakÄ±nca otomatik durur)...")
+        self.durum = VoiceModeDurum.DINLIYOR
+        print("ğ¤ Dinliyor (konumayi birakinca otomatik durur)...")
 
         buffer: list = []
         sessiz_sayac = 0
@@ -344,11 +344,11 @@ class VoiceMode:
         def _callback(indata: Any, frames: int, _time_info: Any, status: Any) -> None:
             nonlocal sessiz_sayac
             if status:
-                logger.debug("[VoiceMode] Ses akÄ±ÅŸÄ± status: %s", status)
+                logger.debug("[VoiceMode] Ses akii status: %s", status)
             # RMS ses seviyesi
             rms = np.sqrt(np.mean(indata**2))  # type: ignore[operator]
             buffer.append(indata.copy())
-            if rms < self.ses_esiÄŸi:
+            if rms < self.ses_esii:
                 sessiz_sayac += 1
             else:
                 sessiz_sayac = 0
@@ -363,26 +363,26 @@ class VoiceMode:
             ):
                 while True:
                     if self._durdurma_olayi.is_set():
-                        print("\nâ¹ Durduruldu.")
+                        print("\nâ¹ Durduruldu.")
                         return None
                     if sessiz_sayac > _VAD_SESSIZ_EN_COK:
-                        print()  # yeni satÄ±r
+                        print()  # yeni satir
                         break
                     if time.monotonic() - baslangic > maks_sure:
-                        print("\nâ± Maksimum sÃ¼re aÅŸÄ±ldÄ±.")
+                        print("\nâi Maksimum s¼re aildi.")
                         break
                     time.sleep(0.05)
         except Exception as e:
-            logger.error("[VoiceMode] KayÄ±t hatasÄ±: %s", e)
+            logger.error("[VoiceMode] Kayit hatasi: %s", e)
             self.durum = VoiceModeDurum.HATA
             self.istatistik["hata_sayisi"] += 1
             return None
 
         if not buffer:
-            logger.warning("[VoiceMode] Ses verisi alÄ±namadÄ±.")
+            logger.warning("[VoiceMode] Ses verisi alinamadi.")
             return None
 
-        # Buffer'Ä± numpy array'e Ã§evir
+        # Buffer'i numpy array'e §evir
         ses_verisi = np.concatenate(buffer, axis=0)  # type: ignore[arg-type]
         sure = time.monotonic() - baslangic
         self.istatistik["kayit_sayisi"] += 1
@@ -395,21 +395,21 @@ class VoiceMode:
         )
 
     def _sureli_kaydet(self, sure: float = 0.0) -> Optional[SesKaydi]:
-        """Belirtilen sÃ¼re boyunca ses kaydeder.
+        """Belirtilen s¼re boyunca ses kaydeder.
 
         Args:
-            sure: KayÄ±t sÃ¼resi (saniye). 0 ise varsayÄ±lan kullanÄ±lÄ±r.
+            sure: Kayit s¼resi (saniye). 0 ise varsayilan kullanilir.
 
         Returns:
-            SesKaydi nesnesi veya baÅŸarÄ±sÄ±zsa None.
+            SesKaydi nesnesi veya baarisizsa None.
         """
         if not SD_MEVCUT:
-            logger.error("[VoiceMode] sounddevice gerekli â€” kayÄ±t yapÄ±lamaz.")
+            logger.error("[VoiceMode] sounddevice gerekli â€” kayit yapilamaz.")
             return None
 
         sure = sure or self.kayit_suresi
-        self.durum = VoiceModeDurum.DÄ°NLÄ°YOR
-        print(f"ğŸ¤ {sure:.0f} saniye kaydediliyor...")
+        self.durum = VoiceModeDurum.DINLIYOR
+        print(f"ğ¤ {sure:.0f} saniye kaydediliyor...")
 
         try:
             ses_verisi = sd.rec(
@@ -420,7 +420,7 @@ class VoiceMode:
             )
             sd.wait()
         except Exception as e:
-            logger.error("[VoiceMode] KayÄ±t hatasÄ±: %s", e)
+            logger.error("[VoiceMode] Kayit hatasi: %s", e)
             self.durum = VoiceModeDurum.HATA
             self.istatistik["hata_sayisi"] += 1
             return None
@@ -443,34 +443,34 @@ class VoiceMode:
         """Ses kaydeder.
 
         VAD (Voice Activity Detection) ile otomatik kesme veya
-        sabit sÃ¼reli kayÄ±t yapar.
+        sabit s¼reli kayit yapar.
 
         Args:
-            sure: Sabit sÃ¼re (saniye). 0 ise VAD veya varsayÄ±lan sÃ¼re kullanÄ±lÄ±r.
-            vad: VAD kullanÄ±lsÄ±n mÄ±? (varsayÄ±lan: True)
-            maks_sure: VAD modunda maksimum kayÄ±t sÃ¼resi.
+            sure: Sabit s¼re (saniye). 0 ise VAD veya varsayilan s¼re kullanilir.
+            vad: VAD kullanilsin mi? (varsayilan: True)
+            maks_sure: VAD modunda maksimum kayit s¼resi.
 
         Returns:
-            SesKaydi nesnesi veya baÅŸarÄ±sÄ±zsa None.
+            SesKaydi nesnesi veya baarisizsa None.
         """
         if vad and sure <= 0:
             return self._vad_ile_kaydet(maks_sure=maks_sure)
         return self._sureli_kaydet(sure=sure or self.kayit_suresi)
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # STT â€” KonuÅŸmadan Metne
+    # STT â€” Konumadan Metne
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _ses_verisini_wav_yap(self, kayit: SesKaydi) -> Optional[str]:
-        """NumPy ses verisini geÃ§ici WAV dosyasÄ±na yazar.
+        """NumPy ses verisini ge§ici WAV dosyasina yazar.
 
-        scipy.io.wavfile veya soundfile kullanÄ±r; yoksa elle yazar.
+        scipy.io.wavfile veya soundfile kullanir; yoksa elle yazar.
 
         Args:
             kayit: SesKaydi nesnesi (veri ve ornekleme_hizi ile).
 
         Returns:
-            WAV dosya yolu veya baÅŸarÄ±sÄ±zsa None.
+            WAV dosya yolu veya baarisizsa None.
         """
         if kayit.dosya_yolu and os.path.exists(kayit.dosya_yolu):
             return kayit.dosya_yolu
@@ -499,28 +499,28 @@ class VoiceMode:
         except ImportError:
             logger.warning("[fix_01_sessiz_except] ImportError")
 
-        logger.error("[VoiceMode] WAV yazmak iÃ§in soundfile veya scipy gerekli.")
+        logger.error("[VoiceMode] WAV yazmak i§in soundfile veya scipy gerekli.")
         return None
 
     def _faster_whisper_stt(self, ses_yolu: str) -> str:
-        """faster-whisper ile yerel STT Ã§evirisi.
+        """faster-whisper ile yerel STT §evirisi.
 
         Args:
             ses_yolu: WAV dosya yolu.
 
         Returns:
-            Ã‡Ã¶zÃ¼mlenen metin.
+            csz¼mlenen metin.
         """
         if not _FASTER_WHISPER_MEVCUT:
-            raise RuntimeError("faster-whisper yÃ¼klÃ¼ deÄŸil.")
+            raise RuntimeError("faster-whisper y¼kl¼ deil.")
 
-        # Modeli ilk Ã§aÄŸrÄ±da yÃ¼kle
+        # Modeli ilk §arida y¼kle
         if self._whisper_model is None:
             model_boyutu = self._cfg.get("whisper_model", "tiny")
             device = self._cfg.get("whisper_device", "cpu")
             compute_type = self._cfg.get("whisper_compute", "int8")
             logger.info(
-                "[VoiceMode] faster-whisper model yÃ¼kleniyor: %s (%s, %s)...",
+                "[VoiceMode] faster-whisper model y¼kleniyor: %s (%s, %s)...",
                 model_boyutu,
                 device,
                 compute_type,
@@ -540,16 +540,16 @@ class VoiceMode:
         return metin
 
     def _openai_stt(self, ses_yolu: str) -> str:
-        """OpenAI Whisper API ile STT Ã§evirisi.
+        """OpenAI Whisper API ile STT §evirisi.
 
         Args:
             ses_yolu: WAV dosya yolu.
 
         Returns:
-            Ã‡Ã¶zÃ¼mlenen metin.
+            csz¼mlenen metin.
         """
         if not _OPENAI_MEVCUT:
-            raise RuntimeError("openai (OpenAI SDK) yÃ¼klÃ¼ deÄŸil.")
+            raise RuntimeError("openai (OpenAI SDK) y¼kl¼ deil.")
 
         if self._openai_client is None:
             api_key = self._cfg.get(
@@ -567,27 +567,27 @@ class VoiceMode:
         return yanit.text.strip()
 
     def metne_cevir(self, kayit: SesKaydi) -> str:
-        """KaydedilmiÅŸ sesi metne Ã§evirir (STT).
+        """Kaydedilmi sesi metne §evirir (STT).
 
-        SÄ±rasÄ±yla dener:
-            1. SeÃ§ili STT backend (faster-whisper veya openai)
-            2. Varsa diÄŸer backend
+        Sirasiyla dener:
+            1. Se§ili STT backend (faster-whisper veya openai)
+            2. Varsa dier backend
 
         Args:
             kayit: SesKaydi nesnesi.
 
         Returns:
-            Ã‡Ã¶zÃ¼mlenen metin veya hata durumunda "[STT HatasÄ±] ...".
+            csz¼mlenen metin veya hata durumunda "[STT Hatasi] ...".
         """
-        self.durum = VoiceModeDurum.Ä°ÅLÄ°YOR
-        print("ğŸ“ Ses metne Ã§evriliyor...")
+        self.durum = VoiceModeDurum.ILIYOR
+        print("ğ“ Ses metne §evriliyor...")
 
-        # WAV dosyasÄ±na yaz
+        # WAV dosyasina yaz
         ses_yolu = self._ses_verisini_wav_yap(kayit)
         if not ses_yolu:
             self.durum = VoiceModeDurum.HATA
             self.istatistik["hata_sayisi"] += 1
-            return "[STT HatasÄ±] WAV dosyasÄ± oluÅŸturulamadÄ±."
+            return "[STT Hatasi] WAV dosyasi oluturulamadi."
 
         # STT backend'leri dene
         hatalar: list[str] = []
@@ -610,18 +610,18 @@ class VoiceMode:
                     kayit.metin = metin
                     self.istatistik["stt_sayisi"] += 1
                     self.durum = VoiceModeDurum.DURDU
-                    # Temp dosyayÄ± temizle
+                    # Temp dosyayi temizle
                     self._temizle(ses_yolu)
                     return metin
             except Exception as e:
                 hatalar.append(f"{backend}: {e}")
-                logger.warning("[VoiceMode] STT backend hatasÄ± (%s): %s", backend, e)
+                logger.warning("[VoiceMode] STT backend hatasi (%s): %s", backend, e)
                 continue
 
         self._temizle(ses_yolu)
         self.durum = VoiceModeDurum.HATA
         self.istatistik["hata_sayisi"] += 1
-        hata_msg = f"[STT HatasÄ±] TÃ¼m backend'ler baÅŸarÄ±sÄ±z: {'; '.join(hatalar)}"
+        hata_msg = f"[STT Hatasi] T¼m backend'ler baarisiz: {'; '.join(hatalar)}"
         logger.error(hata_msg)
         return hata_msg
 
@@ -636,18 +636,18 @@ class VoiceMode:
             metin: Seslendirilecek metin.
 
         Returns:
-            MP3 ses verisi (bytes) veya baÅŸarÄ±sÄ±zsa None.
+            MP3 ses verisi (bytes) veya baarisizsa None.
         """
         if not _EDGE_TTS_MEVCUT:
-            logger.error("[VoiceMode] edge-tts gerekli â€” seslendirme yapÄ±lamaz.")
+            logger.error("[VoiceMode] edge-tts gerekli â€” seslendirme yapilamaz.")
             return None
 
         if not metin or not metin.strip():
-            logger.warning("[VoiceMode] Seslendirilecek metin boÅŸ.")
+            logger.warning("[VoiceMode] Seslendirilecek metin bo.")
             return None
 
         self.durum = VoiceModeDurum.KONUSUYOR
-        print(f"ğŸ—£ Seslendiriliyor ({len(metin)} karakter)...")
+        print(f"ğ-£ Seslendiriliyor ({len(metin)} karakter)...")
 
         try:
             ses = edge_tts.Communicate(metin.strip(), voice=self.tts_sesi)
@@ -658,7 +658,7 @@ class VoiceMode:
             self.istatistik["tts_sayisi"] += 1
             return ses_verisi
         except Exception as e:
-            logger.error("[VoiceMode] TTS hatasÄ±: %s", e)
+            logger.error("[VoiceMode] TTS hatasi: %s", e)
             self.durum = VoiceModeDurum.HATA
             self.istatistik["hata_sayisi"] += 1
             return None
@@ -668,7 +668,7 @@ class VoiceMode:
         ses: Any,
         buffer: io.BytesIO,
     ) -> None:
-        """edge-tts Ã¼retimini BytesIO buffer'a yazar."""
+        """edge-tts ¼retimini BytesIO buffer'a yazar."""
         async for chunk in ses.stream():
             if chunk["type"] == "audio":
                 buffer.write(chunk["data"])
@@ -678,7 +678,7 @@ class VoiceMode:
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _pygame_baslat(self) -> bool:
-        """Pygame mixer'Ä± baÅŸlatÄ±r (ilk Ã§aÄŸrÄ±da)."""
+        """Pygame mixer'i balatir (ilk §arida)."""
         if not PYGAME_MEVCUT:
             return False
         if not self._pygame_ilk:
@@ -686,21 +686,21 @@ class VoiceMode:
                 pygame.mixer.init(frequency=self.ornekleme_hizi)
                 self._pygame_ilk = True
             except Exception as e:
-                logger.warning("[VoiceMode] Pygame mixer baÅŸlatÄ±lamadÄ±: %s", e)
+                logger.warning("[VoiceMode] Pygame mixer balatilamadi: %s", e)
                 return False
         return True
 
     def _sounddevice_oynat(self, ses_verisi: bytes, format_hint: str = "mp3") -> None:
-        """sounddevice ile ses oynatÄ±r (WAV formatÄ±nda).
+        """sounddevice ile ses oynatir (WAV formatinda).
 
         Args:
             ses_verisi: Ses verisi (bytes).
-            format_hint: Ses formatÄ± ("mp3" veya "wav").
+            format_hint: Ses formati ("mp3" veya "wav").
         """
         if not SD_MEVCUT:
             raise RuntimeError("sounddevice gerekli.")
 
-        # MP3'Ã¼ WAV'a Ã§evir
+        # MP3'¼ WAV'a §evir
         if format_hint == "mp3":
             try:
                 import pydub
@@ -714,7 +714,7 @@ class VoiceMode:
 
                 data, sr = sf.read(wav_buf)
             except ImportError:
-                # pydub yoksa geÃ§ici dosyaya yaz, ffmpeg ile Ã§evir
+                # pydub yoksa ge§ici dosyaya yaz, ffmpeg ile §evir
                 fd, temp_in = tempfile.mkstemp(suffix=".mp3", prefix="reymen_tts_")
                 os.close(fd)
                 with open(temp_in, "wb") as f:
@@ -750,15 +750,15 @@ class VoiceMode:
         sd.wait()
 
     def _pygame_oynat(self, ses_verisi: bytes) -> None:
-        """Pygame ile ses oynatÄ±r.
+        """Pygame ile ses oynatir.
 
         Args:
             ses_verisi: MP3 ses verisi (bytes).
         """
         if not self._pygame_baslat():
-            raise RuntimeError("Pygame kullanÄ±lamaz.")
+            raise RuntimeError("Pygame kullanilamaz.")
 
-        # BytesIO Ã¼zerinden geÃ§ici dosyaya yazmadan oynat
+        # BytesIO ¼zerinden ge§ici dosyaya yazmadan oynat
         try:
             # pygame.mixer.music load from file object
             fd, temp = tempfile.mkstemp(suffix=".mp3", prefix="reymen_tts_")
@@ -774,18 +774,18 @@ class VoiceMode:
                 time.sleep(0.1)
             self._temizle(temp)
         except Exception as e:
-            logger.warning("[VoiceMode] Pygame oynatma hatasÄ±: %s", e)
+            logger.warning("[VoiceMode] Pygame oynatma hatasi: %s", e)
             # Fallback: ffplay ile dene
             self._ffplay_oynat(ses_verisi)
 
     def _ffplay_oynat(self, ses_verisi: bytes) -> None:
-        """ffplay (FFmpeg) ile ses oynatÄ±r.
+        """ffplay (FFmpeg) ile ses oynatir.
 
         Args:
             ses_verisi: Ses verisi (bytes).
         """
         if _FFPLAY_BULUNDU is None:
-            raise RuntimeError("ffplay bulunamadÄ±.")
+            raise RuntimeError("ffplay bulunamadi.")
 
         try:
             proc = subprocess.Popen(
@@ -798,14 +798,14 @@ class VoiceMode:
             proc.stdin.close()
             proc.wait()
         except Exception as e:
-            logger.error("[VoiceMode] ffplay oynatma hatasÄ±: %s", e)
+            logger.error("[VoiceMode] ffplay oynatma hatasi: %s", e)
             raise
 
     def oynat(self, ses_verisi: bytes) -> bool:
-        """Ses verisini hoparlÃ¶rden oynatÄ±r.
+        """Ses verisini hoparlsrden oynatir.
 
-        SÄ±rasÄ±yla dener:
-            1. sounddevice (WAV'a Ã§evirerek)
+        Sirasiyla dener:
+            1. sounddevice (WAV'a §evirerek)
             2. pygame
             3. ffplay
 
@@ -813,13 +813,13 @@ class VoiceMode:
             ses_verisi: Ses verisi (bytes, edge-tts'den MP3).
 
         Returns:
-            BaÅŸarÄ±lÄ±ysa True, deÄŸilse False.
+            Baariliysa True, deilse False.
         """
         if not ses_verisi:
             return False
 
         self.durum = VoiceModeDurum.KONUSUYOR
-        print("ğŸ”Š OynatÄ±lÄ±yor...")
+        print("ğ”Š Oynatiliyor...")
 
         hatalar: list[str] = []
 
@@ -832,7 +832,7 @@ class VoiceMode:
             except Exception as e:
                 hatalar.append(f"sounddevice: {e}")
                 logger.debug(
-                    "[VoiceMode] sounddevice oynatma baÅŸarÄ±sÄ±z, pygame deneniyor..."
+                    "[VoiceMode] sounddevice oynatma baarisiz, pygame deneniyor..."
                 )
 
         # 2. pygame
@@ -856,7 +856,7 @@ class VoiceMode:
         self.durum = VoiceModeDurum.HATA
         self.istatistik["hata_sayisi"] += 1
         logger.error(
-            "[VoiceMode] TÃ¼m oynatma backend'leri baÅŸarÄ±sÄ±z: %s", "; ".join(hatalar)
+            "[VoiceMode] T¼m oynatma backend'leri baarisiz: %s", "; ".join(hatalar)
         )
         return False
 
@@ -865,25 +865,25 @@ class VoiceMode:
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _beyin_yanit(self, metin: str) -> str:
-        """KullanÄ±cÄ± metnini Beyin'e gÃ¶nderir, yanÄ±t alÄ±r.
+        """Kullanici metnini Beyin'e gsnderir, yanit alir.
 
         Args:
-            metin: KullanÄ±cÄ±nÄ±n sÃ¶ylediÄŸi metin.
+            metin: Kullanicinin ssyledii metin.
 
         Returns:
-            Beyin yanÄ±tÄ± metni.
+            Beyin yaniti metni.
         """
         if self.beyin is None:
-            logger.warning("[VoiceMode] Beyin baÄŸlÄ± deÄŸil â€” yanÄ±t Ã¼retilemez.")
+            logger.warning("[VoiceMode] Beyin bali deil â€” yanit ¼retilemez.")
             return "[Beyin yok â€” sesli test modu]"
 
-        print("ğŸ§  Beyin dÃ¼ÅŸÃ¼nÃ¼yor...")
+        print("ğ§  Beyin d¼¼n¼yor...")
         try:
-            # VarsayÄ±lan sistem prompt
+            # Varsayilan sistem prompt
             sistem = self._cfg.get(
                 "sistem_prompt",
-                "Sen yardÄ±msever bir asistansÄ±n. KullanÄ±cÄ±yla sesli olarak "
-                "TÃ¼rkÃ§e konuÅŸuyorsun. KÄ±sa ve net cevaplar ver.",
+                "Sen yardimsever bir asistansin. Kullaniciyla sesli olarak "
+                "T¼rk§e konuuyorsun. Kisa ve net cevaplar ver.",
             )
             mesajlar = [
                 {"role": "user", "content": metin},
@@ -894,12 +894,12 @@ class VoiceMode:
             )
             return yanit
         except Exception as e:
-            logger.error("[VoiceMode] Beyin hatasÄ±: %s", e)
+            logger.error("[VoiceMode] Beyin hatasi: %s", e)
             self.istatistik["hata_sayisi"] += 1
-            return f"[Beyin HatasÄ±] {e}"
+            return f"[Beyin Hatasi] {e}"
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # Ana DÃ¶ngÃ¼: Kaydet â†’ STT â†’ LLM â†’ TTS â†’ Oynat
+    # Ana Dsng¼: Kaydet âc’ STT âc’ LLM âc’ TTS âc’ Oynat
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def dinle_ve_cevapla(
@@ -908,15 +908,15 @@ class VoiceMode:
         vad: bool = True,
         maks_sure: float = 30.0,
     ) -> bool:
-        """Tam sesli dÃ¶ngÃ¼: kaydet â†’ STT â†’ LLM â†’ TTS â†’ oynat.
+        """Tam sesli dsng¼: kaydet âc’ STT âc’ LLM âc’ TTS âc’ oynat.
 
         Args:
-            sure: Sabit kayÄ±t sÃ¼resi (0 = VAD veya varsayÄ±lan).
-            vad: Voice Activity Detection kullanÄ±lsÄ±n mÄ±?
-            maks_sure: VAD'de maksimum kayÄ±t sÃ¼resi.
+            sure: Sabit kayit s¼resi (0 = VAD veya varsayilan).
+            vad: Voice Activity Detection kullanilsin mi?
+            maks_sure: VAD'de maksimum kayit s¼resi.
 
         Returns:
-            DÃ¶ngÃ¼ baÅŸarÄ±yla tamamlandÄ±ysa True.
+            Dsng¼ baariyla tamamlandiysa True.
         """
         if self._durdurma_olayi.is_set():
             return False
@@ -932,15 +932,15 @@ class VoiceMode:
             print(f"âŒ {metin}")
             return False
 
-        print(f"\nğŸ“ SÃ¶ylediÄŸiniz: {metin}")
+        print(f"\nğ“ Ssylediiniz: {metin}")
 
-        # 3. LLM yanÄ±tÄ±
+        # 3. LLM yaniti
         yanit = self._beyin_yanit(metin)
         if yanit.startswith("[Beyin"):
             print(f"âŒ {yanit}")
             return False
 
-        print(f"ğŸ¤– YanÄ±t: {yanit}")
+        print(f"ğ¤- Yanit: {yanit}")
 
         # 4. TTS
         ses_verisi = self.seslendir(yanit)
@@ -951,26 +951,26 @@ class VoiceMode:
         return self.oynat(ses_verisi)
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    # REPL (Read-Eval-Print-Loop) ArayÃ¼zÃ¼
+    # REPL (Read-Eval-Print-Loop) Aray¼z¼
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def baslat(self) -> None:
-        """EtkileÅŸimli sesli REPL baÅŸlatÄ±r.
+        """Etkileimli sesli REPL balatir.
 
         Komutlar:
-            dinle   â€” konuÅŸmayÄ± dinle ve cevapla (VAD)
-            kaydet  â€” sabit sÃ¼re kaydet ve cevapla
-            test    â€” ses testi (kaydet â†’ oynat, LLM'siz)
-            durum   â€” mevcut durumu gÃ¶ster
-            cihaz   â€” ses cihazlarÄ±nÄ± listele
-            yardÄ±m  â€” komut listesini gÃ¶ster
-            cik     â€” REPL'den Ã§Ä±k
+            dinle   â€” konumayi dinle ve cevapla (VAD)
+            kaydet  â€” sabit s¼re kaydet ve cevapla
+            test    â€” ses testi (kaydet âc’ oynat, LLM'siz)
+            durum   â€” mevcut durumu gsster
+            cihaz   â€” ses cihazlarini listele
+            yardim  â€” komut listesini gsster
+            cik     â€” REPL'den §ik
         """
         self._durdurma_olayi.clear()
-        print("â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—")
-        print("â•‘   ğŸ™  ReYMeN Voice Mode â€” Sesli Asistan   â•‘")
-        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
-        print("Komutlar: dinle | kaydet | test | durum | cihaz | yardÄ±m | cik")
+        print("â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•-")
+        print("â•‘   ğS  ReYMeN Voice Mode â€” Sesli Asistan   â•‘")
+        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
+        print("Komutlar: dinle | kaydet | test | durum | cihaz | yardim | cik")
         print()
 
         komut_handler: dict[str, Callable[[], bool]] = {
@@ -979,13 +979,13 @@ class VoiceMode:
             "test": self._repl_ses_testi,
             "durum": self._repl_durum_goster,
             "cihaz": self._repl_cihaz_listele,
-            "yardÄ±m": self._repl_yardim,
+            "yardim": self._repl_yardim,
         }
 
         try:
             while not self._durdurma_olayi.is_set():
                 try:
-                    komut = input("\nğŸ™> ").strip().lower()
+                    komut = input("\nğS> ").strip().lower()
                 except (EOFError, KeyboardInterrupt):
                     print("\n")
                     break
@@ -994,7 +994,7 @@ class VoiceMode:
                     continue
 
                 if komut == "cik":
-                    print("ğŸ‘‹ GÃ¶rÃ¼ÅŸmek Ã¼zere!")
+                    print("ğ‘‹ Gsr¼mek ¼zere!")
                     break
 
                 handler = komut_handler.get(komut)
@@ -1002,32 +1002,32 @@ class VoiceMode:
                     try:
                         handler()
                     except Exception as e:
-                        logger.error("[VoiceMode] Komut hatasÄ±: %s", e)
+                        logger.error("[VoiceMode] Komut hatasi: %s", e)
                         print(f"âŒ Hata: {e}")
                 else:
-                    print(f"âŒ Bilinmeyen komut: '{komut}'. 'yardÄ±m' yazÄ±n.")
+                    print(f"âŒ Bilinmeyen komut: '{komut}'. 'yardim' yazin.")
         finally:
             self.durum = VoiceModeDurum.DURDU
 
     def _repl_kaydet_ve_cevapla(self) -> bool:
-        """Sabit sÃ¼reli kayÄ±t + cevaplama (REPL komutu)."""
+        """Sabit s¼reli kayit + cevaplama (REPL komutu)."""
         try:
-            sure_str = input("â± KayÄ±t sÃ¼resi (saniye, varsayÄ±lan 5): ").strip()
+            sure_str = input("âi Kayit s¼resi (saniye, varsayilan 5): ").strip()
             sure = float(sure_str) if sure_str else 5.0
         except (ValueError, EOFError):
             sure = 5.0
         return self.dinle_ve_cevapla(sure=sure, vad=False)
 
     def _repl_ses_testi(self) -> bool:
-        """Ses testi: kaydet â†’ STT â†’ oynat (LLM'siz)."""
-        print("ğŸ”Š Ses testi baÅŸlatÄ±lÄ±yor...")
+        """Ses testi: kaydet âc’ STT âc’ oynat (LLM'siz)."""
+        print("ğ”Š Ses testi balatiliyor...")
         kayit = self.kaydet(vad=True, maks_sure=10.0)
         if kayit is None:
-            print("âŒ KayÄ±t baÅŸarÄ±sÄ±z.")
+            print("âŒ Kayit baarisiz.")
             return False
         metin = self.metne_cevir(kayit)
-        print(f"ğŸ“ AlgÄ±lanan: {metin}")
-        # KaydÄ± oynat
+        print(f"ğ“ Algilanan: {metin}")
+        # Kaydi oynat
         ses_yolu = self._ses_verisini_wav_yap(kayit)
         if ses_yolu:
             with open(ses_yolu, "rb") as f:
@@ -1037,48 +1037,48 @@ class VoiceMode:
         return True
 
     def _repl_durum_goster(self) -> bool:
-        """Mevcut durumu gÃ¶ster (REPL komutu)."""
+        """Mevcut durumu gsster (REPL komutu)."""
         durum = self.kullanilabilir_mi()
-        print("â•”â•â•â• VoiceMode Durumu â•â•â•â•—")
+        print("â•”â•â•â• VoiceMode Durumu â•â•â•â•-")
         print(f"  Durum     : {self.durum}")
         print(f"  Mikrofon  : {'âœ…' if durum['mikrofon'] else 'âŒ'}")
-        print(f"  HoparlÃ¶r  : {'âœ…' if durum['hoparlor'] else 'âŒ'}")
+        print(f"  Hoparlsr  : {'âœ…' if durum['hoparlor'] else 'âŒ'}")
         print(f"  STT       : {'âœ…' if durum['stt'] else 'âŒ'}")
         print(f"  TTS       : {'âœ…' if durum['tts'] else 'âŒ'}")
         print(f"  Beyin     : {'âœ…' if durum['beyin'] else 'âŒ'}")
         print(f"  STT Motor : {self.stt_backend}")
         print(f"  TTS Ses   : {self.tts_sesi}")
-        print(f"  KayÄ±tlar  : {self.istatistik['kayit_sayisi']}")
-        print(f"  STT SayÄ±  : {self.istatistik['stt_sayisi']}")
-        print(f"  TTS SayÄ±  : {self.istatistik['tts_sayisi']}")
+        print(f"  Kayitlar  : {self.istatistik['kayit_sayisi']}")
+        print(f"  STT Sayi  : {self.istatistik['stt_sayisi']}")
+        print(f"  TTS Sayi  : {self.istatistik['tts_sayisi']}")
         print(f"  Hata      : {self.istatistik['hata_sayisi']}")
-        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
+        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
         return True
 
     def _repl_cihaz_listele(self) -> bool:
-        """Ses cihazlarÄ±nÄ± listele (REPL komutu)."""
+        """Ses cihazlarini listele (REPL komutu)."""
         cihazlar = self.cihazlari_listele()
         if not cihazlar:
-            print("âŒ Cihaz bulunamadÄ± veya sounddevice yok.")
+            print("âŒ Cihaz bulunamadi veya sounddevice yok.")
             return False
-        print("â•”â•â•â• Ses CihazlarÄ± â•â•â•â•—")
+        print("â•”â•â•â• Ses Cihazlari â•â•â•â•-")
         for c in cihazlar:
             print(f"  [{c['id']}] {c['adi']}")
-            print(f"       Kanal: {c['kanal']}, Ã–rnek: {c['ornek']} Hz")
-        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
+            print(f"       Kanal: {c['kanal']}, -rnek: {c['ornek']} Hz")
+        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
         return True
 
     def _repl_yardim(self) -> bool:
-        """YardÄ±m mesajÄ± gÃ¶ster (REPL komutu)."""
-        print("â•”â•â•â• Komutlar â•â•â•â•—")
-        print("  dinle  â€” KonuÅŸmayÄ± dinle (VAD) ve Beyin ile cevapla")
-        print("  kaydet â€” Sabit sÃ¼re belirleyip kaydet ve cevapla")
-        print("  test   â€” Ses testi (kaydet â†’ Ã§Ã¶z â†’ oynat, LLM'siz)")
-        print("  durum  â€” Mevcut yapÄ±landÄ±rma ve kullanÄ±m istatistikleri")
-        print("  cihaz  â€” Ses giriÅŸ/Ã§Ä±kÄ±ÅŸ cihazlarÄ±nÄ± listele")
-        print("  cik    â€” Ã‡Ä±kÄ±ÅŸ")
-        print("  yardÄ±m â€” Bu mesaj")
-        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
+        """Yardim mesaji gsster (REPL komutu)."""
+        print("â•”â•â•â• Komutlar â•â•â•â•-")
+        print("  dinle  â€” Konumayi dinle (VAD) ve Beyin ile cevapla")
+        print("  kaydet â€” Sabit s¼re belirleyip kaydet ve cevapla")
+        print("  test   â€” Ses testi (kaydet âc’ §sz âc’ oynat, LLM'siz)")
+        print("  durum  â€” Mevcut yapilandirma ve kullanim istatistikleri")
+        print("  cihaz  â€” Ses giri/§iki cihazlarini listele")
+        print("  cik    â€” ciki")
+        print("  yardim â€” Bu mesaj")
+        print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
         return True
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1086,7 +1086,7 @@ class VoiceMode:
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def durdur(self) -> None:
-        """TÃ¼m ses iÅŸlemlerini durdurur."""
+        """T¼m ses ilemlerini durdurur."""
         self._durdurma_olayi.set()
 
         # Pygame oynatma varsa durdur
@@ -1107,7 +1107,7 @@ class VoiceMode:
         logger.info("[VoiceMode] Durduruldu.")
 
     def temizle(self) -> None:
-        """KaynaklarÄ± serbest bÄ±rak."""
+        """Kaynaklari serbest birak."""
         self.durdur()
 
         # Whisper modelini temizle
@@ -1131,7 +1131,7 @@ class VoiceMode:
 
     @staticmethod
     def _temizle(dosya_yolu: str) -> None:
-        """GeÃ§ici dosyayÄ± gÃ¼venle siler."""
+        """Ge§ici dosyayi g¼venle siler."""
         try:
             if dosya_yolu and os.path.exists(dosya_yolu):
                 os.unlink(dosya_yolu)
@@ -1139,21 +1139,21 @@ class VoiceMode:
             logger.debug("[VoiceMode] Temp dosya silinemedi: %s â€” %s", dosya_yolu, e)
 
 
-# â”€â”€ Asenkron yardÄ±mcÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Asenkron yardimci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def asyncio_loop(koroutin: Any) -> None:
-    """Async fonksiyonu senkron context'te Ã§alÄ±ÅŸtÄ±rÄ±r.
+    """Async fonksiyonu senkron context'te §alitirir.
 
-    Mevcut event loop varsa onu kullanÄ±r, yoksa yeni loop oluÅŸturur.
+    Mevcut event loop varsa onu kullanir, yoksa yeni loop oluturur.
 
     Args:
-        koroutin: Ã‡alÄ±ÅŸtÄ±rÄ±lacak coroutine.
+        koroutin: calitirilacak coroutine.
     """
     try:
         loop = asyncio.get_event_loop()
         if loop.is_running():
-            # Zaten Ã§alÄ±ÅŸan bir loop var â€” yeni loop aÃ§
+            # Zaten §alian bir loop var â€” yeni loop a§
             import asyncio
 
             loop = asyncio.new_event_loop()
@@ -1175,7 +1175,7 @@ def asyncio_loop(koroutin: Any) -> None:
             loop.close()
 
 
-# â”€â”€ DÄ±ÅŸa aktarÄ±lan isimler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Dia aktarilan isimler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 __all__ = [
     "VoiceMode",
@@ -1199,17 +1199,17 @@ if __name__ == "__main__":
     vm = VoiceMode()
     durum = vm.kullanilabilir_mi()
     print(f"Mikrofon: {'âœ…' if durum['mikrofon'] else 'âŒ'}")
-    print(f"HoparlÃ¶r: {'âœ…' if durum['hoparlor'] else 'âŒ'}")
+    print(f"Hoparlsr: {'âœ…' if durum['hoparlor'] else 'âŒ'}")
     print(f"STT:      {'âœ…' if durum['stt'] else 'âŒ'}")
     print(f"TTS:      {'âœ…' if durum['tts'] else 'âŒ'}")
     print(f"Beyin:    {'âœ…' if durum['beyin'] else 'âŒ'}")
     print()
 
     if all(durum.values()):
-        print("TÃ¼m bileÅŸenler hazÄ±r. REPL baÅŸlatÄ±lÄ±yor...")
+        print("T¼m bileenler hazir. REPL balatiliyor...")
         vm.baslat()
     else:
-        print("Demo modu: sadece cihaz listeleme yapÄ±labilir.")
+        print("Demo modu: sadece cihaz listeleme yapilabilir.")
         cihazlar = vm.cihazlari_listele()
         if cihazlar:
             print(f"\n{len(cihazlar)} cihaz bulundu.")

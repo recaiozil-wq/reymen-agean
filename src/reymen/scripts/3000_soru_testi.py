@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 3000 soruluk ReYMeN test script'i.
 Her soru ConversationLoop.run_conversation() ile ReYMeN'e sorulur,
@@ -70,7 +70,7 @@ SORULAR = [
     "SGLang nedir ve LLM serving'de ne gibi avantajlar sunar?",
     "OpenAI API ile Anthropic API arasindaki farklar nelerdir?",
     "LLM'lerde rate limiting ve retry stratejileri nasil olmali?",
-    # LLM gÃ¼venlik
+    # LLM güvenlik
     "Prompt injection saldirisi nedir ve nasil onlenir?",
     "Jailbreak teknikleri nelerdir ve bunlara karsi nasil savunulur?",
     "LLM'lerde output guardrails nasil uygulanir?",

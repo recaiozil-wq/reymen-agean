@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module."""
+"""ReYMeNCLI mixin module."""
 
 import logging
 import os

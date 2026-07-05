@@ -1,4 +1,4 @@
-﻿from contextlib import contextmanager
+from contextlib import contextmanager
 import re, os, sys, time, shutil
 from pathlib import Path
 import logging

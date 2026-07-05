@@ -1,6 +1,6 @@
-﻿"""ğŸ–ï¸ ReYMeN Sandbox â€” izole kod Ã§alÄ±ÅŸtÄ±rma ortamÄ±.
+"""ğŸ–ï¸ ReYMeN Sandbox â€” izole kod çalÄ±ÅŸtÄ±rma ortamÄ±.
 
-Her sandbox kendi temp dizininde Ã§alÄ±ÅŸÄ±r, timeout'lu ve kontrollÃ¼dÃ¼r.
+Her sandbox kendi temp dizininde çalÄ±ÅŸÄ±r, timeout'lu ve kontrollüdür.
 BaÄŸÄ±mlÄ±lÄ±k: yok (tempfile + subprocess + threading ile)
 """
 
@@ -44,7 +44,7 @@ class Sandbox:
     def calistir(
         self, komut: list[str], timeout: int = AZAMI_SURE, env: Optional[dict] = None
     ) -> dict:
-        """Sandbox'da komut Ã§alÄ±ÅŸtÄ±r."""
+        """Sandbox'da komut çalÄ±ÅŸtÄ±r."""
         self.durum = "calisiyor"
         self.baslama = time.time()
 
@@ -78,7 +78,7 @@ class Sandbox:
                 self._proc.kill()
                 self._proc.wait()
                 self.cikti = "(zaman aÅŸÄ±mÄ±)"
-                self.hata = f"Komut {timeout}s iÃ§inde bitmedi"
+                self.hata = f"Komut {timeout}s içinde bitmedi"
                 self.exit_code = -1
                 self.durum = "zamanasimi"
 
@@ -127,7 +127,7 @@ class Sandbox:
 
 
 class SandboxYoneticisi:
-    """TÃ¼m sandbox'larÄ± yÃ¶netir."""
+    """Tüm sandbox'larÄ± yönetir."""
 
     def __init__(self) -> None:
         self._sandboxlar: dict[str, Sandbox] = {}
@@ -156,7 +156,7 @@ class SandboxYoneticisi:
             return [sb.rapor() for sb in sb_list]
 
     def temizle_hepsi(self) -> int:
-        """TÃ¼m sandbox'larÄ± temizle."""
+        """Tüm sandbox'larÄ± temizle."""
         say = 0
         with self._kilit:
             for sb in self._sandboxlar.values():

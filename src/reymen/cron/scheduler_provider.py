@@ -1,4 +1,4 @@
-﻿"""CronScheduler provider interface (Axis B â€” the trigger).
+"""CronScheduler provider interface (Axis B â€” the trigger).
 
 âš ï¸ EXPERIMENTAL â€” this interface is validated by exactly ONE consumer (the
 built-in) until an external provider (Chronos, Phase 4) shakes it out. Until

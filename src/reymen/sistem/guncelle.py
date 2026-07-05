@@ -1,14 +1,14 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-guncelle.py â€” ReYMeN AkÄ±llÄ± GÃ¼ncelleme ModÃ¼lÃ¼.
+guncelle.py â€” ReYMeN AkÄ±llÄ± Güncelleme Modülü.
 
-KullanÄ±m (program iÃ§inde):
-    /guncelle          â†’ kontrol et ve gÃ¼ncelle
+KullanÄ±m (program içinde):
+    /guncelle          â†’ kontrol et ve güncelle
     /guncelle kapat    â†’ otomatik kontrol bildirimini kapat
-    /guncelle ac       â†’ otomatik kontrol bildirimini aÃ§
-    /guncelle durum    â†’ ayarÄ± gÃ¶ster
+    /guncelle ac       â†’ otomatik kontrol bildirimini aç
+    /guncelle durum    â†’ ayarÄ± göster
 
-DoÄŸrudan Ã§alÄ±ÅŸtÄ±rma:
+DoÄŸrudan çalÄ±ÅŸtÄ±rma:
     python guncelle.py
     python guncelle.py --kapat
     python guncelle.py --ac
@@ -29,10 +29,10 @@ PROJE_KOKU = Path(__file__).parent.resolve()
 GITHUB_BRANCH = "main"
 
 # â”€â”€ Buraya kendi GitHub kullanÄ±cÄ± adÄ±nÄ± ve repo adÄ±nÄ± yaz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-GITHUB_REPO = "KULLANICI_ADI/ReYMeN"  # Ã¶rn: "markopasa/ReYMeN"
+GITHUB_REPO = "KULLANICI_ADI/ReYMeN"  # örn: "markopasa/ReYMeN"
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# GÃ¼ncelleme sÄ±rasÄ±nda ASLA dokunulmayacak kiÅŸisel dosyalar
+# Güncelleme sÄ±rasÄ±nda ASLA dokunulmayacak kiÅŸisel dosyalar
 KORUNACAK = {
     ".env",
     ".ReYMeN/session.db",  # -> merkez_db/session_reymen.db
@@ -48,7 +48,7 @@ AYAR_DOSYASI = PROJE_KOKU / ".ReYMeN" / "guncelleme.json"
 _ARKA_PLAN_SONUC: dict = {}
 
 
-# â”€â”€ Ayar yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Ayar yönetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def ayar_oku() -> dict:
@@ -115,7 +115,7 @@ def guncelleme_var_mi() -> tuple[bool, str | None, str | None]:
 
 
 def _degisen_dosyalar() -> dict:
-    """git diff ile gÃ¼ncelleme Ã¶ncesi nelerin deÄŸiÅŸeceÄŸini gÃ¶ster."""
+    """git diff ile güncelleme öncesi nelerin deÄŸiÅŸeceÄŸini göster."""
     sonuc = {"py": [], "skill": [], "diger": [], "korunan": []}
     try:
         # Uzak repo'dan fetch et
@@ -154,7 +154,7 @@ def _degisen_dosyalar() -> dict:
     return sonuc
 
 
-# â”€â”€ GÃ¼ncelleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Güncelleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _git_pull() -> tuple[bool, str]:
@@ -177,7 +177,7 @@ def _git_pull() -> tuple[bool, str]:
 
 
 def _zip_ile_guncelle() -> tuple[bool, str]:
-    """Git olmayan kullanÄ±cÄ±lar iÃ§in â€” kiÅŸisel dosyalarÄ± atlar."""
+    """Git olmayan kullanÄ±cÄ±lar için â€” kiÅŸisel dosyalarÄ± atlar."""
     if "KULLANICI_ADI" in GITHUB_REPO:
         return False, "GITHUB_REPO ayarlanmamÄ±ÅŸ."
     try:
@@ -230,38 +230,38 @@ def _zip_ile_guncelle() -> tuple[bool, str]:
                 guncellenen += 1
 
         tmp_yol.unlink(missing_ok=True)
-        return True, f"{guncellenen} dosya gÃ¼ncellendi (zip yÃ¶ntemi)."
+        return True, f"{guncellenen} dosya güncellendi (zip yöntemi)."
     except Exception as e:
-        return False, f"Zip gÃ¼ncellemesi baÅŸarÄ±sÄ±z: {e}"
+        return False, f"Zip güncellemesi baÅŸarÄ±sÄ±z: {e}"
 
 
 def guncelle(onaysiz: bool = False) -> bool:
     """
-    GÃ¼ncelleme yap. Ã–nce deÄŸiÅŸenleri gÃ¶ster, sonra onay iste.
+    Güncelleme yap. Ã–nce deÄŸiÅŸenleri göster, sonra onay iste.
 
     Returns:
-        True â†’ gÃ¼ncellendi / False â†’ iptal veya hata
+        True â†’ güncellendi / False â†’ iptal veya hata
     """
     print()
     var_mi, uzak, yerel = guncelleme_var_mi()
 
     if not var_mi and uzak is not None:
-        print(f"  Zaten gÃ¼ncel ({yerel}).")
+        print(f"  Zaten güncel ({yerel}).")
         return False
 
     if uzak:
-        print(f"  Mevcut sÃ¼rÃ¼m : {yerel or '(git yok)'}")
-        print(f"  Yeni sÃ¼rÃ¼m   : {uzak}")
+        print(f"  Mevcut sürüm : {yerel or '(git yok)'}")
+        print(f"  Yeni sürüm   : {uzak}")
 
-    # Git varsa nelerin deÄŸiÅŸeceÄŸini gÃ¶ster
+    # Git varsa nelerin deÄŸiÅŸeceÄŸini göster
     git_dir = PROJE_KOKU / ".git"
     if git_dir.exists():
         degisen = _degisen_dosyalar()
         print()
         if degisen["py"]:
-            print(f"  GÃ¼ncellenecek  : {len(degisen['py'])} Python dosyasÄ±")
+            print(f"  Güncellenecek  : {len(degisen['py'])} Python dosyasÄ±")
         if degisen["skill"]:
-            print(f"  Yeni/gÃ¼ncellen.: {len(degisen['skill'])} skill")
+            print(f"  Yeni/güncellen.: {len(degisen['skill'])} skill")
         if degisen["diger"]:
             print(f"  DiÄŸer          : {len(degisen['diger'])} dosya")
         if degisen["korunan"]:
@@ -272,8 +272,8 @@ def guncelle(onaysiz: bool = False) -> bool:
     print()
 
     if not onaysiz:
-        print("  [e] GÃ¼ncelle    [h] Bu sefer atla    [kapat] Bir daha sorma")
-        yanit = input("  SeÃ§im: ").strip().lower()
+        print("  [e] Güncelle    [h] Bu sefer atla    [kapat] Bir daha sorma")
+        yanit = input("  Seçim: ").strip().lower()
         if yanit == "kapat":
             otomatik_kapat()
             return False
@@ -285,13 +285,13 @@ def guncelle(onaysiz: bool = False) -> bool:
         print("  git pull yapÄ±lÄ±yor...")
         basari, cikti = _git_pull()
     else:
-        print("  Zip yÃ¶ntemiyle gÃ¼ncelleniyor...")
+        print("  Zip yöntemiyle güncelleniyor...")
         basari, cikti = _zip_ile_guncelle()
 
     if basari:
         print(f"  âœ“ {cikti}")
-        print("\n  GÃ¼ncelleme tamamlandÄ±! ProgramÄ± yeniden baÅŸlatÄ±n.")
-        # SHA'yÄ± "gÃ¶sterildi" olarak kaydet
+        print("\n  Güncelleme tamamlandÄ±! ProgramÄ± yeniden baÅŸlatÄ±n.")
+        # SHA'yÄ± "gösterildi" olarak kaydet
         ayar = ayar_oku()
         ayar["gosterilen_sha"] = uzak or ""
         ayar_kaydet(ayar)
@@ -300,38 +300,38 @@ def guncelle(onaysiz: bool = False) -> bool:
     return basari
 
 
-# â”€â”€ AÃ§ma / Kapatma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Açma / Kapatma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def otomatik_ac():
-    """Otomatik gÃ¼ncelleme bildirimini aÃ§."""
+    """Otomatik güncelleme bildirimini aç."""
     ayar = ayar_oku()
     ayar["otomatik_kontrol"] = True
     ayar["gosterilen_sha"] = ""  # Bildirimi sÄ±fÄ±rla
     ayar_kaydet(ayar)
-    print("  âœ“ Otomatik gÃ¼ncelleme kontrolÃ¼ aÃ§Ä±ldÄ±.")
+    print("  âœ“ Otomatik güncelleme kontrolü açÄ±ldÄ±.")
 
 
 def otomatik_kapat():
-    """Otomatik gÃ¼ncelleme bildirimini kapat."""
+    """Otomatik güncelleme bildirimini kapat."""
     ayar = ayar_oku()
     ayar["otomatik_kontrol"] = False
     ayar_kaydet(ayar)
-    print("  Otomatik gÃ¼ncelleme kapatÄ±ldÄ±.")
-    print("  Tekrar aÃ§mak iÃ§in: /guncelle ac")
+    print("  Otomatik güncelleme kapatÄ±ldÄ±.")
+    print("  Tekrar açmak için: /guncelle ac")
 
 
 def durum_goster():
-    """GÃ¼ncelleme ayarÄ±nÄ± ve son durumu gÃ¶ster."""
+    """Güncelleme ayarÄ±nÄ± ve son durumu göster."""
     ayar = ayar_oku()
-    aktif = "AÃ§Ä±k" if ayar.get("otomatik_kontrol", True) else "KapalÄ±"
+    aktif = "AçÄ±k" if ayar.get("otomatik_kontrol", True) else "KapalÄ±"
     print(f"  Otomatik kontrol : {aktif}")
     print(f"  GitHub repo      : {GITHUB_REPO}")
     yerel = _yerel_commit()
-    print(f"  Yerel sÃ¼rÃ¼m      : {yerel or '(git repo deÄŸil)'}")
+    print(f"  Yerel sürüm      : {yerel or '(git repo deÄŸil)'}")
 
 
-# â”€â”€ Arka plan kontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Arka plan kontrolü â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _arka_plan_kontrol():
@@ -349,7 +349,7 @@ def _arka_plan_kontrol():
 
 
 def arka_plan_baslat():
-    """Startup'ta Ã§aÄŸÄ±r â€” arka planda kontrol baÅŸlatÄ±r, kullanÄ±cÄ±yÄ± bekletmez."""
+    """Startup'ta çaÄŸÄ±r â€” arka planda kontrol baÅŸlatÄ±r, kullanÄ±cÄ±yÄ± bekletmez."""
     if "KULLANICI_ADI" in GITHUB_REPO:
         return
     t = threading.Thread(target=_arka_plan_kontrol, daemon=True)
@@ -358,8 +358,8 @@ def arka_plan_baslat():
 
 def guncelleme_bildirimi() -> str | None:
     """
-    Arka plan sonucu hazÄ±rsa ve yeni bir SHA ise bildirim dÃ¶ndÃ¼r.
-    main.py dÃ¶ngÃ¼sÃ¼nde her turda Ã§aÄŸrÄ±lÄ±r, bir kez gÃ¶sterir.
+    Arka plan sonucu hazÄ±rsa ve yeni bir SHA ise bildirim döndür.
+    main.py döngüsünde her turda çaÄŸrÄ±lÄ±r, bir kez gösterir.
     """
     if not _ARKA_PLAN_SONUC.get("var_mi"):
         return None
@@ -367,29 +367,29 @@ def guncelleme_bildirimi() -> str | None:
     yerel = _ARKA_PLAN_SONUC.get("yerel", "?")
     gosterilen = _ARKA_PLAN_SONUC.get("gosterilen", "")
 
-    # AynÄ± sÃ¼rÃ¼m iÃ§in tekrar gÃ¶sterme
+    # AynÄ± sürüm için tekrar gösterme
     if uzak == gosterilen:
         return None
 
     return (
         f"\n  â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—\n"
-        f"  â•‘  Yeni sÃ¼rÃ¼m mevcut: {yerel} â†’ {uzak}  â•‘\n"
-        f"  â•‘  Skill ve kod gÃ¼ncellemesi var.       â•‘\n"
+        f"  â•‘  Yeni sürüm mevcut: {yerel} â†’ {uzak}  â•‘\n"
+        f"  â•‘  Skill ve kod güncellemesi var.       â•‘\n"
         f"  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n"
-        f"  '/guncelle' â†’ gÃ¼ncelle\n"
+        f"  '/guncelle' â†’ güncelle\n"
         f"  '/guncelle kapat' â†’ bir daha sorma\n"
     )
 
 
-# â”€â”€ /guncelle komut yÃ¶nlendirici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ /guncelle komut yönlendirici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def komut_isle(args: str = "") -> bool:
     """
-    main.py'den '/guncelle [args]' ÅŸeklinde Ã§aÄŸrÄ±lÄ±r.
+    main.py'den '/guncelle [args]' ÅŸeklinde çaÄŸrÄ±lÄ±r.
 
     Args:
-        args: "kapat", "ac", "durum" veya "" (gÃ¼ncelle)
+        args: "kapat", "ac", "durum" veya "" (güncelle)
 
     Returns:
         True â†’ program yeniden baÅŸlatÄ±lmalÄ±
@@ -408,11 +408,11 @@ def komut_isle(args: str = "") -> bool:
         durum_goster()
         return False
 
-    # VarsayÄ±lan: gÃ¼ncelle
+    # VarsayÄ±lan: güncelle
     return guncelle(onaysiz=False)
 
 
-# â”€â”€ DoÄŸrudan Ã§alÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ DoÄŸrudan çalÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     args = sys.argv[1:]
@@ -429,12 +429,12 @@ if __name__ == "__main__":
         durum_goster()
         sys.exit(0)
 
-    print("=== ReYMeN GÃ¼ncelleme AracÄ± ===")
+    print("=== ReYMeN Güncelleme AracÄ± ===")
     print(f"Repo  : {GITHUB_REPO}")
     print(f"Yerel : {_yerel_commit() or '(git repo deÄŸil)'}")
 
     if "KULLANICI_ADI" in GITHUB_REPO:
-        print("\n[!] guncelle.py iÃ§indeki GITHUB_REPO deÄŸiÅŸkenini ayarla.")
+        print("\n[!] guncelle.py içindeki GITHUB_REPO deÄŸiÅŸkenini ayarla.")
         print('    Ã–rnek: GITHUB_REPO = "markopasa/ReYMeN"')
         sys.exit(1)
 

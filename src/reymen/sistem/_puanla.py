@@ -1,11 +1,11 @@
-﻿"""
+"""
 _puanla.py â€” Web Tetikleyici Puanlama Motoru
 
 Web aramasÄ± sonucu gelen bilgiyi puanlar:
-- GÃ¼ncellik (tarih)
-- Kaynak gÃ¼venilirliÄŸi (resmi dokÃ¼man > forum > LLM)
-- DoÄŸrulama sayÄ±sÄ± (kaÃ§ kaynak aynÄ± ÅŸeyi sÃ¶ylÃ¼yor)
-- OnceHafiza ile karÅŸÄ±laÅŸtÄ±rma (Ã§eliÅŸki varsa dÃ¼ÅŸÃ¼k puan)
+- Güncellik (tarih)
+- Kaynak güvenilirliÄŸi (resmi doküman > forum > LLM)
+- DoÄŸrulama sayÄ±sÄ± (kaç kaynak aynÄ± ÅŸeyi söylüyor)
+- OnceHafiza ile karÅŸÄ±laÅŸtÄ±rma (çeliÅŸki varsa düÅŸük puan)
 
 Puan > 0.7 â†’ hafÄ±zaya kaydet
 Puan 0.4-0.7 â†’ kullanÄ±cÄ±ya danÄ±ÅŸ
@@ -15,7 +15,7 @@ Puan < 0.4 â†’ reddet
 import re
 from datetime import datetime, date
 
-# Kaynak gÃ¼venilirlik puanlarÄ±
+# Kaynak güvenilirlik puanlarÄ±
 KAYNAK_PUAN = {
     "resmi_dokuman": 1.0,  # PyPI, GitHub resmi, Microsoft docs
     "stackoverflow": 0.8,  # StackOverflow / GitHub Issues
@@ -44,7 +44,7 @@ ALAN_ADI_PUAN = {
 
 
 def kaynak_turu_bul(url: str) -> str:
-    """URL'den kaynak tÃ¼rÃ¼nÃ¼ tahmin et."""
+    """URL'den kaynak türünü tahmin et."""
     if not url:
         return "bilinmiyor"
     for alan, puan in ALAN_ADI_PUAN.items():
@@ -57,7 +57,7 @@ def kaynak_turu_bul(url: str) -> str:
 
 
 def kaynak_guvenirlik_puan(url: str) -> float:
-    """URL'den kaynak gÃ¼venilirlik puanÄ± hesapla."""
+    """URL'den kaynak güvenilirlik puanÄ± hesapla."""
     if not url:
         return KAYNAK_PUAN["bilinmiyor"]
     for alan, puan in ALAN_ADI_PUAN.items():
@@ -68,8 +68,8 @@ def kaynak_guvenirlik_puan(url: str) -> float:
 
 def guncellik_puan(tarih_str: str = None) -> float:
     """
-    Bilginin gÃ¼ncelliÄŸini puanla.
-    - 30 gÃ¼nden yeni: 1.0
+    Bilginin güncelliÄŸini puanla.
+    - 30 günden yeni: 1.0
     - 6 aydan yeni: 0.8
     - 1 yÄ±ldan yeni: 0.5
     - 2 yÄ±ldan eski: 0.2
@@ -95,7 +95,7 @@ def guncellik_puan(tarih_str: str = None) -> float:
 
 
 def dogrulama_puan(kaynak_sayisi: int) -> float:
-    """KaÃ§ farklÄ± kaynak aynÄ± bilgiyi doÄŸruluyor."""
+    """Kaç farklÄ± kaynak aynÄ± bilgiyi doÄŸruluyor."""
     if kaynak_sayisi >= 3:
         return 1.0
     elif kaynak_sayisi == 2:
@@ -108,7 +108,7 @@ def dogrulama_puan(kaynak_sayisi: int) -> float:
 def celiski_puan(oncehafiza_guven: float, web_icerik_uyum: float) -> float:
     """
     OnceHafiza'daki bilgi ile web'den gelen bilgi arasÄ±ndaki uyum.
-    oncehafiza_guven: DB'deki gÃ¼ven skoru (0-1)
+    oncehafiza_guven: DB'deki güven skoru (0-1)
     web_icerik_uyum: Ä°ki kaynaÄŸÄ±n ne kadar uyumlu olduÄŸu (0-1)
     """
     if web_icerik_uyum >= 0.8:
@@ -136,11 +136,11 @@ def hesapla(
     Parametreler:
         url: Bilginin kaynak URL'si
         tarih: Bilginin yayÄ±n tarihi (YYYY-MM-DD)
-        kaynak_sayisi: KaÃ§ farklÄ± kaynak doÄŸruluyor
-        oncehafiza_guven: DB'deki mevcut gÃ¼ven (0-1)
-        web_icerik_uyum: Ä°Ã§erik uyumu (0-1)
+        kaynak_sayisi: Kaç farklÄ± kaynak doÄŸruluyor
+        oncehafiza_guven: DB'deki mevcut güven (0-1)
+        web_icerik_uyum: Ä°çerik uyumu (0-1)
 
-    DÃ¶nen:
+    Dönen:
         {
             "puan": float (0-1),
             "karar": "kaydet" | "danis" | "reddet",
@@ -154,7 +154,7 @@ def hesapla(
     if oncehafiza_guven is not None and web_icerik_uyum is not None:
         p_celiski = celiski_puan(oncehafiza_guven, web_icerik_uyum)
     else:
-        p_celiski = 0.5  # KarÅŸÄ±laÅŸtÄ±rma yoksa nÃ¶tr
+        p_celiski = 0.5  # KarÅŸÄ±laÅŸtÄ±rma yoksa nötr
 
     puan = (
         p_guncellik * agirlik_guncellik
@@ -192,18 +192,18 @@ def karar_aciklamasi(sonuc: dict) -> str:
 
     if karar == "kaydet":
         return (
-            f"âœ… PUAN={puan} â†’ KAYDET (gÃ¼ncellik={detay['guncellik']}, "
+            f"âœ… PUAN={puan} â†’ KAYDET (güncellik={detay['guncellik']}, "
             f"kaynak={detay['kaynak_guven']}, doÄŸrulama={detay['dogrulama']})"
         )
     elif karar == "danis":
         return (
-            f"âš ï¸ PUAN={puan} â†’ DANIÅ (gÃ¼ncellik={detay['guncellik']}, "
-            f"kaynak={detay['kaynak_guven']}, Ã§eliÅŸki={detay['celiski']})"
+            f"âš ï¸ PUAN={puan} â†’ DANIÅ (güncellik={detay['guncellik']}, "
+            f"kaynak={detay['kaynak_guven']}, çeliÅŸki={detay['celiski']})"
         )
     else:
         return (
             f"âŒ PUAN={puan} â†’ REDDET (kaynak={detay['kaynak_guven']}, "
-            f"doÄŸrulama={detay['dogrulama']}, gÃ¼ncellik={detay['guncellik']})"
+            f"doÄŸrulama={detay['dogrulama']}, güncellik={detay['guncellik']})"
         )
 
 
@@ -214,7 +214,7 @@ if __name__ == "__main__":
         ("https://docs.python.org/3/library/", "2026-06-01", 3, 0.9, 1.0),  # Kaydet
         ("https://stackoverflow.com/questions/123", "2025-12-01", 1, 0.8, 0.6),  # DanÄ±ÅŸ
         ("https://random-forum.com/thread", "2023-01-01", 1, None, None),  # Reddet
-        ("https://github.com/user/repo", "2026-05-15", 2, 0.5, 0.3),  # DanÄ±ÅŸ (Ã§eliÅŸki)
+        ("https://github.com/user/repo", "2026-05-15", 2, 0.5, 0.3),  # DanÄ±ÅŸ (çeliÅŸki)
     ]
 
     for url, tarih, ks, og, wu in testler:

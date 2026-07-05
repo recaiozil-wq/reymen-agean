@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """context_references.py â€” Referans Yonetimi.
 
 Gecmis konusmalardan onemli referanslari cikarir, saklar ve
@@ -71,7 +71,7 @@ class ReferansYoneticisi:
 
 
 def motor_kaydet(motor):
-    """Referans araÃ§larÄ±nÄ± motora kaydet."""
+    """Referans araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     _ry = ReferansYoneticisi()
@@ -85,13 +85,13 @@ def motor_kaydet(motor):
     )
     motor._plugin_arac_kaydet(
         "REFERANS_ARA",
-        lambda sorgu="": str(_ry.ara(str(sorgu))) or "[Referans]: SonuÃ§ yok",
+        lambda sorgu="": str(_ry.ara(str(sorgu))) or "[Referans]: Sonuç yok",
         "KaydedilmiÅŸ referanslarda metin ara",
     )
     motor._plugin_arac_kaydet(
         "REFERANS_OZET",
         lambda: _ry.context_ozeti() or "[Referans]: KayÄ±t yok",
-        "Son referanslarÄ±n Ã¶zetini gÃ¶ster",
+        "Son referanslarÄ±n özetini göster",
     )
 
 

@@ -1,4 +1,4 @@
-﻿"""_handle_profile_command handler."""
+"""_handle_profile_command handler."""
 
 from reymen.sistem.ReYMeN_constants import display_reymen_home
 

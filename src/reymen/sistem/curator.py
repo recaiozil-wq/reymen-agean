@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """curator.py â€” ReYMeN Otomatik Bakim (Curator) Modulu.
 
 Ne yapar:
@@ -252,7 +252,7 @@ def curator_temizlik_yap(
     kok: str | Path | None = None,
     pycache_sil: bool = True,
 ) -> list[str]:
-    """GerÃ§ek temizlik islemlerini yap (dry_run=False).
+    """Gerçek temizlik islemlerini yap (dry_run=False).
 
     Args:
         kok: Proje kok dizini
@@ -356,7 +356,7 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "CURATOR_TEMIZLIK",
         _tool_curator_temizlik,
-        "GerÃ§ek temizlik yap: __pycache__ sil.",
+        "Gerçek temizlik yap: __pycache__ sil.",
     )
     logger.info("[CURATOR] Motor'a 3 arac kaydedildi")
 

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 continuous_learning.py â€” Cross-Session Continuous Learning System.
 

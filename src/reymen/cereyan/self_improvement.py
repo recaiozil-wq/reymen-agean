@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 self_improvement.py â€” ReYMeN Otonom Oz-Gelistirme Motoru.
 

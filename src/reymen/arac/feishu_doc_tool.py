@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-"""feishu_doc_tool.py â€” Feishu (Lark) DokÃ¼man AracÄ±.
+# -*- coding: utf-8 -*-
+"""feishu_doc_tool.py â€” Feishu (Lark) Doküman AracÄ±.
 
-Feishu Docs API v1: dÃ¶kÃ¼man oluÅŸtur, oku, gÃ¼ncelle, listele.
-gateway/feishu.py'den baÄŸÄ±msÄ±z; dokÃ¼man odaklÄ± motor aracÄ±.
+Feishu Docs API v1: döküman oluÅŸtur, oku, güncelle, listele.
+gateway/feishu.py'den baÄŸÄ±msÄ±z; doküman odaklÄ± motor aracÄ±.
 ENV: FEISHU_APP_ID, FEISHU_APP_SECRET
 """
 
@@ -21,7 +21,7 @@ _TOKEN_CACHE: dict = {"token": "", "bitis": 0.0}
 
 
 def _feishu_token() -> str:
-    """Tenant access token al (Ã¶nbellekli)."""
+    """Tenant access token al (önbellekli)."""
     if time.time() < _TOKEN_CACHE["bitis"] and _TOKEN_CACHE["token"]:
         return _TOKEN_CACHE["token"]
     if not FEISHU_APP_ID or not FEISHU_APP_SECRET:
@@ -108,18 +108,18 @@ def _fs_patch(yol: str, veri: dict) -> dict:
         return {"error": str(e)}
 
 
-# â”€â”€ DÃ¶kÃ¼man Ä°ÅŸlemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Döküman Ä°ÅŸlemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def dokuman_olustur(baslik: str, klasor_token: str = "") -> str:
-    """Yeni Feishu dokÃ¼manÄ± oluÅŸtur.
+    """Yeni Feishu dokümanÄ± oluÅŸtur.
 
     Args:
-        baslik:        DÃ¶kÃ¼man baÅŸlÄ±ÄŸÄ±
-        klasor_token:  KlasÃ¶r token'Ä± (boÅŸsa root)
+        baslik:        Döküman baÅŸlÄ±ÄŸÄ±
+        klasor_token:  Klasör token'Ä± (boÅŸsa root)
 
     Returns:
-        DÃ¶kÃ¼man URL veya hata
+        Döküman URL veya hata
     """
     veri: dict = {"title": baslik}
     if klasor_token:
@@ -127,40 +127,40 @@ def dokuman_olustur(baslik: str, klasor_token: str = "") -> str:
 
     yanit = _fs_post("/docx/v1/documents", veri)
     if "error" in yanit:
-        return f"[Feishu DÃ¶kÃ¼man]: {yanit['error']}"
+        return f"[Feishu Döküman]: {yanit['error']}"
 
     doc_id = yanit.get("data", {}).get("document", {}).get("document_id", "")
     url = f"https://docs.larksuite.com/docx/{doc_id}" if doc_id else ""
-    return f"DÃ¶kÃ¼man oluÅŸturuldu: {doc_id}\nURL: {url}"
+    return f"Döküman oluÅŸturuldu: {doc_id}\nURL: {url}"
 
 
 def dokuman_oku(document_id: str) -> str:
-    """Feishu dÃ¶kÃ¼manÄ± iÃ§eriÄŸini oku.
+    """Feishu dökümanÄ± içeriÄŸini oku.
 
     Args:
-        document_id: DÃ¶kÃ¼man ID'si
+        document_id: Döküman ID'si
 
     Returns:
-        DÃ¶kÃ¼man iÃ§eriÄŸi metin olarak
+        Döküman içeriÄŸi metin olarak
     """
     yanit = _fs_get(f"/docx/v1/documents/{document_id}/raw_content")
     if "error" in yanit:
-        return f"[Feishu DÃ¶kÃ¼man]: {yanit['error']}"
+        return f"[Feishu Döküman]: {yanit['error']}"
 
     icerik = yanit.get("data", {}).get("content", "")
-    return icerik or "[BoÅŸ dÃ¶kÃ¼man]"
+    return icerik or "[BoÅŸ döküman]"
 
 
 def dokuman_blok_ekle(document_id: str, metin: str, blok_tipi: str = "text") -> str:
-    """DÃ¶kÃ¼manÄ±n sonuna blok ekle.
+    """DökümanÄ±n sonuna blok ekle.
 
     Args:
-        document_id: DÃ¶kÃ¼man ID'si
+        document_id: Döküman ID'si
         metin:       Eklenecek metin
         blok_tipi:   text | heading1 | heading2 | bullet | ordered
 
     Returns:
-        SonuÃ§ metni
+        Sonuç metni
     """
     tip_map = {
         "text": 2,
@@ -187,14 +187,14 @@ def dokuman_blok_ekle(document_id: str, metin: str, blok_tipi: str = "text") -> 
 
 
 def dokuman_ara(arama_terimi: str, max_sonuc: int = 10) -> str:
-    """Feishu dÃ¶kÃ¼manlarÄ±nda ara.
+    """Feishu dökümanlarÄ±nda ara.
 
     Args:
-        arama_terimi: Aranacak kelime/cÃ¼mle
-        max_sonuc:    KaÃ§ sonuÃ§ dÃ¶neceÄŸi
+        arama_terimi: Aranacak kelime/cümle
+        max_sonuc:    Kaç sonuç döneceÄŸi
 
     Returns:
-        SonuÃ§lar metin olarak
+        Sonuçlar metin olarak
     """
     yanit = _fs_post(
         "/suite/docs-api/search/object",
@@ -209,9 +209,9 @@ def dokuman_ara(arama_terimi: str, max_sonuc: int = 10) -> str:
 
     oge_listesi = yanit.get("data", {}).get("docs_entities", [])
     if not oge_listesi:
-        return f"'{arama_terimi}' iÃ§in sonuÃ§ bulunamadÄ±."
+        return f"'{arama_terimi}' için sonuç bulunamadÄ±."
 
-    satirlar = [f"Feishu Arama: '{arama_terimi}' â€” {len(oge_listesi)} sonuÃ§"]
+    satirlar = [f"Feishu Arama: '{arama_terimi}' â€” {len(oge_listesi)} sonuç"]
     for oge in oge_listesi:
         satirlar.append(
             f"  [{oge.get('docs_type','?')}] {oge.get('title','Ä°simsiz')} "
@@ -221,31 +221,31 @@ def dokuman_ara(arama_terimi: str, max_sonuc: int = 10) -> str:
 
 
 def motor_kaydet(motor):
-    """Feishu dÃ¶kÃ¼man araÃ§larÄ±nÄ± motora kaydet."""
+    """Feishu döküman araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_OLUSTUR",
         lambda baslik, klasor="": dokuman_olustur(baslik, klasor),
-        "Feishu'da yeni dÃ¶kÃ¼man oluÅŸtur",
+        "Feishu'da yeni döküman oluÅŸtur",
     )
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_OKU",
         lambda document_id: dokuman_oku(document_id),
-        "Feishu dÃ¶kÃ¼manÄ±nÄ± oku",
+        "Feishu dökümanÄ±nÄ± oku",
     )
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_BLOK_EKLE",
         lambda document_id, metin, blok_tipi="text": dokuman_blok_ekle(
             document_id, metin, blok_tipi
         ),
-        "Feishu dÃ¶kÃ¼manÄ±na iÃ§erik ekle",
+        "Feishu dökümanÄ±na içerik ekle",
     )
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_ARA",
         lambda arama_terimi, max_sonuc=10: dokuman_ara(arama_terimi, int(max_sonuc)),
-        "Feishu dÃ¶kÃ¼manlarÄ±nda ara",
+        "Feishu dökümanlarÄ±nda ara",
     )
 
 

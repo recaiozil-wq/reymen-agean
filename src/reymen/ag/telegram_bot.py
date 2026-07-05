@@ -172,6 +172,15 @@ def _cmd_run(msg: dict, hedef: str):
 def _cmd_cancel(msg: dict):
     cid = msg["chat"]["id"]
     global _aktif_gorev
+
+    # Hermes-style: once dosya sinyali gonder (conversation_loop yakalar)
+    try:
+        from reymen.cereyan.conversation_loop import iptal_sinyali_gonder
+        iptal_sinyali_gonder(mesaj="telegram_cancel")
+    except Exception:
+        pass
+
+    # Eski mekanizma: thread Event (yedeK)
     if _aktif_gorev:
         _aktif_gorev["iptal"].set()
         gonder(cid, f"Iptal istegi gonderildi: {_aktif_gorev['hedef'][:80]}")

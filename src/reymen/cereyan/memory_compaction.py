@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 memory_compaction.py â€” MEMORY.md / USER.md 50K Compaction System.
 

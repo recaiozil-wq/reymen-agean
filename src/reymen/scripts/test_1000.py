@@ -1,4 +1,4 @@
-﻿"""ReYMeN 1000 soru toplu test â€” otomatik soru uret (background'da calisir)"""
+"""ReYMeN 1000 soru toplu test â€” otomatik soru uret (background'da calisir)"""
 
 import os, sys, json, time, random, itertools, string
 from dotenv import load_dotenv
@@ -41,7 +41,7 @@ veda = [
     "gorusuruz",
     "hadi",
     "hadi bakalim",
-    "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z",
+    "görüÅŸürüz",
     "kapan",
     "cikis",
     "sonlandir",

@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.lazy_deps stub â€” baÄŸÄ±mlÄ±lÄ±klarÄ±n kurulu olduÄŸunu varsayar."""
+"""ReYMeN tools.lazy_deps stub â€” baÄŸÄ±mlÄ±lÄ±klarÄ±n kurulu olduÄŸunu varsayar."""
 
 import logging
 
@@ -13,14 +13,14 @@ def ensure(package_spec: str, reason: str = "", optional: bool = False) -> bool:
     """ReYMeN'de lazy install yok â€” paket zaten kurulu varsayÄ±lÄ±r.
 
     Args:
-        package_spec: pip spec (Ã¶r: "firecrawl-py>=1.0")
-        reason: KullanÄ±cÄ±ya gÃ¶sterilecek aÃ§Ä±klama
-        optional: True ise sessizce geÃ§
+        package_spec: pip spec (ör: "firecrawl-py>=1.0")
+        reason: KullanÄ±cÄ±ya gösterilecek açÄ±klama
+        optional: True ise sessizce geç
 
     Returns:
         bool: Paket import edilebiliyorsa True
     """
-    # Paket adÄ±nÄ± Ã§Ä±kar (versiyon spesifikasyonundan temizle)
+    # Paket adÄ±nÄ± çÄ±kar (versiyon spesifikasyonundan temizle)
     pkg_name = (
         package_spec.split(">=")[0].split("<")[0].split("=")[0].split("[")[0].strip()
     )

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Timezone-aware clock for ReYMeN.
 
 Provides a single ``now()`` helper that returns a timezone-aware datetime

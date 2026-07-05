@@ -1,11 +1,11 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """session_search_tool.py â€” Oturumlar ArasÄ± Arama AracÄ±.
 
 ReYMeN'teki session_search tool'un ReYMeN uyarlamasÄ±.
 FTS5 altyapÄ±sÄ±nÄ± (hafiza_genislet.py) kullanarak
-geÃ§miÅŸ konuÅŸmalarda tam metin arama yapar.
+geçmiÅŸ konuÅŸmalarda tam metin arama yapar.
 
-ToolRegistry'e kayÄ±t iÃ§in:
+ToolRegistry'e kayÄ±t için:
     TOOL_META = {...}
     def run(...)
 """
@@ -21,22 +21,22 @@ logger = logging.getLogger(__name__)
 TOOL_META = {
     "ad": "session_search",
     "versiyon": "1.0.0",
-    "aciklama": "GeÃ§miÅŸ konuÅŸmalarda FTS5 ile tam metin arama yapar.",
+    "aciklama": "GeçmiÅŸ konuÅŸmalarda FTS5 ile tam metin arama yapar.",
     "kategori": "bellek",
     "parametreler": {
         "sorgu": {
             "tip": "str",
-            "aciklama": "FTS5 arama sorgusu (Ã¶rn: 'decorator AND python')",
+            "aciklama": "FTS5 arama sorgusu (örn: 'decorator AND python')",
             "zorunlu": True,
         },
         "limit": {
             "tip": "int",
-            "aciklama": "Maksimum sonuÃ§ sayÄ±sÄ± (varsayÄ±lan: 5)",
+            "aciklama": "Maksimum sonuç sayÄ±sÄ± (varsayÄ±lan: 5)",
             "zorunlu": False,
         },
         "koleksiyon": {
             "tip": "str",
-            "aciklama": "Koleksiyon filtresi (boÅŸ = tÃ¼mÃ¼)",
+            "aciklama": "Koleksiyon filtresi (boÅŸ = tümü)",
             "zorunlu": False,
         },
     },
@@ -45,7 +45,7 @@ TOOL_META = {
 
 
 def _get_hafiza():
-    """GelismisHafiza Ã¶rneÄŸini al."""
+    """GelismisHafiza örneÄŸini al."""
     try:
         from reymen.hafiza.hafiza_genislet import GelismisHafiza
 
@@ -58,22 +58,22 @@ def _get_hafiza():
 
 
 def run(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
-    """GeÃ§miÅŸ konuÅŸmalarda FTS5 ile tam metin arama yap.
+    """GeçmiÅŸ konuÅŸmalarda FTS5 ile tam metin arama yap.
 
     Args:
-        sorgu: FTS5 sorgusu (Ã¶rn: 'decorator AND python')
-        limit: Maks sonuÃ§ sayÄ±sÄ± (varsayÄ±lan: 5)
-        koleksiyon: Koleksiyon filtresi (boÅŸ = tÃ¼mÃ¼)
+        sorgu: FTS5 sorgusu (örn: 'decorator AND python')
+        limit: Maks sonuç sayÄ±sÄ± (varsayÄ±lan: 5)
+        koleksiyon: Koleksiyon filtresi (boÅŸ = tümü)
 
     Returns:
-        str: FormatlanmÄ±ÅŸ arama sonuÃ§larÄ±
+        str: FormatlanmÄ±ÅŸ arama sonuçlarÄ±
     """
     if not sorgu.strip():
-        return "[SESSION_SEARCH] Sorgu boÅŸ, sonuÃ§ yok."
+        return "[SESSION_SEARCH] Sorgu boÅŸ, sonuç yok."
 
     hf = _get_hafiza()
     if not hf:
-        # Alternatif: session.db Ã¼zerinden SQLite arama
+        # Alternatif: session.db üzerinden SQLite arama
         return _fallback_ara(sorgu, limit, koleksiyon)
 
     try:
@@ -86,10 +86,10 @@ def run(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
         return f"[SESSION_SEARCH_HATASI] {e}"
 
     if not sonuclar:
-        return f"[SESSION_SEARCH] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
+        return f"[SESSION_SEARCH] '{sorgu}' için sonuç bulunamadÄ±."
 
     satirlar = []
-    satirlar.append(f"ğŸ” '{sorgu}' iÃ§in {len(sonuclar)} sonuÃ§:")
+    satirlar.append(f"ğŸ” '{sorgu}' için {len(sonuclar)} sonuç:")
     satirlar.append("")
 
     for i, doc in enumerate(sonuclar, 1):
@@ -127,7 +127,7 @@ def _fallback_ara(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
                 # LIKE ile basit arama
                 like_sorgu = f"%{sorgu}%"
                 satirlar = []
-                satirlar.append(f"ğŸ” '{sorgu}' iÃ§in fallback arama ({db_yol.name}):")
+                satirlar.append(f"ğŸ” '{sorgu}' için fallback arama ({db_yol.name}):")
 
                 try:
                     c.execute(
@@ -141,7 +141,7 @@ def _fallback_ara(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
                                 f"  {i}. S:{str(sid)[:20]} â†’ {str(icerik)[:150]}"
                             )
                     else:
-                        satirlar.append("  SonuÃ§ yok.")
+                        satirlar.append("  Sonuç yok.")
                 except Exception:
                     satirlar.append("  Tablo bulunamadÄ±.")
 

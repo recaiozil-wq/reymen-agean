@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """cozum_hafizasi.py â€” Cozulmus sorunlari yapilandirilmis bicimde tutar.
 
 Her kayit: sorun, kok neden, cozum, basari/fail sayisi, guven skoru.

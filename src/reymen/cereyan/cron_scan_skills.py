@@ -1,8 +1,8 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 cron_scan_skills.py â€” ReYMeN OnceHafiza skills tarama cron job.
-Her 6 saatte bir Ã§alÄ±ÅŸÄ±r.
+Her 6 saatte bir çalÄ±ÅŸÄ±r.
 
 KullanÄ±m:
     python reymen/cereyan/cron_scan_skills.py
@@ -43,7 +43,7 @@ def dosya_hash(dosya_yolu: str) -> str:
 
 
 def kategori_ve_ad(dosya_yolu: str) -> tuple[str, str]:
-    """GÃ¶reli yoldan kategori ve dosya adÄ±."""
+    """Göreli yoldan kategori ve dosya adÄ±."""
     rel = os.path.relpath(dosya_yolu, str(SKILLS_DIR)).replace("\\", "/")
     parts = rel.split("/")
     return ("", parts[0]) if len(parts) == 1 else ("/".join(parts[:-1]), parts[-1])
@@ -61,7 +61,7 @@ def beceriden_baslik(icerik: str) -> str:
 def skills_db_guncelle(
     meta_adi: str, dosya_yolu: str, icerik: str, new_hash: str
 ) -> None:
-    """skills_index.db'de FTS5 + meta gÃ¼ncelle."""
+    """skills_index.db'de FTS5 + meta güncelle."""
     baslik = beceriden_baslik(icerik)
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     con = sqlite3.connect(str(SKILLS_DB))
@@ -76,7 +76,7 @@ def skills_db_guncelle(
         )
         con.commit()
     except Exception as e:
-        logger.warning("skills_db gÃ¼ncelleme hatasÄ± (%s): %s", meta_adi, e)
+        logger.warning("skills_db güncelleme hatasÄ± (%s): %s", meta_adi, e)
     finally:
         con.close()
 
@@ -103,7 +103,7 @@ def skills_db_ekle(meta_adi: str, dosya_yolu: str, icerik: str, new_hash: str) -
 
 
 def ogrenme_db_guncelle(meta_adi: str, icerik: str) -> None:
-    """OnceHafiza ogrenme.db'yi gÃ¼ncelle."""
+    """OnceHafiza ogrenme.db'yi güncelle."""
     hedef = meta_adi.replace(".md", "").replace("/", "_")
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     con = sqlite3.connect(str(OGRENME_DB))
@@ -134,7 +134,7 @@ def ogrenme_db_guncelle(meta_adi: str, icerik: str) -> None:
 def main() -> None:
     logger.info("=" * 60)
     logger.info("ğŸ” CRON: Skills â†’ OnceHafiza taramasÄ± baÅŸlÄ±yor")
-    logger.info("   KlasÃ¶r:   %s", SKILLS_DIR)
+    logger.info("   Klasör:   %s", SKILLS_DIR)
     logger.info("   Skills DB: %s", SKILLS_DB)
     logger.info("   Ã–ÄŸrenme DB: %s", OGRENME_DB)
 
@@ -142,13 +142,13 @@ def main() -> None:
     md_dosyalari = sorted(SKILLS_DIR.rglob("*.md"))
     logger.info("ğŸ“„ %d .md dosyasÄ± bulundu.", len(md_dosyalari))
 
-    # 2) Mevcut meta tablosunu yÃ¼kle
+    # 2) Mevcut meta tablosunu yükle
     con = sqlite3.connect(str(SKILLS_DB))
     meta_map = dict(con.execute("SELECT ad, dosya_hash FROM beceriler_meta").fetchall())
     con.close()
     logger.info("ğŸ“š DB'de %d kayÄ±tlÄ± dosya.", len(meta_map))
 
-    # 3) Tarama + gÃ¼ncelleme
+    # 3) Tarama + güncelleme
     yeni_say = 0
     guncel_say = 0
     atlanan_say = 0
@@ -197,7 +197,7 @@ def main() -> None:
     logger.info("=" * 60)
     logger.info("âœ… CRON taramasÄ± tamamlandÄ±!")
     logger.info("   ğŸ†• Yeni eklenen:   %d", yeni_say)
-    logger.info("   ğŸ”„ GÃ¼ncellenen:    %d", guncel_say)
+    logger.info("   ğŸ”„ Güncellenen:    %d", guncel_say)
     logger.info("   â­  Atlanan:        %d", atlanan_say)
     logger.info("   ğŸ“Š Toplam:         %d", len(md_dosyalari))
     logger.info("=" * 60)

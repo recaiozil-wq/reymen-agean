@@ -1,18 +1,18 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
-araclar_ses.py â€” Sesli komut giriÅŸi + STT/TTS araÃ§larÄ±.
+araclar_ses.py â€” Sesli komut giriÅŸi + STT/TTS araçlarÄ±.
 
-  SES_DINLE   â€” Mikrofonu dinler, konuÅŸmayÄ± metne Ã§evirir (mevcut, korunur).
-  SES_TANIMA  â€” Bir ses dosyasÄ±nÄ± (wav/mp3/...) metne Ã§evirir (Whisper).
-  SESLENDIR   â€” Metni sese Ã§evirir, dosya yolu MEDIA formatÄ±nda dÃ¶ner.
-  OPENAI_TTS  â€” OpenAI TTS API ile metni sese Ã§evirir (yeni).
-  OPENAI_STT  â€” OpenAI Whisper API ile sesi metne Ã§evirir (yeni).
+  SES_DINLE   â€” Mikrofonu dinler, konuÅŸmayÄ± metne çevirir (mevcut, korunur).
+  SES_TANIMA  â€” Bir ses dosyasÄ±nÄ± (wav/mp3/...) metne çevirir (Whisper).
+  SESLENDIR   â€” Metni sese çevirir, dosya yolu MEDIA formatÄ±nda döner.
+  OPENAI_TTS  â€” OpenAI TTS API ile metni sese çevirir (yeni).
+  OPENAI_STT  â€” OpenAI Whisper API ile sesi metne çevirir (yeni).
 
-BaÄŸÄ±mlÄ±lÄ±klar (hepsi opsiyonel, eksikse araÃ§ sessizce/aÃ§Ä±klayarak degrade eder):
+BaÄŸÄ±mlÄ±lÄ±klar (hepsi opsiyonel, eksikse araç sessizce/açÄ±klayarak degrade eder):
     pip install SpeechRecognition pyaudio   # SES_DINLE (mikrofon)
-    pip install faster-whisper              # SES_TANIMA (Ã¶ncelikli, hÄ±zlÄ±)
+    pip install faster-whisper              # SES_TANIMA (öncelikli, hÄ±zlÄ±)
     pip install openai-whisper              # SES_TANIMA (fallback)
-    pip install edge-tts                    # SESLENDIR (Ã¶ncelikli, online, kaliteli)
+    pip install edge-tts                    # SESLENDIR (öncelikli, online, kaliteli)
     pip install pyttsx3                     # SESLENDIR (fallback, offline)
 
 OpenAI API (yeni):
@@ -20,13 +20,13 @@ OpenAI API (yeni):
     POST https://api.openai.com/v1/audio/speech      â†’ TTS
     POST https://api.openai.com/v1/audio/transcriptions â†’ STT
 
-MEDIA format sÃ¶zleÅŸmesi (kÃ¶prÃ¼/telegram_bot tarafÄ±ndan ayrÄ±ÅŸtÄ±rÄ±lmasÄ± beklenir):
+MEDIA format sözleÅŸmesi (köprü/telegram_bot tarafÄ±ndan ayrÄ±ÅŸtÄ±rÄ±lmasÄ± beklenir):
 
     [MEDIA type="audio" src="<dosya-yolu>"]
-    <aÃ§Ä±klama>
+    <açÄ±klama>
     [/MEDIA]
 
-Projenizdeki kÃ¶prÃ¼ farklÄ± bir biÃ§im bekliyorsa _media() fonksiyonunu gÃ¼ncelleyin.
+Projenizdeki köprü farklÄ± bir biçim bekliyorsa _media() fonksiyonunu güncelleyin.
 """
 
 import asyncio
@@ -60,7 +60,7 @@ class SesliKomut:
         self._recognizer = sr.Recognizer() if SR_OK else None
 
     def dinle(self, zaman_asimi=5):
-        """Mikrofondan tek bir komut dinler, metne Ã§evirir."""
+        """Mikrofondan tek bir komut dinler, metne çevirir."""
         if not SR_OK:
             return "[Ses]: SpeechRecognition kurulu deÄŸil (pip install SpeechRecognition pyaudio)."
         try:
@@ -78,9 +78,9 @@ class SesliKomut:
             return f"[Ses HatasÄ±]: {e}"
 
     def seslendir(self, metin):
-        """Metni doÄŸrudan hoparlÃ¶rden seslendirir (pyttsx3, dosya Ã¼retmez).
+        """Metni doÄŸrudan hoparlörden seslendirir (pyttsx3, dosya üretmez).
 
-        Not: Dosya Ã¼retip MEDIA olarak gÃ¶ndermek iÃ§in modÃ¼l seviyesindeki
+        Not: Dosya üretip MEDIA olarak göndermek için modül seviyesindeki
         seslendir() fonksiyonunu (SESLENDIR aracÄ±) kullanÄ±n.
         """
         try:
@@ -96,7 +96,7 @@ class SesliKomut:
             return f"[Ses Hatasi]: {e}"
 
     def komut_bekle(self, tetikleyici="yeni proje"):
-        """Belirli bir tetikleyici cÃ¼mle duyana kadar dinler (basit eÅŸleÅŸme)."""
+        """Belirli bir tetikleyici cümle duyana kadar dinler (basit eÅŸleÅŸme)."""
         metin = self.dinle()
         if isinstance(metin, str) and tetikleyici.lower() in metin.lower():
             return {"tetiklendi": True, "metin": metin}
@@ -133,7 +133,7 @@ def _openai_whisper_model(model_adi: str = "base"):
 
 
 def ses_tanima(dosya_yolu: str, dil: str = "tr") -> str:
-    """Ses dosyasÄ±nÄ± (wav/mp3/m4a/...) metne Ã§evirir. faster-whisper > openai-whisper."""
+    """Ses dosyasÄ±nÄ± (wav/mp3/m4a/...) metne çevirir. faster-whisper > openai-whisper."""
     if not dosya_yolu or not dosya_yolu.strip():
         return "[SES_TANIMA] Hata: 'dosya_yolu' boÅŸ olamaz."
     if not os.path.exists(dosya_yolu):
@@ -172,7 +172,7 @@ def ses_tanima(dosya_yolu: str, dil: str = "tr") -> str:
 
 
 def seslendir(metin: str, ses: str = "tr-TR-AhmetNeural", dosya_yolu: str = "") -> str:
-    """Metni sese Ã§evirir; dosya yolunu MEDIA formatÄ±nda dÃ¶ner. edge-tts > pyttsx3."""
+    """Metni sese çevirir; dosya yolunu MEDIA formatÄ±nda döner. edge-tts > pyttsx3."""
     if not metin or not metin.strip():
         return "[SESLENDIR] Hata: 'metin' boÅŸ olamaz."
 
@@ -193,7 +193,7 @@ def seslendir(metin: str, ses: str = "tr-TR-AhmetNeural", dosya_yolu: str = "") 
     except ImportError:
         logger.warning("[fix_01_sessiz_except] ImportError")
     except Exception as e:
-        logger.warning("[SESLENDIR] edge-tts hatasÄ±, pyttsx3'e dÃ¼ÅŸÃ¼lÃ¼yor: %s", e)
+        logger.warning("[SESLENDIR] edge-tts hatasÄ±, pyttsx3'e düÅŸülüyor: %s", e)
 
     try:
         import pyttsx3
@@ -222,12 +222,12 @@ def openai_tts(
     dosya_yolu: str = "",
     format: str = "mp3",
 ) -> str:
-    """OpenAI TTS API ile metni sese Ã§evirir.
+    """OpenAI TTS API ile metni sese çevirir.
 
-    https://api.openai.com/v1/audio/speech endpoint'ini Ã§aÄŸÄ±rÄ±r.
+    https://api.openai.com/v1/audio/speech endpoint'ini çaÄŸÄ±rÄ±r.
 
     Args:
-        metin: Sese Ã§evrilecek metin
+        metin: Sese çevrilecek metin
         ses: OpenAI sesi ('alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer')
         model: TTS modeli ('tts-1' hÄ±zlÄ±, 'tts-1-hd' kaliteli)
         dosya_yolu: Ã‡Ä±ktÄ± dosyasÄ± yolu (boÅŸsa temp dosya)
@@ -296,9 +296,9 @@ def openai_tts(
 
 
 def openai_stt(dosya_yolu: str, model: str = "whisper-1", dil: str = "tr") -> str:
-    """OpenAI Whisper API ile ses dosyasÄ±nÄ± metne Ã§evirir.
+    """OpenAI Whisper API ile ses dosyasÄ±nÄ± metne çevirir.
 
-    https://api.openai.com/v1/audio/transcriptions endpoint'ini Ã§aÄŸÄ±rÄ±r.
+    https://api.openai.com/v1/audio/transcriptions endpoint'ini çaÄŸÄ±rÄ±r.
 
     Args:
         dosya_yolu: Ses dosyasÄ± yolu (wav/mp3/m4a/...)
@@ -379,7 +379,7 @@ def openai_stt(dosya_yolu: str, model: str = "whisper-1", dil: str = "tr") -> st
 
 
 def motor_kaydet(motor):
-    """Ses araÃ§larÄ±nÄ± motora kaydet."""
+    """Ses araçlarÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     _sk = SesliKomut()
@@ -387,30 +387,30 @@ def motor_kaydet(motor):
         motor._plugin_arac_kaydet(
             "SES_DINLE",
             lambda: _sk.dinle(),
-            "Mikrofondan sesli komut dinle ve metne Ã§evir",
+            "Mikrofondan sesli komut dinle ve metne çevir",
         )
         motor._plugin_arac_kaydet(
             "SES_TANIMA",
             ses_tanima,
-            "Bir ses dosyasÄ±nÄ± metne Ã§evirir (Whisper). Parametreler: dosya_yolu, dil.",
+            "Bir ses dosyasÄ±nÄ± metne çevirir (Whisper). Parametreler: dosya_yolu, dil.",
         )
         motor._plugin_arac_kaydet(
             "SESLENDIR",
             seslendir,
-            "Metni sese Ã§evirir, dosya yolunu MEDIA olarak dÃ¶ner (edge-tts/pyttsx3). "
+            "Metni sese çevirir, dosya yolunu MEDIA olarak döner (edge-tts/pyttsx3). "
             "Parametreler: metin, ses, dosya_yolu.",
         )
         motor._plugin_arac_kaydet(
             "OPENAI_TTS",
             openai_tts,
-            "OpenAI TTS API ile metni sese Ã§evirir (yÃ¼ksek kalite). "
+            "OpenAI TTS API ile metni sese çevirir (yüksek kalite). "
             "Parametreler: metin, ses (alloy/echo/fable/onyx/nova/shimmer), "
             "model (tts-1/tts-1-hd), dosya_yolu, format.",
         )
         motor._plugin_arac_kaydet(
             "OPENAI_STT",
             openai_stt,
-            "OpenAI Whisper API ile ses dosyasÄ±nÄ± metne Ã§evirir. "
+            "OpenAI Whisper API ile ses dosyasÄ±nÄ± metne çevirir. "
             "Parametreler: dosya_yolu, model (whisper-1), dil.",
         )
     except Exception as e:

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """ReYMeN Desktop CLI â€” baslat/durdur/durum/tray."""
 
 from __future__ import annotations

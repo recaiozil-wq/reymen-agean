@@ -1,10 +1,10 @@
-﻿"""cli_commands â€” MixinCommands modÃ¼ler yapÄ±sÄ±.
+"""cli_commands â€” MixinCommands modüler yapÄ±sÄ±.
 
-Bu paket, cli_mixin_commands.py'nin modÃ¼ler versiyonudur.
-TÃ¼m alt modÃ¼llerden MixinCommands sÄ±nÄ±fÄ±nÄ± birleÅŸtirir.
+Bu paket, cli_mixin_commands.py'nin modüler versiyonudur.
+Tüm alt modüllerden MixinCommands sÄ±nÄ±fÄ±nÄ± birleÅŸtirir.
 """
 
-# TÃ¼m alt modÃ¼lleri import et (metotlar MixinCommands'a eklenir)
+# Tüm alt modülleri import et (metotlar MixinCommands'a eklenir)
 from .base import MixinCommands as _BaseMixin
 from .edit_commands import MixinCommands as _EditMixin
 from .tool_commands import MixinCommands as _ToolMixin
@@ -29,7 +29,7 @@ class MixinCommands(
     _ConfigMixin,
     _SystemMixin,
 ):
-    """BirleÅŸtirilmiÅŸ MixinCommands â€” tÃ¼m komut metotlarÄ±nÄ± iÃ§erir."""
+    """BirleÅŸtirilmiÅŸ MixinCommands â€” tüm komut metotlarÄ±nÄ± içerir."""
 
     pass
 

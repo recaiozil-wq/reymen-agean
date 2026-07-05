@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 network_restriction.py â€” ReYMeN Ag Kisitlama Modulu.
 
@@ -108,7 +108,7 @@ def _ip_izinli_mi(ip_adresi: str, izinli_liste: list) -> bool:
 def _hosts_etkilesim(eklenecek: list, kaldirilacak: list) -> dict:
     """Hosts dosyasina domain/IP yonlendirmesi ekle/kaldir.
 
-    TÃ¼m gidis trafigini engellemek icin bilinen domain'leri
+    Tüm gidis trafigini engellemek icin bilinen domain'leri
     127.0.0.1'e yonlendirir.
 
     Args:

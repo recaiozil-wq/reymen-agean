@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module â€” Skills, Tools, Bundles, Cron, Curator, Background."""
+"""ReYMeNCLI mixin module â€” Skills, Tools, Bundles, Cron, Curator, Background."""
 
 import logging
 import os

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 beceri_kutuphanesi.py â€” FAZ 6: JSON sematik beceri kutuphanesi.
 
@@ -143,7 +143,7 @@ class BeceriKutuphanesi:
     def benzer_bul(self, sorgu: str, esik_skor: float = 0.15) -> Optional[dict]:
         """Sorguyla en cok eslesen beceliyi dondur.
 
-        Kelime otusmasi skoru kullanir (basit, kÃ¼tÃ¼phane gerektirmez).
+        Kelime otusmasi skoru kullanir (basit, kütüphane gerektirmez).
         esik_skor altindaysa None doner.
         """
         if not self._beceriler:

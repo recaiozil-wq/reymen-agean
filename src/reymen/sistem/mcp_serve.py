@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 mcp_serve.py â€” ReYMeN MCP (Model Context Protocol) Sunucusu.
 
@@ -45,7 +45,7 @@ _durum = {"calisiyor": False, "son_sonuc": "", "son_hedef": ""}
 _durum_kilit = threading.Lock()
 
 
-# â”€â”€ AraÃ§ Tanimlamalari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Araç Tanimlamalari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 TOOLS = [
     {
@@ -124,7 +124,7 @@ TOOLS = [
 ]
 
 
-# â”€â”€ AraÃ§ Uygulayicilari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Araç Uygulayicilari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _arac_calistir(name: str, args: dict) -> str:
@@ -217,14 +217,14 @@ def _dosya_yaz(dosya: str, icerik: str) -> str:
 
 
 def _shell_calistir(komut: str) -> str:
-    """MCP uzerinden calistirilan shell komutu. shlex.split ile gÃ¼venli."""
+    """MCP uzerinden calistirilan shell komutu. shlex.split ile güvenli."""
     import subprocess
     import shlex
 
     try:
         args_list = shlex.split(komut, posix=(sys.platform != "win32"))
         if not args_list:
-            return "GeÃ§ersiz komut"
+            return "Geçersiz komut"
         r = subprocess.run(  # nosec B603
             args_list,
             shell=False,

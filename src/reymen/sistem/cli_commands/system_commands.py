@@ -1,7 +1,7 @@
-﻿"""Sistem komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
+"""Sistem komutlarÄ± â€” MixinCommands alt modülü.
 
 Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
-MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± içerir.
 """
 
 import logging

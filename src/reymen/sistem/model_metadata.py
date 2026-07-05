@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """model_metadata.py â€” Model Bilgileri ve Yetenekler.
 
 Her modelin context penceresi, yetenekleri, fiyati ve

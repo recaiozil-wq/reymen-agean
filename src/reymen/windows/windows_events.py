@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 windows_events.py â€” Windows Otomasyon Event Sistemi
 
-ModÃ¼ller arasÄ± haberleÅŸme iÃ§in merkezi event bus.
-Her modÃ¼l olay bildirir, diÄŸer modÃ¼ller dinler.
+Modüller arasÄ± haberleÅŸme için merkezi event bus.
+Her modül olay bildirir, diÄŸer modüller dinler.
 """
 
 from __future__ import annotations

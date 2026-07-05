@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.environments.docker shim â€” ReYMeN Docker ortamÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.environments.docker shim â€” ReYMeN Docker ortamÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

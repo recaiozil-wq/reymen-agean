@@ -1,9 +1,9 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FIX 02 â€” __all__ Ekleyici (121 __init__.py)
 Yapar : BoÅŸ veya __all__ eksik __init__.py'lere otomatik __all__ ekler
 Test  : Her dosyayÄ± AST parse + __all__ varlÄ±ÄŸÄ± ile doÄŸrular
-Rapor : fix_02_rapor.json + konsol Ã¶zeti
+Rapor : fix_02_rapor.json + konsol özeti
 KullanÄ±m: python fix_02_all_ekle.py [proje_koku]
 """
 
@@ -102,7 +102,7 @@ def dosya_test_et(yol: Path) -> tuple[bool, str]:
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 02 â€” __all__ Ekleyici\nKÃ¶k: {kok}")
+    hdr(f"FIX 02 â€” __all__ Ekleyici\nKök: {kok}")
     t0 = time.time()
     rapor = {
         "tarih": datetime.now().isoformat(),
@@ -179,10 +179,10 @@ def main():
     hdr("RAPOR")
     print(f"  Eklenen __all__   : {C.GRN}{len(rapor['islenen'])}{C.RESET}")
     print(f"  Zaten vardÄ±       : {C.GRN}{len(rapor['zaten_var'])}{C.RESET}")
-    print(f"  Test geÃ§en        : {C.GRN}{len(rapor['test_gecen'])}{C.RESET}")
+    print(f"  Test geçen        : {C.GRN}{len(rapor['test_gecen'])}{C.RESET}")
     print(f"  Test hata         : {C.RED}{len(rapor['test_hata'])}{C.RESET}")
     print(f"  Atlanan           : {C.YEL}{len(rapor['atlanan'])}{C.RESET}")
-    print(f"  SÃ¼re              : {rapor['sure']}s")
+    print(f"  Süre              : {rapor['sure']}s")
     rapor_yolu = kok / "fix_02_rapor.json"
     with open(rapor_yolu, "w", encoding="utf-8") as fp:
         json.dump(rapor, fp, ensure_ascii=False, indent=2)

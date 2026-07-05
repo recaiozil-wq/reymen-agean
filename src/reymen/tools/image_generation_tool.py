@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Apache 2.0 â€” ReYMeN Image Gen shim. Bagimsiz: stdlib + reymen.arac.image_gen_engine.
 """
 image_generation_tool.py â€” ReYMeN Image Gen shim.

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 delegate_task_tool.py â€” ThreadPoolExecutor-based parallel sub-agent delegation.
 
@@ -8,14 +8,14 @@ Beyin instance, collects results and summarizes.
 
 Usage:
     DELEGATE_TASK(
-        "gÃ¶rev_tanÄ±mlarÄ±_json",
+        "görev_tanÄ±mlarÄ±_json",
         "baÄŸlam",
         max_paralel=3,
         timeout=60
     )
 
-    gÃ¶rev_tanÄ±mlarÄ±_json = [
-        {"gorev": "Dosya oku ve Ã¶zetle", "baglam": "dosya: test.py"},
+    görev_tanÄ±mlarÄ±_json = [
+        {"gorev": "Dosya oku ve özetle", "baglam": "dosya: test.py"},
         {"gorev": "Web'de ara", "baglam": "konu: yapay zeka"},
     ]
 
@@ -44,7 +44,7 @@ _MAX_PARALEL = int(os.environ.get("DELEGATE_MAX_PARALEL", "5"))
 _TIMEOUT = int(os.environ.get("DELEGATE_TIMEOUT", "120"))
 _MAX_ADIM = int(os.environ.get("DELEGATE_MAX_ADIM", "10"))
 
-# Proje kÃ¶kÃ¼ â†’ config.yaml yÃ¼kleme
+# Proje kökü â†’ config.yaml yükleme
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 _CONFIG_YOLU = _PROJE_KOK / "config.yaml"
 
@@ -83,7 +83,7 @@ class AltGorevSonuc:
 
 @dataclass
 class DelegasyonSonuc:
-    """TÃ¼m delegasyonun toplu sonucu."""
+    """Tüm delegasyonun toplu sonucu."""
 
     parent_task_id: str
     toplam_gorev: int
@@ -103,14 +103,14 @@ def _alt_gorev_calistir(
     provider: Optional[str] = None,
     model: Optional[str] = None,
 ) -> AltGorevSonuc:
-    """Tek bir alt gÃ¶revi Ã§alÄ±ÅŸtÄ±r (ThreadPoolExecutor worker'Ä±).
+    """Tek bir alt görevi çalÄ±ÅŸtÄ±r (ThreadPoolExecutor worker'Ä±).
 
-    Her alt gÃ¶rev:
+    Her alt görev:
     - Kendi Beyin instance'Ä±nÄ± alÄ±r (ana ajandan baÄŸÄ±msÄ±z)
-    - Kendi ReAct dÃ¶ngÃ¼sÃ¼nÃ¼ Ã§alÄ±ÅŸtÄ±rÄ±r
-    - Sonucu dÃ¶ndÃ¼rÃ¼r
+    - Kendi ReAct döngüsünü çalÄ±ÅŸtÄ±rÄ±r
+    - Sonucu döndürür
 
-    Zaman aÅŸÄ±mÄ± ve hata durumlarÄ±nÄ± yÃ¶netir.
+    Zaman aÅŸÄ±mÄ± ve hata durumlarÄ±nÄ± yönetir.
     """
     baslangic = time.time()
     sonuc = AltGorevSonuc(
@@ -120,28 +120,28 @@ def _alt_gorev_calistir(
     )
 
     try:
-        # Lazy import â€” sadece gerektiÄŸinde yÃ¼klenir
+        # Lazy import â€” sadece gerektiÄŸinde yüklenir
         from reymen.cereyan.beyin import Beyin
 
-        # Alt ajan iÃ§in ayrÄ± Beyin (proje config'inden)
+        # Alt ajan için ayrÄ± Beyin (proje config'inden)
         beyin = Beyin(config=_DELEGATE_CONFIG)
 
-        # Sistem promptu: alt ajan iÃ§in kÄ±sa ReAct talimatÄ±
+        # Sistem promptu: alt ajan için kÄ±sa ReAct talimatÄ±
         sistem_prompt = (
             f"Sen {task_id} ID'li bir ALT AJANSIN. "
-            f"GÃ¶revi tamamlamak iÃ§in kÄ±sa ve Ã¶z cevap ver.\n\n"
+            f"Görevi tamamlamak için kÄ±sa ve öz cevap ver.\n\n"
             f"GÃ–REV: {gorev}\n"
             f"BAÄLAM: {baglam or '(verilmedi)'}\n\n"
             f"KURALLAR:\n"
-            f"- DoÄŸrudan cevap yaz, araÃ§ kullanmana gerek yok.\n"
-            f"- TÃ¼rkÃ§e cevap ver.\n"
+            f"- DoÄŸrudan cevap yaz, araç kullanmana gerek yok.\n"
+            f"- Türkçe cevap ver.\n"
             f"- En fazla {max_adim} adÄ±mÄ±n var.\n"
             f"- GOREV_BITTI ile bitir.\n"
         )
 
         mesajlar = [
             {"role": "system", "content": sistem_prompt},
-            {"role": "user", "content": f"GÃ¶rev: {gorev}\nBaÄŸlam: {baglam}"},
+            {"role": "user", "content": f"Görev: {gorev}\nBaÄŸlam: {baglam}"},
         ]
 
         adim = 0
@@ -152,7 +152,7 @@ def _alt_gorev_calistir(
                 sonuc.sonuc = f"(zaman_aÅŸÄ±mÄ±={timeout}s)"
                 break
 
-            # LLM Ã§aÄŸrÄ±sÄ±
+            # LLM çaÄŸrÄ±sÄ±
             yanit = beyin.uret(sistem_prompt[:500], mesajlar)
             if not yanit:
                 sonuc.sonuc = "(boÅŸ_yanÄ±t)"
@@ -160,7 +160,7 @@ def _alt_gorev_calistir(
 
             mesajlar.append({"role": "assistant", "content": yanit})
 
-            # GOREV_BITTI kontrolÃ¼
+            # GOREV_BITTI kontrolü
             if "GOREV_BITTI" in yanit:
                 import re
 
@@ -168,12 +168,12 @@ def _alt_gorev_calistir(
                 sonuc.sonuc = m.group(1) if m else yanit
                 break
 
-            # BITTI: kontrolÃ¼
+            # BITTI: kontrolü
             if yanit.strip().startswith("BITTI:"):
                 sonuc.sonuc = yanit.split("BITTI:", 1)[1].strip()
                 break
 
-            # Son adÄ±mda yanÄ±tÄ± sonuÃ§ olarak al
+            # Son adÄ±mda yanÄ±tÄ± sonuç olarak al
             if adim >= max_adim:
                 sonuc.sonuc = yanit[:1000]
 
@@ -190,7 +190,7 @@ def _alt_gorev_calistir(
 
     except Exception as e:
         sonuc.hata = f"{type(e).__name__}: {e}"
-        logger.warning("[delegate_task] Alt gÃ¶rev hatasÄ± (%s): %s", task_id, e)
+        logger.warning("[delegate_task] Alt görev hatasÄ± (%s): %s", task_id, e)
 
     finally:
         sonuc.sure_sn = round(time.time() - baslangic, 2)
@@ -207,19 +207,19 @@ def _delegate_task_impl(
     provider: Optional[str] = None,
     model: Optional[str] = None,
 ) -> DelegasyonSonuc:
-    """ThreadPoolExecutor ile alt gÃ¶revleri paralel Ã§alÄ±ÅŸtÄ±r.
+    """ThreadPoolExecutor ile alt görevleri paralel çalÄ±ÅŸtÄ±r.
 
     Args:
         gorev_listesi: Her biri {"gorev": str, "baglam": str} olan dict listesi.
-        baglam_genel: TÃ¼m alt gÃ¶revlere eklenecek genel baÄŸlam.
-        max_paralel: AynÄ± anda Ã§alÄ±ÅŸacak maksimum alt ajan sayÄ±sÄ±.
-        timeout: Her alt gÃ¶rev iÃ§in maksimum sÃ¼re (saniye).
-        max_adim: Her alt gÃ¶rev iÃ§in maksimum adÄ±m sayÄ±sÄ±.
-        provider: Alt ajanlar iÃ§in provider (opsiyonel).
-        model: Alt ajanlar iÃ§in model (opsiyonel).
+        baglam_genel: Tüm alt görevlere eklenecek genel baÄŸlam.
+        max_paralel: AynÄ± anda çalÄ±ÅŸacak maksimum alt ajan sayÄ±sÄ±.
+        timeout: Her alt görev için maksimum süre (saniye).
+        max_adim: Her alt görev için maksimum adÄ±m sayÄ±sÄ±.
+        provider: Alt ajanlar için provider (opsiyonel).
+        model: Alt ajanlar için model (opsiyonel).
 
     Returns:
-        DelegasyonSonuc â€” tÃ¼m sonuÃ§larÄ± ve Ã¶zeti iÃ§erir.
+        DelegasyonSonuc â€” tüm sonuçlarÄ± ve özeti içerir.
     """
     parent_id = str(uuid.uuid4())[:8]
     baslangic = time.time()
@@ -230,7 +230,7 @@ def _delegate_task_impl(
             toplam_gorev=0,
             basarili=0,
             basarisiz=0,
-            ozet="HiÃ§ gÃ¶rev tanÄ±mlanmamÄ±ÅŸ.",
+            ozet="Hiç görev tanÄ±mlanmamÄ±ÅŸ.",
         )
 
     sonuc = DelegasyonSonuc(
@@ -240,7 +240,7 @@ def _delegate_task_impl(
         basarisiz=0,
     )
 
-    # ThreadPoolExecutor ile paralel Ã§alÄ±ÅŸtÄ±r
+    # ThreadPoolExecutor ile paralel çalÄ±ÅŸtÄ±r
     with ThreadPoolExecutor(max_workers=max_paralel) as executor:
         future_map = {}
         for i, g in enumerate(gorev_listesi):
@@ -267,7 +267,7 @@ def _delegate_task_impl(
             )
             future_map[future] = task_id
 
-        # SonuÃ§larÄ± topla
+        # SonuçlarÄ± topla
         for future in as_completed(future_map, timeout=timeout + 10):
             task_id = future_map[future]
             try:
@@ -296,22 +296,22 @@ def _delegate_task_impl(
 
 
 def _ozet_olustur(ds: DelegasyonSonuc) -> str:
-    """Delegasyon sonucundan okunabilir bir Ã¶zet oluÅŸtur."""
+    """Delegasyon sonucundan okunabilir bir özet oluÅŸtur."""
     basarili_yuzde = round(
         (ds.basarili / ds.toplam_gorev * 100) if ds.toplam_gorev > 0 else 0
     )
 
     satirlar = [
         f"ğŸ“‹ DELEGASYON Ã–ZETÄ° (ID: {ds.parent_task_id})",
-        f"  â±  SÃ¼re: {ds.toplam_sure_sn:.1f}s",
-        f"  ğŸ“Š Toplam: {ds.toplam_gorev} gÃ¶rev",
+        f"  â±  Süre: {ds.toplam_sure_sn:.1f}s",
+        f"  ğŸ“Š Toplam: {ds.toplam_gorev} görev",
         f"  âœ… BaÅŸarÄ±lÄ±: {ds.basarili} ({basarili_yuzde}%)",
         f"  âŒ BaÅŸarÄ±sÄ±z: {ds.basarisiz}",
         "",
     ]
 
     if ds.sonuclar:
-        satirlar.append("GÃ¶rev SonuÃ§larÄ±:")
+        satirlar.append("Görev SonuçlarÄ±:")
         for s in ds.sonuclar:
             ikon = "âœ…" if s.basarili else "âŒ"
             sonuc_ozet = (s.sonuc or s.hata or "-")[:150]
@@ -322,7 +322,7 @@ def _ozet_olustur(ds: DelegasyonSonuc) -> str:
     return "\n".join(satirlar)
 
 
-# â”€â”€ Ana fonksiyon: LLM'den Ã§aÄŸrÄ±lÄ±r â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Ana fonksiyon: LLM'den çaÄŸrÄ±lÄ±r â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def delegate_task(
@@ -332,23 +332,23 @@ def delegate_task(
     timeout: int = _TIMEOUT,
     max_adim: int = _MAX_ADIM,
 ) -> str:
-    """Alt ajanlarÄ± ThreadPoolExecutor ile paralel Ã§alÄ±ÅŸtÄ±rÄ±r.
+    """Alt ajanlarÄ± ThreadPoolExecutor ile paralel çalÄ±ÅŸtÄ±rÄ±r.
 
     Her alt ajan kendi Beyin instance'Ä±nÄ± kullanÄ±r, ayrÄ± bir conversation
-    baÄŸlamÄ±nda Ã§alÄ±ÅŸÄ±r. TÃ¼m sonuÃ§lar toplanÄ±r ve Ã¶zetlenir.
+    baÄŸlamÄ±nda çalÄ±ÅŸÄ±r. Tüm sonuçlar toplanÄ±r ve özetlenir.
 
     Args:
         gorev_tanimlari: JSON string. Her biri {"gorev": "...", "baglam": "..."}
                          olan bir dizi. Ã–rnek:
                          [{"gorev": "Dosya oku", "baglam": "test.py"},
                           {"gorev": "Web ara", "baglam": "yapay zeka"}]
-        baglam_genel: TÃ¼m alt gÃ¶revlere eklenecek genel baÄŸlam (opsiyonel).
-        max_paralel: AynÄ± anda Ã§alÄ±ÅŸacak maksimum alt ajan sayÄ±sÄ± (varsayÄ±lan: 5).
-        timeout: Her alt gÃ¶rev iÃ§in maksimum sÃ¼re, saniye (varsayÄ±lan: 120).
-        max_adim: Her alt gÃ¶rev iÃ§in maksimum adÄ±m sayÄ±sÄ± (varsayÄ±lan: 10).
+        baglam_genel: Tüm alt görevlere eklenecek genel baÄŸlam (opsiyonel).
+        max_paralel: AynÄ± anda çalÄ±ÅŸacak maksimum alt ajan sayÄ±sÄ± (varsayÄ±lan: 5).
+        timeout: Her alt görev için maksimum süre, saniye (varsayÄ±lan: 120).
+        max_adim: Her alt görev için maksimum adÄ±m sayÄ±sÄ± (varsayÄ±lan: 10).
 
     Returns:
-        Ã–zet metin â€” tÃ¼m alt ajan sonuÃ§larÄ±nÄ±n okunabilir Ã¶zeti.
+        Ã–zet metin â€” tüm alt ajan sonuçlarÄ±nÄ±n okunabilir özeti.
     """
     try:
         # JSON parse
@@ -360,7 +360,7 @@ def delegate_task(
         if not isinstance(gorev_listesi, list):
             return "âŒ HATA: gorev_tanimlari bir JSON dizi olmalÄ±."
 
-        # Delegasyonu Ã§alÄ±ÅŸtÄ±r
+        # Delegasyonu çalÄ±ÅŸtÄ±r
         ds = _delegate_task_impl(
             gorev_listesi=gorev_listesi,
             baglam_genel=baglam_genel,
@@ -372,7 +372,7 @@ def delegate_task(
         return ds.ozet
 
     except json.JSONDecodeError as e:
-        return f"âŒ HATA: GeÃ§ersiz JSON formatÄ± â€” {e}"
+        return f"âŒ HATA: Geçersiz JSON formatÄ± â€” {e}"
     except Exception as e:
         logger.error("[delegate_task] Beklenmeyen hata: %s", e)
         logger.error(traceback.format_exc())
@@ -386,38 +386,38 @@ def motor_kaydet(motor) -> None:
     """Motor'a DELEGATE_TASK aracÄ±nÄ± kaydet.
 
     Bu fonksiyon, motor.py'nin _plugin_moduller_yukle() metodu tarafÄ±ndan
-    otomatik Ã§aÄŸrÄ±lÄ±r. Tool tanÄ±mÄ±nÄ± ve fonksiyonunu motor'a bildirir.
+    otomatik çaÄŸrÄ±lÄ±r. Tool tanÄ±mÄ±nÄ± ve fonksiyonunu motor'a bildirir.
     """
     motor._plugin_arac_kaydet(
         "DELEGATE_TASK",
         delegate_task,
         (
-            "Alt ajanlarÄ± paralel Ã§alÄ±ÅŸtÄ±rÄ±r. "
-            "Paralel alt-ajan sistemi: GÃ¶revleri ThreadPoolExecutor ile paralel Ã§alÄ±ÅŸtÄ±rÄ±r. "
-            "Her alt ajan kendi Beyin instance'Ä±nÄ± kullanÄ±r, ayrÄ± bir conversation baÄŸlamÄ±nda Ã§alÄ±ÅŸÄ±r. "
-            "TÃ¼m sonuÃ§lar toplanÄ±r ve Ã¶zetlenir.\n\n"
+            "Alt ajanlarÄ± paralel çalÄ±ÅŸtÄ±rÄ±r. "
+            "Paralel alt-ajan sistemi: Görevleri ThreadPoolExecutor ile paralel çalÄ±ÅŸtÄ±rÄ±r. "
+            "Her alt ajan kendi Beyin instance'Ä±nÄ± kullanÄ±r, ayrÄ± bir conversation baÄŸlamÄ±nda çalÄ±ÅŸÄ±r. "
+            "Tüm sonuçlar toplanÄ±r ve özetlenir.\n\n"
             "Parametreler:\n"
             "  gorev_tanimlari (str, ZORUNLU): JSON string. "
             'Her biri {"gorev": "...", "baglam": "..."} olan bir dizi.\n'
-            "  baglam_genel (str, opsiyonel): TÃ¼m alt gÃ¶revlere eklenecek genel baÄŸlam.\n"
-            "  max_paralel (int, opsiyonel): AynÄ± anda Ã§alÄ±ÅŸacak maksimum alt ajan sayÄ±sÄ± (varsayÄ±lan: 5).\n"
-            "  timeout (int, opsiyonel): Her alt gÃ¶rev iÃ§in maksimum sÃ¼re (varsayÄ±lan: 120s).\n"
-            "  max_adim (int, opsiyonel): Her alt gÃ¶rev iÃ§in maksimum adÄ±m (varsayÄ±lan: 10).\n\n"
+            "  baglam_genel (str, opsiyonel): Tüm alt görevlere eklenecek genel baÄŸlam.\n"
+            "  max_paralel (int, opsiyonel): AynÄ± anda çalÄ±ÅŸacak maksimum alt ajan sayÄ±sÄ± (varsayÄ±lan: 5).\n"
+            "  timeout (int, opsiyonel): Her alt görev için maksimum süre (varsayÄ±lan: 120s).\n"
+            "  max_adim (int, opsiyonel): Her alt görev için maksimum adÄ±m (varsayÄ±lan: 10).\n\n"
             "Ã–rnek:\n"
-            '  DELEGATE_TASK(\'[{"gorev":"DosyayÄ± oku ve Ã¶zetle","baglam":"test.py"},'
+            '  DELEGATE_TASK(\'[{"gorev":"DosyayÄ± oku ve özetle","baglam":"test.py"},'
             '{"gorev":"Web ara","baglam":"yapay zeka"}]\')'
         ),
     )
 
 
-# â”€â”€ DoÄŸrudan Ã§alÄ±ÅŸtÄ±rma testi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ DoÄŸrudan çalÄ±ÅŸtÄ±rma testi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     # Test: basit delegasyon
     test_gorevler = json.dumps(
         [
-            {"gorev": "Merhaba dÃ¼nya yaz", "baglam": ""},
-            {"gorev": "2+2 kaÃ§ eder?", "baglam": "matematik"},
+            {"gorev": "Merhaba dünya yaz", "baglam": ""},
+            {"gorev": "2+2 kaç eder?", "baglam": "matematik"},
         ]
     )
     sonuc = delegate_task(test_gorevler, max_paralel=2, timeout=30, max_adim=3)

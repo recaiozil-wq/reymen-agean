@@ -1,4 +1,4 @@
-﻿"""ReYMeNCLI mixin module â€” Browser management."""
+"""ReYMeNCLI mixin module â€” Browser management."""
 
 import logging
 import os

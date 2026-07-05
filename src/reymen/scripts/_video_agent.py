@@ -1,4 +1,4 @@
-﻿from once_hafiza import kaydet
+from once_hafiza import kaydet
 import sqlite3
 
 # GOREV 1: Video ajani mimarisi

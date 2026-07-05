@@ -5,6 +5,7 @@ import subprocess
 import sys
 from pyrogram import Client
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -89,8 +90,11 @@ def update_bot_py(bot_py_path: str, new_token: str):
 def restart_bot(bot_py_path: str):
     print("[5/6] Bot yeniden başlatılıyor...")
     bot_dir = os.path.dirname(bot_py_path)
+    reymen_python = Path(bot_dir).resolve().parents[2] / ".venv_reymen" / "Scripts" / "python.exe"
+    if not reymen_python.exists():
+        reymen_python = sys.executable
     subprocess.Popen(
-        ["python", bot_py_path],
+        [str(reymen_python), bot_py_path],
         cwd=bot_dir,
         creationflags=subprocess.CREATE_NEW_CONSOLE,
     )

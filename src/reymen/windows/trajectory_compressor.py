@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """trajectory_compressor.py â€” Gecmis Sikistirma.
 
 Uzun oturumlarda eski adimlari LLM'e ozetleterek context

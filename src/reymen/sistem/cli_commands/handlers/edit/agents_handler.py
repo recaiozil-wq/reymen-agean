@@ -1,4 +1,4 @@
-﻿"""_handle_agents_command handler."""
+"""_handle_agents_command handler."""
 
 from reymen.sistem.cli_display import _cprint
 

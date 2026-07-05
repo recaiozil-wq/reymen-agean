@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 STT Tool â€” Sesi metne cevirir (faster-whisper).
 ReYMeN icin native STT araci.
@@ -94,7 +94,7 @@ def sesi_metne_cevir(
         logger.info(
             "[STT] Transkripsiyon tamam: %d karakter, dil=%s",
             len(tam_metin),
-            bilä¿¡æ¯.language if hasattr(bilgi, "language") else dil,
+            bilgi.language if hasattr(bilgi, "language") else dil,
         )
         return tam_metin
 
@@ -121,7 +121,7 @@ def stt_durum() -> str:
     if _WHISPER_MODEL is not None:
         durum += "âœ… Model su an RAM'de (yuklu)"
     else:
-        durum += "â³ Model henuz yuklenmedi (ilk kullanimda yuklenecek)"
+        durum += "â³ Model henuz yuklenmedi (ilk kullanimda yuklenecek)"
 
     return durum
 

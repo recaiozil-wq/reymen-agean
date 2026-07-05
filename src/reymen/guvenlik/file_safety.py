@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """file_safety.py â€” Dosya Guvenlik Taramasi.
 
 Dosya yazma/okuma islemlerini guvenlik acisindan kontrol eder.

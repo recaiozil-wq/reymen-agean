@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 akilli_yonlendirici.py â€” Mixture-of-Experts Gorev Yonlendiricisi.
 

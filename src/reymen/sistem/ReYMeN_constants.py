@@ -1,4 +1,4 @@
-﻿"""Shared constants for ReYMeN Agent.
+"""Shared constants for ReYMeN Agent.
 
 Import-safe module with no dependencies â€” can be imported from anywhere
 without risk of circular imports.

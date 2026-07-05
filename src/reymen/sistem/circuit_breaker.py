@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """circuit_breaker.py â€” Circuit Breaker pattern (ReYMeN SOUL.md standardÄ±).
 
 5 ardisik hata â†’ circuit OPEN (30sn bekle) â†’ HALF_OPEN â†’ basarili cagri â†’ CLOSED.
@@ -44,7 +44,7 @@ class CircuitBreaker:
     def denetle(self) -> Optional[str]:
         """Circuit aciksa engel mesaji doner, aksi halde None.
 
-        OPEN durumunda BEKLEME_SURESI geÃ§tiyse otomatik HALF_OPEN'a gecer.
+        OPEN durumunda BEKLEME_SURESI geçtiyse otomatik HALF_OPEN'a gecer.
         """
         if self.durum == CircuitBreakerState.OPEN:
             gecen = time.time() - self.son_acilma

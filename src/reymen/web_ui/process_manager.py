@@ -1,4 +1,4 @@
-﻿"""âš™ï¸ GÃ¼venli process yÃ¶netimi â€” PID-based start/stop/restart."""
+"""âš™ï¸ Güvenli process yönetimi â€” PID-based start/stop/restart."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 
 
 class ProcessManager:
-    """PID-based process yÃ¶netimi. taskkill kullanmaz, sinyal gÃ¶nderir."""
+    """PID-based process yönetimi. taskkill kullanmaz, sinyal gönderir."""
 
     def __init__(self, pid_dir: Path | None = None) -> None:
         self.pid_dir = pid_dir or (PROJE_KOK / ".ReYMeN" / "pids")
@@ -50,7 +50,7 @@ class ProcessManager:
         self._durum_yolu(ad).write_text(json.dumps(durum, indent=2, ensure_ascii=False))
 
     def durum(self, ad: str) -> dict:
-        """Process durumunu dÃ¶ndÃ¼r."""
+        """Process durumunu döndür."""
         durum_yolu = self._durum_yolu(ad)
         pid_yolu = self._pid_yolu(ad)
 
@@ -89,7 +89,7 @@ class ProcessManager:
             try:
                 os.kill(pid, signal.SIGTERM)
                 if not force:
-                    # Graceful shutdown iÃ§in bekle
+                    # Graceful shutdown için bekle
                     for _ in range(10):
                         if not self._pid_calisiyor(pid):
                             break
@@ -105,7 +105,7 @@ class ProcessManager:
                                 timeout=5,
                             )
             except (OSError, subprocess.TimeoutExpired):
-                # Zaten Ã¶lmÃ¼ÅŸ
+                # Zaten ölmüÅŸ
                 logger.warning("[fix_01_sessiz_except] Exception")
         except (ValueError, OSError) as e:
             logger.warning("PID okunamadi: %s", e)
@@ -145,7 +145,7 @@ class ProcessManager:
             return False
 
     def tumu(self) -> list[dict]:
-        """TÃ¼m kayÄ±tlÄ± process'leri listele."""
+        """Tüm kayÄ±tlÄ± process'leri listele."""
         sonuclar = []
         for f in self.pid_dir.glob("*.pid"):
             ad = f.stem

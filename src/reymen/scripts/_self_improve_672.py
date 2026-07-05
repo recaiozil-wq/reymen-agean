@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Self-improvement meta-loop: 672 iterations (7 days Ã— 15 min)"""
 
 import sys, os, logging

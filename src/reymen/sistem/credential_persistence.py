@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """credential_persistence.py â€” Kimlik Kaliciligi.
 
 API anahtarlarini Windows Credential Manager veya

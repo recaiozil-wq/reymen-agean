@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 self_improve_scheduler.py â€” ReYMeN Autonomous Self-Improvement Scheduler.
 
@@ -68,7 +68,7 @@ class KendiniGelistirScheduler:
         return kayit
 
     def tumunu_calistir(self) -> dict:
-        """TÃ¼m self-improvement gÃ¶revlerini sÄ±rayla Ã§alÄ±ÅŸtÄ±r."""
+        """Tüm self-improvement görevlerini sÄ±rayla çalÄ±ÅŸtÄ±r."""
         log.info("[SELF_IMPROVE] === Tum gorevler baslatiliyor ===")
 
         # 1. Self-improve metrik toplama
@@ -96,7 +96,7 @@ class KendiniGelistirScheduler:
         return self.sonuc
 
     def _hafiza_budama_cagir(self) -> str:
-        """HafÄ±za budamayÄ± Ã§alÄ±ÅŸtÄ±rÄ±r."""
+        """HafÄ±za budamayÄ± çalÄ±ÅŸtÄ±rÄ±r."""
         import importlib
 
         try:
@@ -123,7 +123,7 @@ class KendiniGelistirScheduler:
             return f"[HATA] {e}"
 
     def _si_cron_cagir(self) -> str:
-        """Self-improve cron metriklerini Ã§alÄ±ÅŸtÄ±rÄ±r."""
+        """Self-improve cron metriklerini çalÄ±ÅŸtÄ±rÄ±r."""
         import subprocess
 
         r = subprocess.run(
@@ -137,7 +137,7 @@ class KendiniGelistirScheduler:
         return r.stdout[:200] or r.stderr[:200] or "tamam"
 
     def _skill_iyilestir_cagir(self) -> str:
-        """Skill iyileÅŸtirme sistemini Ã§alÄ±ÅŸtÄ±rÄ±r."""
+        """Skill iyileÅŸtirme sistemini çalÄ±ÅŸtÄ±rÄ±r."""
         from reymen.scripts.skill_iyilestirici import SkillIyilestirici
 
         iyilestirici = SkillIyilestirici()
@@ -152,7 +152,7 @@ class KendiniGelistirScheduler:
         return "Iyilestirme adayi bulunamadi"
 
     def _auto_budama_cagir(self) -> str:
-        """Kod budama sistemini Ã§alÄ±ÅŸtÄ±rÄ±r."""
+        """Kod budama sistemini çalÄ±ÅŸtÄ±rÄ±r."""
         try:
             from reymen.cereyan.auto_budama import AutoBudama
 
@@ -200,12 +200,12 @@ class KendiniGelistirScheduler:
             )
 
     def durum_goster(self) -> str:
-        """KayÄ±tlÄ± durumu gÃ¶ster."""
+        """KayÄ±tlÄ± durumu göster."""
         if not DURUM_DOSYASI.exists():
-            return "HenÃ¼z Ã§alÄ±ÅŸtÄ±rÄ±lmamÄ±ÅŸ."
+            return "Henüz çalÄ±ÅŸtÄ±rÄ±lmamÄ±ÅŸ."
         with open(DURUM_DOSYASI, "r", encoding="utf-8") as f:
             data = json.load(f)
-        lines = [f"Son gÃ¼ncelleme: {data.get('son_guncelleme', '?')}"]
+        lines = [f"Son güncelleme: {data.get('son_guncelleme', '?')}"]
         for ad, kayit in data.get("gorevler", {}).items():
             durum = "âœ…" if kayit.get("basarili") else "âŒ"
             lines.append(

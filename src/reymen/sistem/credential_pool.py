@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """credential_pool.py â€” Kimlik Havuzu.
 
 Birden fazla kaynaktan (env, dosya, Windows Credential Manager)

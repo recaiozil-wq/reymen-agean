@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 web_search_engine.py â€” Ã‡ok back-end'li web arama motoru (ABC tabanlÄ±).
 
@@ -6,19 +6,19 @@ WebSearchEngine ABC:
   - Soyut calistir(sorgu, max_sonuc) â†’ str
 
 Engine'ler:
-  - DuckDuckGoEngine  â€” duckduckgo-search kÃ¼tÃ¼phanesi (Ã¶ncelikli) / DDG Lite HTML (fallback)
+  - DuckDuckGoEngine  â€” duckduckgo-search kütüphanesi (öncelikli) / DDG Lite HTML (fallback)
   - GoogleEngine      â€” stub (GOOGLE_API_KEY gerektirir, NotImplementedError)
   - BingEngine        â€” stub (BING_API_KEY gerektirir, NotImplementedError)
   - FirecrawlEngine   â€” Firecrawl API (FIRECRAWL_API_KEY)
   - BraveSearchEngine â€” Brave Search API (BRAVE_API_KEY)
-  - SearXNGEngine     â€” SearXNG Ã¶rnek (SEARXNG_URL)
+  - SearXNGEngine     â€” SearXNG örnek (SEARXNG_URL)
   - ExaEngine         â€” Exa API (EXA_API_KEY)
 
 WebSearchRegistry:
-  - engine kaydet / seÃ§ (ad ile) / calistir (engine adÄ± + sorgu ile)
-  - Auto-detect: env var'larÄ±na gÃ¶re hangi engine'lerin hazÄ±r olduÄŸunu belirler
-  - Config backend seÃ§imi: config'de web.backend veya web.search_backend varsa o engine kullanÄ±lÄ±r
-  - VarsayÄ±lan engine: duckduckgo (her zaman Ã§alÄ±ÅŸÄ±r)
+  - engine kaydet / seç (ad ile) / calistir (engine adÄ± + sorgu ile)
+  - Auto-detect: env var'larÄ±na göre hangi engine'lerin hazÄ±r olduÄŸunu belirler
+  - Config backend seçimi: config'de web.backend veya web.search_backend varsa o engine kullanÄ±lÄ±r
+  - VarsayÄ±lan engine: duckduckgo (her zaman çalÄ±ÅŸÄ±r)
 
 Motor tool:
   WEB_ARAMA(sorgu, backend="duckduckgo") â†’ str
@@ -78,16 +78,16 @@ def _http_post_json(
 
 
 class WebSearchEngine(ABC):
-    """TÃ¼m web arama engine'leri iÃ§in soyut taban sÄ±nÄ±fÄ±."""
+    """Tüm web arama engine'leri için soyut taban sÄ±nÄ±fÄ±."""
 
     @property
     @abstractmethod
     def ad(self) -> str:
-        """Engine'in benzersiz adÄ± (kÃ¼Ã§Ã¼k harf)."""
+        """Engine'in benzersiz adÄ± (küçük harf)."""
 
     @abstractmethod
     def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
-        """Web aramasÄ± yap, formatlÄ± metin dÃ¶ndÃ¼r."""
+        """Web aramasÄ± yap, formatlÄ± metin döndür."""
         ...
 
     def __init__(self) -> None:
@@ -103,12 +103,12 @@ class WebSearchEngine(ABC):
         return self._hazir
 
     def hazir_degilse_hata(self) -> Optional[str]:
-        """Engine hazÄ±r deÄŸilse aÃ§Ä±klayÄ±cÄ± hata mesajÄ± dÃ¶ndÃ¼r, yoksa None."""
+        """Engine hazÄ±r deÄŸilse açÄ±klayÄ±cÄ± hata mesajÄ± döndür, yoksa None."""
         return None
 
     @staticmethod
     def _sonuc_formatla(results: list, kaynak: str) -> str:
-        """SonuÃ§larÄ± formatla â€” tÃ¼m engine'ler ortak kullanÄ±r."""
+        """SonuçlarÄ± formatla â€” tüm engine'ler ortak kullanÄ±r."""
         if not results:
             return ""
         satirlar = [f"[Web Arama â€” {kaynak}]:", "=" * 50]
@@ -132,7 +132,7 @@ class WebSearchEngine(ABC):
 class DuckDuckGoEngine(WebSearchEngine):
     """DuckDuckGo arama engine'i. API key gerekmez.
 
-    Ã–ncelik: duckduckgo-search kÃ¼tÃ¼phanesi
+    Ã–ncelik: duckduckgo-search kütüphanesi
     Fallback: DDG Lite HTML scraping
     """
 
@@ -141,7 +141,7 @@ class DuckDuckGoEngine(WebSearchEngine):
         return "duckduckgo"
 
     def _bagimliliklari_kontrol_et(self) -> bool:
-        # duckduckgo-search isteÄŸe baÄŸlÄ± â€” hiÃ§biri yoksa Lite HTML fallback Ã§alÄ±ÅŸÄ±r
+        # duckduckgo-search isteÄŸe baÄŸlÄ± â€” hiçbiri yoksa Lite HTML fallback çalÄ±ÅŸÄ±r
         return True
 
     def _ddgs_library_ara(self, sorgu: str, max_sonuc: int = 5) -> Optional[list[dict]]:
@@ -266,7 +266,7 @@ class GoogleEngine(WebSearchEngine):
                 "GoogleEngine: GOOGLE_API_KEY ve GOOGLE_CX ortam deÄŸiÅŸkenleri gerekli."
             )
         raise NotImplementedError(
-            "GoogleEngine henÃ¼z implemente edilmedi. "
+            "GoogleEngine henüz implemente edilmedi. "
             "GOOGLE_API_KEY ve GOOGLE_CX ayarlandÄ± ancak HTTP istemcisi eksik."
         )
 
@@ -297,7 +297,7 @@ class BingEngine(WebSearchEngine):
                 "BingEngine: BING_API_KEY ortam deÄŸiÅŸkeni gerekli."
             )
         raise NotImplementedError(
-            "BingEngine henÃ¼z implemente edilmedi. "
+            "BingEngine henüz implemente edilmedi. "
             "BING_API_KEY ayarlandÄ± ancak HTTP istemcisi eksik."
         )
 
@@ -351,14 +351,14 @@ class FirecrawlEngine(WebSearchEngine):
                 ]
                 if formatted:
                     return self._sonuc_formatla(formatted, "Firecrawl")
-                return f"[FIRECRAWL] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
+                return f"[FIRECRAWL] '{sorgu}' için sonuç bulunamadÄ±."
             hata = sonuc.get("error", "Bilinmeyen hata")
             return f"[FIRECRAWL] Arama baÅŸarÄ±sÄ±z: {hata}"
         except urllib.error.HTTPError as e:
             if e.code == 401:
                 return "[FIRECRAWL] Kimlik doÄŸrulama hatasÄ±. FIRECRAWL_API_KEY kontrol edin."
             elif e.code == 402:
-                return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yÃ¼kleyin."
+                return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yükleyin."
             elif e.code == 429:
                 return "[FIRECRAWL] Rate limit aÅŸÄ±ldÄ±. Daha sonra tekrar deneyin."
             return f"[FIRECRAWL] HTTP {e.code}: {e.reason}"
@@ -425,7 +425,7 @@ class BraveSearchEngine(WebSearchEngine):
             ]
             if formatted:
                 return self._sonuc_formatla(formatted, "Brave Search")
-            return f"[BRAVE] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
+            return f"[BRAVE] '{sorgu}' için sonuç bulunamadÄ±."
         except Exception as e:
             log.exception("[BraveSearchEngine] arama hatasi:")
             return f"[BRAVE] Hata: {e}"
@@ -439,11 +439,11 @@ class BraveSearchEngine(WebSearchEngine):
 class SearXNGEngine(WebSearchEngine):
     """SearXNG (kendi instance) ile web aramasÄ±. SEARXNG_URL gerekli.
 
-    SearXNG instance'Ä±nÄ±n /search endpoint'ine JSON formatÄ±nda sorgu gÃ¶nderir.
-    EÄŸer SEARXNG_URL ayarlanmamÄ±ÅŸsa, herkese aÃ§Ä±k instance'larÄ± dener.
+    SearXNG instance'Ä±nÄ±n /search endpoint'ine JSON formatÄ±nda sorgu gönderir.
+    EÄŸer SEARXNG_URL ayarlanmamÄ±ÅŸsa, herkese açÄ±k instance'larÄ± dener.
     """
 
-    # Herkese aÃ§Ä±k SearXNG instance'larÄ± (son Ã§are fallback)
+    # Herkese açÄ±k SearXNG instance'larÄ± (son çare fallback)
     PUBLIC_INSTANCES = [
         "https://searx.be",
         "https://search.sapti.me",
@@ -518,7 +518,7 @@ class SearXNGEngine(WebSearchEngine):
 class ExaEngine(WebSearchEngine):
     """Exa API ile web aramasÄ±. EXA_API_KEY gerekli.
 
-    https://api.exa.ai/search endpoint'ine POST JSON sorgu gÃ¶nderir.
+    https://api.exa.ai/search endpoint'ine POST JSON sorgu gönderir.
     """
 
     @property
@@ -559,7 +559,7 @@ class ExaEngine(WebSearchEngine):
             ]
             if formatted:
                 return self._sonuc_formatla(formatted, "Exa")
-            return f"[EXA] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
+            return f"[EXA] '{sorgu}' için sonuç bulunamadÄ±."
         except urllib.error.HTTPError as e:
             if e.code == 401:
                 return "[EXA] Kimlik doÄŸrulama hatasÄ±. EXA_API_KEY kontrol edin."
@@ -579,8 +579,8 @@ class ExaEngine(WebSearchEngine):
 class SearchDispatcher:
     """Multi-backend web arama dispatcher'Ä±.
 
-    TÃ¼m engine'leri registry'de tutar, config ve env var'larÄ±na gÃ¶re
-    default engine'i seÃ§er.
+    Tüm engine'leri registry'de tutar, config ve env var'larÄ±na göre
+    default engine'i seçer.
 
     KullanÄ±m:
         dispatcher = SearchDispatcher(config=my_config)
@@ -603,7 +603,7 @@ class SearchDispatcher:
         log.info("[SearchDispatcher] Engine kaydedildi: %s", adi)
 
     def _resolve_backend_from_config(self) -> Optional[str]:
-        """Config'den backend seÃ§imini Ã§Ã¶zÃ¼mle.
+        """Config'den backend seçimini çözümle.
 
         Ã–ncelik sÄ±rasÄ±:
           1. web.search_backend (per-capability override)
@@ -650,7 +650,7 @@ class SearchDispatcher:
         return "duckduckgo"
 
     def _sec_varsayilan(self) -> Optional[WebSearchEngine]:
-        """Config'den veya auto-detect'ten varsayÄ±lan engine'i seÃ§."""
+        """Config'den veya auto-detect'ten varsayÄ±lan engine'i seç."""
         config_backend = self._resolve_backend_from_config()
         if config_backend and config_backend in self._engines:
             eng = self._engines[config_backend]
@@ -663,7 +663,7 @@ class SearchDispatcher:
         return self._engines.get("duckduckgo")
 
     def sec(self, ad: str) -> Optional[WebSearchEngine]:
-        """Ada gÃ¶re engine seÃ§. VarsayÄ±lana dÃ¼ÅŸ."""
+        """Ada göre engine seç. VarsayÄ±lana düÅŸ."""
         eng = self._engines.get(ad)
         if eng is None and self._varsayilan:
             log.warning(
@@ -689,10 +689,10 @@ class SearchDispatcher:
         Args:
             sorgu: Arama sorgusu.
             engine: KullanÄ±lacak engine adÄ± (None veya "auto" = config'deki default).
-            max_sonuc: Maksimum sonuÃ§ sayÄ±sÄ±.
+            max_sonuc: Maksimum sonuç sayÄ±sÄ±.
 
         Returns:
-            FormatlÄ± arama sonuÃ§larÄ± veya hata mesajÄ±.
+            FormatlÄ± arama sonuçlarÄ± veya hata mesajÄ±.
         """
         if not engine or engine == "auto":
             eng = self._sec_varsayilan()
@@ -740,7 +740,7 @@ class SearchDispatcher:
 
 
 class WebSearchRegistry(SearchDispatcher):
-    """Geriye uyumluluk iÃ§in eski isim. Yeni kod SearchDispatcher kullanmalÄ±."""
+    """Geriye uyumluluk için eski isim. Yeni kod SearchDispatcher kullanmalÄ±."""
 
     pass
 
@@ -751,11 +751,11 @@ _dispatcher: Optional[SearchDispatcher] = None
 
 
 def _load_config_for_registry() -> dict:
-    """Config dosyasÄ±nÄ± oku â€” varsa web.backend/web.search_backend iÃ§in.
+    """Config dosyasÄ±nÄ± oku â€” varsa web.backend/web.search_backend için.
 
     Ã–ncelik sÄ±rasÄ±:
       1. reymen_cli.config / ReYMeN_cli.config (CLI yapÄ±landÄ±rmasÄ±)
-      2. Proje kÃ¶kÃ¼ndeki config.yaml (doÄŸrudan YAML okuma)
+      2. Proje kökündeki config.yaml (doÄŸrudan YAML okuma)
       3. .ReYMeN/config.yaml (ikincil config)
     """
     # 1. CLI config
@@ -780,7 +780,7 @@ def _load_config_for_registry() -> dict:
             "[SessizExcept] %s: %s", type(_e).__name__, _e
         )
 
-    # 2. Proje kÃ¶kÃ¼ config.yaml
+    # 2. Proje kökü config.yaml
     import yaml
 
     for cfg_yolu in [
@@ -829,7 +829,7 @@ def _get_registry() -> SearchDispatcher:
 
 
 def reset_registry() -> None:
-    """Dispatcher'i sÄ±fÄ±rla (test / yeniden yapÄ±landÄ±rma iÃ§in)."""
+    """Dispatcher'i sÄ±fÄ±rla (test / yeniden yapÄ±landÄ±rma için)."""
     global _dispatcher
     _dispatcher = None
 
@@ -840,13 +840,13 @@ def reset_registry() -> None:
 
 
 def web_arama(sorgu: str, backend: str = "duckduckgo", max_sonuc: int = 5) -> str:
-    """WEB_ARAMA tool'u â€” backend parametresi ile Ã§oklu arama motoru.
+    """WEB_ARAMA tool'u â€” backend parametresi ile çoklu arama motoru.
 
     Args:
         sorgu: Arama sorgusu.
         backend: Kullanilacak engine adi (duckduckgo, google, bing,
                  firecrawl, brave, searxng, exa, auto).
-                 "auto" veya boÅŸ: config/auto-detect ile en iyi engine seÃ§ilir.
+                 "auto" veya boÅŸ: config/auto-detect ile en iyi engine seçilir.
         max_sonuc: Maksimum sonuc sayisi.
 
     Returns:
@@ -907,7 +907,7 @@ def _web_arama_ayristir_ve_calistir(ham: str) -> str:
     if b_match:
         backend = b_match.group(1)
     if not sorgu:
-        # Fallback: tÃ¼m string'i sorgu olarak al
+        # Fallback: tüm string'i sorgu olarak al
         sorgu = ham.strip().strip('"').strip("'")
     return web_arama(sorgu, backend)
 

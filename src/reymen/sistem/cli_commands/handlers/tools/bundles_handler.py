@@ -1,4 +1,4 @@
-﻿"""_handle_bundles_command handler."""
+"""_handle_bundles_command handler."""
 
 
 def _handle_bundles_command(cli, cmd: str) -> None:

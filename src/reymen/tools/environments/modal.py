@@ -1,4 +1,4 @@
-﻿"""ReYMeN tools.environments.modal shim â€” ReYMeN Modal ortamÄ±nÄ± yÃ¶nlendirir."""
+"""ReYMeN tools.environments.modal shim â€” ReYMeN Modal ortamÄ±nÄ± yönlendirir."""
 
 from __future__ import annotations
 

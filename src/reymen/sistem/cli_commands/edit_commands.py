@@ -1,7 +1,7 @@
-﻿"""DÃ¼zenleme komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
+"""Düzenleme komutlarÄ± â€” MixinCommands alt modülü.
 
 Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
-MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± içerir.
 """
 
 import logging
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """DÃ¼zenleme komutlarÄ±."""
+    """Düzenleme komutlarÄ±."""
 
     def _handle_rollback_command(self, command: str):
         """Handle /rollback â€” list, diff, or restore filesystem checkpoints.

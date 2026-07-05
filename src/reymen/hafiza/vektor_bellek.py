@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 vektor_bellek.py â€” VektorBellek: Embedding + semantic search.
 
@@ -27,8 +27,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# â”€â”€ ChromaDB (LAZY import â€” modÃ¼l seviyesinde degil, ilk kullanimda yuklenir)
-# Agir bagimliliklari (torch vb.) nedeniyle modÃ¼l seviyesinde import edilmez.
+# â”€â”€ ChromaDB (LAZY import â€” modül seviyesinde degil, ilk kullanimda yuklenir)
+# Agir bagimliliklari (torch vb.) nedeniyle modül seviyesinde import edilmez.
 CHROMA_MEVCUT = None
 SENTENCE_TRANSFORMERS_MEVCUT = None
 

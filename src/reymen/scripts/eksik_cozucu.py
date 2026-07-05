@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """eksik_cozucu.py â€” ReYMeN 3 eksigi otomatik cozer.
 
 Yaptigi isler:
